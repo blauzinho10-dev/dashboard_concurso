@@ -377,11 +377,14 @@ function renderRevisions(){
     ${faixa21_30 > 0 ? `<div class="alert warning">⚠️ ${faixa21_30} tópico(s) entre 21-30 dias sem revisão. Agende esta semana.</div>` : ''}
     ${faixa30plus === 0 && faixa21_30 === 0 ? `<div class="alert success">✅ Nenhum tópico crítico! Maioria das revisões em dia.</div>` : ''}
   `;
-
-  // Tabela com faixas coloridas
-  document.querySelector('#revisionTable thead').innerHTML = `<tr><th>Matéria</th><th>Bloco</th><th>Tópico</th><th>Último</th><th>Dias</th><th>Faixa</th><th>Ação</th></tr>`;
+   // Tabela com faixas coloridas + últimos estudados
+  document.querySelector('#revisionTable thead').innerHTML = `
+    <tr>
+      <th>Matéria</th><th>Bloco</th><th>Tópico</th><th>Último Estudo</th><th>Dias</th><th>Faixa</th><th>Ação</th>
+    </tr>`;
   
-  document.querySelector('#revisionTable tbody').innerHTML = revItems.slice(0, 60).map(r => {
+  // Ordenação: mais atrasado primeiro (30+ dias) → mais recente (0-5 dias)
+  document.querySelector('#revisionTable tbody').innerHTML = revItems.slice(0, 80).map(r => {
     let corDias, badgeClass, faixaLabel, acaoLabel;
     if (r.daysSince <= 5) {
       corDias = '#10b981'; badgeClass = 'badge-green'; faixaLabel = '🟢 0-5d'; acaoLabel = 'Em dia';
@@ -403,7 +406,12 @@ function renderRevisions(){
       <td><span style="font-size:.65rem">${faixaLabel}</span></td>
       <td><span class="badge ${badgeClass}">${acaoLabel}</span></td>
     </tr>`;
-  }).join('');
+  }).join('') + `
+    <tr><td colspan="7" style="text-align:center;color:#64748b;padding:15px;font-size:.7rem">
+      📊 <strong>${revItems.length}</strong> tópicos monitorados | 
+      🟢 <strong>${faixa0_5}</strong> em dia | 
+      🔴 <strong>${faixa30plus}</strong> urgentes
+    </td></tr>`;
 }
 
 // Init
