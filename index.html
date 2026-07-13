@@ -521,37 +521,51 @@ function renderAll() {
   const totalE = painel.reduce((s, m) => s + m.estudados, 0);
   const totalP = painel.reduce((s, m) => s + m.pendentes, 0);
   const horas  = estudos.reduce((s, e) => s + e.tempo, 0);
-  const qE     = estudos.reduce((s, e) => s + e.questoes, 0);
-  const aE     = estudos.reduce((s, e) => s + e.acertos, 0);
-  const qD     = desempenho.reduce((s, d) => s + d.questoes, 0);
-  const aD     = desempenho.reduce((s, d) => s + d.acertos, 0);
-  const eD     = desempenho.reduce((s, d) => s + d.erros, 0);
+  
+  // Questões e acertos dos estudos (novos, a partir de 03/07/2026)
+  const qE = estudos.reduce((s, e) => s + e.questoes, 0);
+  const aE = estudos.reduce((s, e) => s + e.acertos, 0);
+  
+  // Questões e acertos do desempenho (histórico, até 03/03/2026)
+  const qD = desempenho.reduce((s, d) => s + d.questoes, 0);
+  const aD = desempenho.reduce((s, d) => s + d.acertos, 0);
+  const eD = desempenho.reduce((s, d) => s + d.erros, 0);
+  
+  // TOTAL CONSOLIDADO = Histórico + Novo
+  const qTotal = qD + qE;
+  const aTotal = aD + aE;
+  const eTotal = eD + (qE - aE);
+  const taxaTotal = qTotal ? aTotal / qTotal : 0;
 
   // ── KPIs Overview ──
   document.getElementById('kpiOverview').innerHTML = `
     <div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Cobertura Geral</div><div class="kpi-value">${fmtPct(totalT ? totalE/totalT : 0)}</div><div class="kpi-sub">${totalE}/${totalT} tópicos</div></div>
     <div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Total de Horas</div><div class="kpi-value">${fmtHDec(horas)}</div><div class="kpi-sub">${estudos.length} sessões</div></div>
-    <div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Taxa Desempenho</div><div class="kpi-value">${fmtPct(qD ? aD/qD : 0)}</div><div class="kpi-sub">${qD} questões</div></div>
+    <div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Taxa Geral</div><div class="kpi-value">${fmtPct(taxaTotal)}</div><div class="kpi-sub">${qTotal.toLocaleString('pt-BR')} questões totais</div></div>
     <div class="kpi" style="border-top:3px solid #ef4444"><div class="kpi-label">Pendentes</div><div class="kpi-value">${totalP}</div><div class="kpi-sub">tópicos</div></div>
     <div class="kpi" style="border-top:3px solid #8b5cf6"><div class="kpi-label">Questões Estudos</div><div class="kpi-value">${qE}</div><div class="kpi-sub">Taxa: ${fmtPct(qE ? aE/qE : 0)}</div></div>
-    <div class="kpi" style="border-top:3px solid #06b6d4"><div class="kpi-label">Erros</div><div class="kpi-value">${eD}</div><div class="kpi-sub">no desempenho</div></div>
+    <div class="kpi" style="border-top:3px solid #06b6d4"><div class="kpi-label">Erros Totais</div><div class="kpi-value">${eTotal}</div><div class="kpi-sub">em ${qTotal} questões</div></div>
   `;
 
   // ── Charts Overview ──
   const sortedP = [...painel].sort((a, b) => b.pct - a.pct);
-  charts.c1 = new Chart(document.getElementById('chartProgress').getContext('2d'), {
-    type: 'bar',
-    data: { labels: sortedP.map(m => m.materia), datasets: [{ data: sortedP.map(m => +(m.pct*100).toFixed(1)), backgroundColor: sortedP.map(m => m.pct >= 0.8 ? '#10b981' : m.pct >= 0.5 ? '#f59e0b' : '#ef4444'), borderRadius: 4 }] },
-    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, layout: { padding: { right: 35 } }, plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'right', color: '#fff', font: { size: 10, weight: 'bold' }, formatter: v => v + '%' } }, scales: { x: { max: 100, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } }, y: { grid: { display: false }, ticks: { color: '#cbd5e1', font: { size: 10 } } } } }
-  });
+  if (sortedP.length > 0) {
+    charts.c1 = new Chart(document.getElementById('chartProgress').getContext('2d'), {
+      type: 'bar',
+      data: { labels: sortedP.map(m => m.materia), datasets: [{ data: sortedP.map(m => +(m.pct*100).toFixed(1)), backgroundColor: sortedP.map(m => m.pct >= 0.8 ? '#10b981' : m.pct >= 0.5 ? '#f59e0b' : '#ef4444'), borderRadius: 4 }] },
+      options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, layout: { padding: { right: 35 } }, plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'right', color: '#fff', font: { size: 10, weight: 'bold' }, formatter: v => v + '%' } }, scales: { x: { max: 100, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } }, y: { grid: { display: false }, ticks: { color: '#cbd5e1', font: { size: 10 } } } } }
+    });
+  }
 
-  charts.c2 = new Chart(document.getElementById('chartRadar').getContext('2d'), {
-    type: 'radar',
-    data: { labels: painel.map(m => m.materia.substring(0, 18)), datasets: [{ label: 'Cobertura', data: painel.map(m => +(m.pct*100).toFixed(1)), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.2)' }, { label: 'Meta 80%', data: painel.map(() => 80), borderColor: 'rgba(245,158,11,0.5)', borderDash: [5,5], pointRadius: 0 }] },
-    options: { responsive: true, maintainAspectRatio: false, scales: { r: { max: 100, grid: { color: '#334155' }, ticks: { display: false }, pointLabels: { color: '#cbd5e1', font: { size: 10 } } } }, plugins: { legend: { labels: { color: '#ffffff' } }, datalabels: { display: false } } }
-  });
+  if (painel.length > 0) {
+    charts.c2 = new Chart(document.getElementById('chartRadar').getContext('2d'), {
+      type: 'radar',
+      data: { labels: painel.map(m => m.materia.substring(0, 18)), datasets: [{ label: 'Cobertura', data: painel.map(m => +(m.pct*100).toFixed(1)), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.2)' }, { label: 'Meta 80%', data: painel.map(() => 80), borderColor: 'rgba(245,158,11,0.5)', borderDash: [5,5], pointRadius: 0 }] },
+      options: { responsive: true, maintainAspectRatio: false, scales: { r: { max: 100, grid: { color: '#334155' }, ticks: { display: false }, pointLabels: { color: '#cbd5e1', font: { size: 10 } } } }, plugins: { legend: { labels: { color: '#ffffff' } }, datalabels: { display: false } } }
+    });
+  }
 
-  // FIX: Horas por matéria — agora sempre renderiza se houver estudos
+  // Horas por matéria
   const hByM = {};
   estudos.forEach(e => { hByM[e.materia] = (hByM[e.materia] || 0) + e.tempo; });
   const hEntries = Object.entries(hByM).sort((a, b) => b[1] - a[1]);
@@ -562,9 +576,11 @@ function renderAll() {
       options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, layout: { padding: { right: 35 } }, plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'right', color: '#fff', font: { size: 10, weight: 'bold' }, formatter: v => v + 'h' } }, scales: { x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } }, y: { grid: { display: false }, ticks: { color: '#cbd5e1', font: { size: 10 } } } } }
     });
   } else {
-    document.getElementById('chartHours').parentElement.innerHTML = '<div class="empty-state">Nenhuma sessão registrada ainda.</div>';
+    const chartHoursEl = document.getElementById('chartHours');
+    if (chartHoursEl) chartHoursEl.parentElement.innerHTML = '<div class="empty-state">Nenhuma sessão registrada ainda.</div>';
   }
 
+  // Doughnut
   charts.c4 = new Chart(document.getElementById('chartDoughnut').getContext('2d'), {
     type: 'doughnut',
     data: { labels: ['Estudados', 'Pendentes'], datasets: [{ data: [totalE, totalP], backgroundColor: ['#3b82f6', '#ef4444'] }] },
@@ -575,12 +591,13 @@ function renderAll() {
   const best = desempenho.filter(d => d.questoes >= 5).sort((a, b) => b.pct - a.pct)[0];
   const worst = desempenho.filter(d => d.questoes >= 5).sort((a, b) => a.pct - b.pct)[0];
   document.getElementById('kpiPerf').innerHTML = `
-    <div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Total Questões</div><div class="kpi-value">${qD}</div></div>
-    <div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Taxa Geral</div><div class="kpi-value">${fmtPct(qD ? aD/qD : 0)}</div></div>
+    <div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Total Questões</div><div class="kpi-value">${qTotal.toLocaleString('pt-BR')}</div><div class="kpi-sub">${qD} históricas + ${qE} estudos</div></div>
+    <div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Taxa Geral</div><div class="kpi-value">${fmtPct(taxaTotal)}</div></div>
     <div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Melhor</div><div class="kpi-value" style="font-size:1rem;">${best ? best.materia.substring(0,18) : '—'}</div>${best ? `<div class="kpi-sub">${fmtPct(best.pct)}</div>` : ''}</div>
     <div class="kpi" style="border-top:3px solid #ef4444"><div class="kpi-label">Precisa Atenção</div><div class="kpi-value" style="font-size:1rem;">${worst ? worst.materia.substring(0,18) : '—'}</div>${worst ? `<div class="kpi-sub">${fmtPct(worst.pct)}</div>` : ''}</div>
   `;
 
+  // Gráficos de desempenho
   const filtPerf = desempenho.filter(d => d.questoes >= 5).sort((a, b) => b.pct - a.pct);
   if (filtPerf.length > 0) {
     charts.c5 = new Chart(document.getElementById('chartAccuracy').getContext('2d'), {
@@ -597,15 +614,34 @@ function renderAll() {
     });
   }
 
+  // Tabela de desempenho (mostra os históricos + totais dos estudos)
   document.querySelector('#perfTable tbody').innerHTML = desempenho.map(d => {
     const bc = d.pct >= 0.7 ? 'badge-green' : d.pct >= 0.6 ? 'badge-amber' : 'badge-red';
     return `<tr><td>${d.materia}</td><td>${d.questoes}</td><td>${d.acertos}</td><td>${d.erros}</td><td>${fmtPct(d.pct)}</td><td><span class="badge ${bc}">${d.pct >= 0.7 ? 'Bom' : d.pct >= 0.6 ? 'Regular' : 'Crítico'}</span></td></tr>`;
-  }).join('');
+  }).join('') + `
+    <tr style="background:rgba(59,130,246,0.1);font-weight:bold;">
+      <td>📝 Estudos (novo)</td>
+      <td>${qE}</td>
+      <td>${aE}</td>
+      <td>${qE - aE}</td>
+      <td>${fmtPct(qE ? aE/qE : 0)}</td>
+      <td><span class="badge badge-blue">Atual</span></td>
+    </tr>
+    <tr style="background:rgba(16,185,129,0.1);font-weight:bold;">
+      <td>📊 TOTAL CONSOLIDADO</td>
+      <td>${qTotal}</td>
+      <td>${aTotal}</td>
+      <td>${eTotal}</td>
+      <td>${fmtPct(taxaTotal)}</td>
+      <td><span class="badge badge-green">Total</span></td>
+    </tr>
+  `;
 
   // ── Preenche selects de filtros ──
   const materias = [...new Set(estudos.map(e => e.materia))].sort();
   ['filterSubject', 'filterTopicMateria', 'evolMateria', 'evolMateriaAcerto'].forEach(id => {
     const el = document.getElementById(id);
+    if (!el) return;
     const val = el.value;
     el.innerHTML = '<option value="all">Todas as Matérias</option>' + materias.map(m => `<option value="${m}">${m}</option>`).join('');
     if (val && val !== 'all') el.value = val;
@@ -637,7 +673,7 @@ function renderAll() {
     return `<tr><td>${r.materia}</td><td>${r.bloco}</td><td>${r.topico.substring(0,40)}</td><td>${r.dataStr.split('-').reverse().join('/')}</td><td class="${urgClass}">${r.daysSince}d</td><td><span class="badge ${badgeClass}">${label}</span></td></tr>`;
   }).join('');
 
-  // ── Renderiza abas com estado ──
+  // ── Renderiza abas ──
   renderMetas();
   renderSubjects();
   renderTopics();
