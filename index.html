@@ -313,10 +313,97 @@ function renderMetas(){
 
 // Revisions no loadData
 function renderRevisions(){
-  const hoje=new Date(),topicLast={};estudos.forEach(e=>{const k=e.materia+'|||'+e.bloco+'|||'+e.topico;if(!topicLast[k]||e.data>topicLast[k].data)topicLast[k]=e});
-  const revItems=Object.values(topicLast).map(e=>{const ds=Math.floor((hoje-e.data)/(1000*60*60*24));return{...e,daysSince:ds,urgency:ds>=30?'overdue':ds>=14?'warning':'ok'}}).sort((a,b)=>b.daysSince-a.daysSince);
-  document.getElementById('revisionAlerts').innerHTML=(revItems.filter(r=>r.daysSince>=30).length>0?`<div class="alert danger">🔴 ${revItems.filter(r=>r.daysSince>=30).length} tópicos sem revisão há 30+ dias!</div>`:'')+(revItems.filter(r=>r.daysSince>=14&&r.daysSince<30).length>0?`<div class="alert warning">🟡 ${revItems.filter(r=>r.daysSince>=14&&r.daysSince<30).length} tópicos sem revisão há 14-30 dias.</div>`:'')+(revItems.filter(r=>r.daysSince>=30).length===0&&revItems.filter(r=>r.daysSince>=14).length===0?'<div class="alert success">✅ Revisões em dia!</div>':'');
-  document.querySelector('#revisionTable tbody').innerHTML=revItems.slice(0,50).map(r=>{const uc=r.urgency==='overdue'?'rev-overdue':r.urgency==='warning'?'rev-warning':'rev-ok',bc=r.urgency==='overdue'?'badge-red':r.urgency==='warning'?'badge-amber':'badge-green',lb=r.urgency==='overdue'?'URGENTE':r.urgency==='warning'?'Atenção':'OK';return`<tr><td>${r.materia}</td><td>${r.bloco}</td><td>${r.topico.substring(0,40)}</td><td>${r.dataStr.split('-').reverse().join('/')}</td><td class="${uc}">${r.daysSince}d</td><td><span class="badge ${bc}">${lb}</span></td></tr>`}).join('');
+  const hoje = new Date();
+  const topicLast = {};
+  estudos.forEach(e => {
+    const k = e.materia + '|||' + e.bloco + '|||' + e.topico;
+    if (!topicLast[k] || e.data > topicLast[k].data) topicLast[k] = e;
+  });
+  
+  const revItems = Object.values(topicLast).map(e => {
+    const ds = Math.floor((hoje - e.data) / (1000 * 60 * 60 * 24));
+    let urgency, faixa;
+    if (ds <= 5) { urgency = 'ok'; faixa = '🟢 0-5 dias'; }
+    else if (ds <= 12) { urgency = 'soon'; faixa = '🔵 6-12 dias'; }
+    else if (ds <= 20) { urgency = 'warning'; faixa = '🟡 13-20 dias'; }
+    else if (ds <= 30) { urgency = 'attention'; faixa = '🟠 21-30 dias'; }
+    else { urgency = 'overdue'; faixa = '🔴 30+ dias'; }
+    return { ...e, daysSince: ds, urgency, faixa };
+  }).sort((a, b) => b.daysSince - a.daysSince);
+
+  // Contagem por faixa
+  const faixa0_5 = revItems.filter(r => r.daysSince <= 5).length;
+  const faixa6_12 = revItems.filter(r => r.daysSince > 5 && r.daysSince <= 12).length;
+  const faixa13_20 = revItems.filter(r => r.daysSince > 12 && r.daysSince <= 20).length;
+  const faixa21_30 = revItems.filter(r => r.daysSince > 20 && r.daysSince <= 30).length;
+  const faixa30plus = revItems.filter(r => r.daysSince > 30).length;
+  const totalTopicos = revItems.length;
+  
+  // Cards de resumo
+  document.getElementById('revisionAlerts').innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:12px">
+      <div class="card" style="text-align:center;border-top:3px solid #10b981;padding:12px">
+        <div style="font-size:1.8rem;font-weight:bold;color:#10b981">${faixa0_5}</div>
+        <div style="font-size:.7rem;color:#94a3b8">🟢 0-5 dias</div>
+        <div style="font-size:.6rem;color:#64748b">Revisão em dia</div>
+      </div>
+      <div class="card" style="text-align:center;border-top:3px solid #3b82f6;padding:12px">
+        <div style="font-size:1.8rem;font-weight:bold;color:#60a5fa">${faixa6_12}</div>
+        <div style="font-size:.7rem;color:#94a3b8">🔵 6-12 dias</div>
+        <div style="font-size:.6rem;color:#64748b">Revisão próxima</div>
+      </div>
+      <div class="card" style="text-align:center;border-top:3px solid #f59e0b;padding:12px">
+        <div style="font-size:1.8rem;font-weight:bold;color:#f59e0b">${faixa13_20}</div>
+        <div style="font-size:.7rem;color:#94a3b8">🟡 13-20 dias</div>
+        <div style="font-size:.6rem;color:#64748b">Atenção</div>
+      </div>
+      <div class="card" style="text-align:center;border-top:3px solid #f97316;padding:12px">
+        <div style="font-size:1.8rem;font-weight:bold;color:#f97316">${faixa21_30}</div>
+        <div style="font-size:.7rem;color:#94a3b8">🟠 21-30 dias</div>
+        <div style="font-size:.6rem;color:#64748b">Alerta</div>
+      </div>
+      <div class="card" style="text-align:center;border-top:3px solid #ef4444;padding:12px">
+        <div style="font-size:1.8rem;font-weight:bold;color:#ef4444">${faixa30plus}</div>
+        <div style="font-size:.7rem;color:#94a3b8">🔴 30+ dias</div>
+        <div style="font-size:.6rem;color:#64748b">Urgente</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <span style="background:rgba(16,185,129,.1);color:#10b981;padding:3px 8px;border-radius:10px;font-size:.65rem">🟢 ${faixa0_5} em dia (${totalTopicos?Math.round(faixa0_5/totalTopicos*100):0}%)</span>
+      <span style="background:rgba(239,68,68,.1);color:#ef4444;padding:3px 8px;border-radius:10px;font-size:.65rem">🔴 ${faixa30plus} urgentes (${totalTopicos?Math.round(faixa30plus/totalTopicos*100):0}%)</span>
+      <span style="background:rgba(148,163,184,.1);color:#94a3b8;padding:3px 8px;border-radius:10px;font-size:.65rem">📊 ${totalTopicos} tópicos no total</span>
+    </div>
+    ${faixa30plus > 0 ? `<div class="alert danger">🚨 ${faixa30plus} tópico(s) sem revisão há mais de 30 dias! Priorize imediatamente.</div>` : ''}
+    ${faixa21_30 > 0 ? `<div class="alert warning">⚠️ ${faixa21_30} tópico(s) entre 21-30 dias sem revisão. Agende esta semana.</div>` : ''}
+    ${faixa30plus === 0 && faixa21_30 === 0 ? `<div class="alert success">✅ Nenhum tópico crítico! Maioria das revisões em dia.</div>` : ''}
+  `;
+
+  // Tabela com faixas coloridas
+  document.querySelector('#revisionTable thead').innerHTML = `<tr><th>Matéria</th><th>Bloco</th><th>Tópico</th><th>Último</th><th>Dias</th><th>Faixa</th><th>Ação</th></tr>`;
+  
+  document.querySelector('#revisionTable tbody').innerHTML = revItems.slice(0, 60).map(r => {
+    let corDias, badgeClass, faixaLabel, acaoLabel;
+    if (r.daysSince <= 5) {
+      corDias = '#10b981'; badgeClass = 'badge-green'; faixaLabel = '🟢 0-5d'; acaoLabel = 'Em dia';
+    } else if (r.daysSince <= 12) {
+      corDias = '#60a5fa'; badgeClass = 'badge-blue'; faixaLabel = '🔵 6-12d'; acaoLabel = 'Agendar';
+    } else if (r.daysSince <= 20) {
+      corDias = '#f59e0b'; badgeClass = 'badge-amber'; faixaLabel = '🟡 13-20d'; acaoLabel = 'Revisar';
+    } else if (r.daysSince <= 30) {
+      corDias = '#f97316'; badgeClass = 'badge-amber'; faixaLabel = '🟠 21-30d'; acaoLabel = 'Urgente';
+    } else {
+      corDias = '#ef4444'; badgeClass = 'badge-red'; faixaLabel = '🔴 30+d'; acaoLabel = 'CRÍTICO';
+    }
+    return `<tr>
+      <td>${r.materia}</td>
+      <td>${r.bloco}</td>
+      <td>${r.topico.length > 40 ? r.topico.substring(0,38)+'…' : r.topico}</td>
+      <td>${r.dataStr.split('-').reverse().join('/')}</td>
+      <td style="color:${corDias};font-weight:bold">${r.daysSince}d</td>
+      <td><span style="font-size:.65rem">${faixaLabel}</span></td>
+      <td><span class="badge ${badgeClass}">${acaoLabel}</span></td>
+    </tr>`;
+  }).join('');
 }
 
 // Init
