@@ -384,7 +384,7 @@ function renderRevisions(){
     </tr>`;
   
   // Ordenação: mais atrasado primeiro (30+ dias) → mais recente (0-5 dias)
-  document.querySelector('#revisionTable tbody').innerHTML = revItems.slice(0, 80).map(r => {
+  document.querySelector('#revisionTable tbody').innerHTML = revItems.slice(0, 150).map(r => {
     let corDias, badgeClass, faixaLabel, acaoLabel;
     if (r.daysSince <= 5) {
       corDias = '#10b981'; badgeClass = 'badge-green'; faixaLabel = '🟢 0-5d'; acaoLabel = 'Em dia';
