@@ -400,6 +400,7 @@ async function registrarEstudo() {
     status.innerHTML = '⏳ Registrando...';
     const data = [materia, bloco, topico, tempo, questoes, acertos].join('|');
     const r = await fetch(API + '?action=addEstudo&data=' + encodeURIComponent(data));
+    await renderAll();
     const txt = await r.text();
     if (txt.startsWith('ERRO')) throw new Error(txt);
     status.innerHTML = '<span style="color:#10b981;">✅ Registrado com sucesso!</span>';
@@ -407,7 +408,13 @@ async function registrarEstudo() {
     document.getElementById('regQuestoes').value = '0';
     document.getElementById('regAcertos').value = '0';
     setTimeout(() => status.innerHTML = '', 3000);
-    loadData();
+   loadData().then(() => {
+    renderAll();
+    renderMetas();
+    renderSubjects();
+    renderTopics();
+    renderEvolution();
+    });
   } catch(e) {
     status.innerHTML = `<span style="color:#ef4444;">❌ Erro: ${e.message}</span>`;
   }
