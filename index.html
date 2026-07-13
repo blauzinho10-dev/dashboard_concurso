@@ -7,69 +7,65 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: 'Segoe UI', Arial, sans-serif; background: #0a0e1a; color: #e0e0e0; min-height: 100vh; }
-.header { background: #111827; padding: 15px 20px; border-bottom: 1px solid #1e293b; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; position:sticky; top:0; z-index:100; }
-.header h1 { font-size: 1.2rem; color: #ffffff; }
-.header button { background: #3b82f6; color:#fff; border:none; padding:8px 16px; border-radius:5px; cursor:pointer; font-weight:bold; }
-.tabs { display:flex; gap:4px; padding:10px 20px; overflow-x:auto; border-bottom:1px solid #1e293b; background:#0f172a; }
-.tab { padding:8px 15px; border:none; background:none; color:#94a3b8; cursor:pointer; font-size:0.82rem; white-space:nowrap; border-bottom:2px solid transparent; font-family:inherit; }
-.tab:hover { color:#cbd5e1; }
-.tab.active { color:#ffffff; border-bottom-color:#3b82f6; font-weight:bold; }
-.content { max-width:1400px; margin:0 auto; padding:20px; }
-.tab-panel { display:none; }
-.tab-panel.active { display:block; }
-.card { background:#111827; padding:20px; border-radius:10px; margin-bottom:20px; border:1px solid #1e293b; }
-.card h3 { color:#ffffff; font-size:0.85rem; text-transform:uppercase; margin-bottom:15px; }
-.kpi-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); gap:15px; margin-bottom:20px; }
-.kpi { background:#111827; padding:18px; border-radius:10px; border:1px solid #1e293b; }
-.kpi-label { font-size:0.7rem; color:#94a3b8; text-transform:uppercase; }
-.kpi-value { font-size:1.8rem; font-weight:bold; margin:5px 0; color:#ffffff; }
-.kpi-sub { font-size:0.7rem; color:#64748b; }
-.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
-.chart-wrap { position:relative; width:100%; height:350px; }
-table { width:100%; border-collapse:collapse; font-size:0.8rem; }
-th { text-align:left; padding:10px; border-bottom:1px solid #1e293b; color:#ffffff; font-size:0.7rem; text-transform:uppercase; background:#111827; position:sticky; top:0; }
-td { padding:8px 10px; border-bottom:1px solid rgba(30,41,59,0.5); color:#cbd5e1; }
-.badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.65rem; font-weight:bold; }
-.badge-green { background:rgba(16,185,129,0.2); color:#10b981; }
-.badge-amber { background:rgba(245,158,11,0.2); color:#f59e0b; }
-.badge-red { background:rgba(239,68,68,0.2); color:#ef4444; }
-.badge-blue { background:rgba(59,130,246,0.2); color:#60a5fa; }
-.loading { text-align:center; padding:60px; color:#ffffff; display:flex; flex-direction:column; align-items:center; }
-.spinner { width:50px;height:50px; border:3px solid #1e293b; border-top-color:#3b82f6; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 15px; }
-@keyframes spin { to { transform:rotate(360deg); } }
-.filters { display:flex; gap:10px; margin-bottom:20px; align-items:center; flex-wrap:wrap; }
-.filters label { font-size:0.75rem; color:#94a3b8; }
-.filters select, .filters input { background:#1e293b; border:1px solid #334155; color:#f1f5f9; padding:8px 12px; border-radius:5px; font-family:inherit; font-size:0.8rem; }
-.alert { padding:15px; border-radius:8px; margin-bottom:10px; border-left:3px solid; }
-.alert.danger { background:rgba(239,68,68,0.1); border-color:#ef4444; color:#fca5a5; }
-.alert.warning { background:rgba(245,158,11,0.1); border-color:#f59e0b; color:#fcd34d; }
-.alert.success { background:rgba(16,185,129,0.1); border-color:#10b981; color:#6ee7b7; }
-.scroll { max-height:400px; overflow-y:auto; }
-.scroll::-webkit-scrollbar { width:5px; }
-.scroll::-webkit-scrollbar-thumb { background:#334155; border-radius:3px; }
-.timer-display { font-size:5rem; font-weight:bold; color:#3b82f6; margin:20px 0; font-family:monospace; text-align:center; }
-.timer-controls { display:flex; gap:10px; justify-content:center; margin:15px 0; }
-.timer-controls button { padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:1rem; }
-.btn-start { background:#10b981; color:#fff; }
-.btn-pause { background:#f59e0b; color:#000; }
-.btn-reset { background:#ef4444; color:#fff; }
-.timer-status { font-size:1.2rem; margin:10px 0; text-align:center; }
-.timer-status.studying { color:#10b981; }
-.timer-status.break { color:#f59e0b; }
-.session-counter { color:#94a3b8; font-size:0.9rem; text-align:center; }
-.form-group { margin-bottom:12px; }
-.form-group label { display:block; font-size:0.8rem; color:#94a3b8; margin-bottom:4px; }
-.form-group select, .form-group input { width:100%; background:#1e293b; border:1px solid #334155; color:#f1f5f9; padding:10px; border-radius:5px; font-family:inherit; }
-.btn-submit { background:#3b82f6; color:#fff; border:none; padding:12px 25px; border-radius:8px; font-weight:bold; cursor:pointer; width:100%; font-size:1rem; }
-.goal-bar { height:12px; background:#1e293b; border-radius:6px; margin:5px 0 12px; overflow:hidden; }
-.goal-fill { height:100%; background:linear-gradient(90deg, #3b82f6, #10b981); border-radius:6px; transition:width 0.5s; }
-.rev-overdue { color:#ef4444; font-weight:bold; }
-.rev-warning { color:#f59e0b; font-weight:bold; }
-.rev-ok { color:#10b981; }
-.empty-state { text-align:center; padding:40px; color:#475569; font-size:0.85rem; }
-@media(max-width:768px) { .grid-2 { grid-template-columns:1fr; } .timer-display { font-size:3rem; } }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#0a0e1a;color:#e0e0e0;min-height:100vh}
+.header{background:#111827;padding:15px 20px;border-bottom:1px solid #1e293b;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:100}
+.header h1{font-size:1.2rem;color:#fff}
+.header button{background:#3b82f6;color:#fff;border:none;padding:8px 16px;border-radius:5px;cursor:pointer;font-weight:bold}
+.tabs{display:flex;gap:4px;padding:10px 20px;overflow-x:auto;border-bottom:1px solid #1e293b;background:#0f172a}
+.tab{padding:8px 15px;border:none;background:none;color:#94a3b8;cursor:pointer;font-size:.82rem;white-space:nowrap;border-bottom:2px solid transparent;font-family:inherit}
+.tab:hover{color:#cbd5e1}
+.tab.active{color:#fff;border-bottom-color:#3b82f6;font-weight:bold}
+.content{max-width:1400px;margin:0 auto;padding:20px}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.card{background:#111827;padding:20px;border-radius:10px;margin-bottom:20px;border:1px solid #1e293b}
+.card h3{color:#fff;font-size:.85rem;text-transform:uppercase;margin-bottom:15px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:15px;margin-bottom:20px}
+.kpi{background:#111827;padding:18px;border-radius:10px;border:1px solid #1e293b}
+.kpi-label{font-size:.7rem;color:#94a3b8;text-transform:uppercase}
+.kpi-value{font-size:1.8rem;font-weight:bold;margin:5px 0;color:#fff}
+.kpi-sub{font-size:.7rem;color:#64748b}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+.chart-wrap{position:relative;width:100%;height:350px}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+th{text-align:left;padding:10px;border-bottom:1px solid #1e293b;color:#fff;font-size:.7rem;text-transform:uppercase;background:#111827;position:sticky;top:0}
+td{padding:8px 10px;border-bottom:1px solid rgba(30,41,59,0.5);color:#cbd5e1}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.65rem;font-weight:bold}
+.badge-green{background:rgba(16,185,129,.2);color:#10b981}
+.badge-amber{background:rgba(245,158,11,.2);color:#f59e0b}
+.badge-red{background:rgba(239,68,68,.2);color:#ef4444}
+.badge-blue{background:rgba(59,130,246,.2);color:#60a5fa}
+.loading{text-align:center;padding:60px;color:#fff;display:flex;flex-direction:column;align-items:center}
+.spinner{width:50px;height:50px;border:3px solid #1e293b;border-top-color:#3b82f6;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 15px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.filters{display:flex;gap:10px;margin-bottom:20px;align-items:center;flex-wrap:wrap}
+.filters label{font-size:.75rem;color:#94a3b8}
+.filters select,.filters input{background:#1e293b;border:1px solid #334155;color:#f1f5f9;padding:8px 12px;border-radius:5px;font-family:inherit;font-size:.8rem}
+.alert{padding:15px;border-radius:8px;margin-bottom:10px;border-left:3px solid}
+.alert.danger{background:rgba(239,68,68,.1);border-color:#ef4444;color:#fca5a5}
+.alert.warning{background:rgba(245,158,11,.1);border-color:#f59e0b;color:#fcd34d}
+.alert.success{background:rgba(16,185,129,.1);border-color:#10b981;color:#6ee7b7}
+.scroll{max-height:400px;overflow-y:auto}
+.scroll::-webkit-scrollbar{width:5px}
+.scroll::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+.timer-display{font-size:5rem;font-weight:bold;color:#3b82f6;margin:20px 0;font-family:monospace;text-align:center}
+.timer-controls{display:flex;gap:10px;justify-content:center;margin:15px 0}
+.timer-controls button{padding:12px 25px;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-size:1rem}
+.btn-start{background:#10b981;color:#fff}
+.btn-pause{background:#f59e0b;color:#000}
+.btn-reset{background:#ef4444;color:#fff}
+.timer-status{font-size:1.2rem;margin:10px 0;text-align:center}
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:.8rem;color:#94a3b8;margin-bottom:4px}
+.form-group select,.form-group input{width:100%;background:#1e293b;border:1px solid #334155;color:#f1f5f9;padding:10px;border-radius:5px;font-family:inherit}
+.btn-submit{background:#3b82f6;color:#fff;border:none;padding:12px 25px;border-radius:8px;font-weight:bold;cursor:pointer;width:100%;font-size:1rem}
+.goal-bar{height:12px;background:#1e293b;border-radius:6px;margin:5px 0 12px;overflow:hidden}
+.goal-fill{height:100%;background:linear-gradient(90deg,#3b82f6,#10b981);border-radius:6px;transition:width .5s}
+.rev-overdue{color:#ef4444;font-weight:bold}
+.rev-ok{color:#10b981}
+.empty-state{text-align:center;padding:40px;color:#475569;font-size:.85rem}
+@media(max-width:768px){.grid-2{grid-template-columns:1fr}.timer-display{font-size:3rem}}
 </style>
 </head>
 <body>
@@ -77,8 +73,8 @@ td { padding:8px 10px; border-bottom:1px solid rgba(30,41,59,0.5); color:#cbd5e1
 <div class="header">
   <h1>📊 Central de Comando — Auditor Fiscal</h1>
   <div style="display:flex;align-items:center;gap:15px">
-    <span style="background:rgba(245,158,11,0.2);color:#f59e0b;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:bold;">SEFAZ-AL</span>
-    <span id="lastUpdate" style="font-size:0.7rem;color:#64748b;">—</span>
+    <span style="background:rgba(245,158,11,.2);color:#f59e0b;padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:bold">SEFAZ-AL</span>
+    <span id="lastUpdate" style="font-size:.7rem;color:#64748b">—</span>
     <button onclick="loadData()">🔄 Atualizar</button>
   </div>
 </div>
@@ -89,6 +85,7 @@ td { padding:8px 10px; border-bottom:1px solid rgba(30,41,59,0.5); color:#cbd5e1
   <button class="tab" onclick="switchTab('performance',this)">Desempenho</button>
   <button class="tab" onclick="switchTab('evolution',this)">Evolução</button>
   <button class="tab" onclick="switchTab('subjects',this)">Por Matéria</button>
+  <button class="tab" onclick="switchTab('topics',this)">Por Tópico</button>
   <button class="tab" onclick="switchTab('revisions',this)">Revisões</button>
 </div>
 
@@ -97,213 +94,153 @@ td { padding:8px 10px; border-bottom:1px solid rgba(30,41,59,0.5); color:#cbd5e1
 
   <div id="tab-study" class="tab-panel active">
     <div class="grid-2">
-      <div class="card">
-        <h3>⏱️ Pomodoro 50/10</h3>
-        <div class="timer-display" id="timerDisplay">50:00</div>
-        <div class="timer-status" id="timerStatus">Pronto</div>
-        <div class="session-counter" id="sessionCounter">Sessões: 0</div>
-        <div class="timer-controls">
-          <button class="btn-start" onclick="startPomodoro()">▶</button>
-          <button class="btn-pause" onclick="pausePomodoro()">⏸</button>
-          <button class="btn-reset" onclick="resetPomodoro()">↺</button>
-        </div>
-      </div>
-      <div class="card">
-        <h3>📝 Registrar Sessão</h3>
-        <div class="form-group"><label>Matéria</label><select id="regMateria" onchange="updateBlocos()"><option value="">Selecione...</option></select></div>
-        <div class="form-group"><label>Bloco</label><select id="regBloco"><option value="">Matéria primeiro</option></select></div>
-        <div class="form-group"><label>Tópico</label><input type="text" id="regTopico" placeholder="Ex: Princípios"></div>
-        <div class="grid-2">
-          <div class="form-group"><label>Tempo (min)</label><input type="number" id="regTempo" value="50" min="1"></div>
-          <div class="form-group"><label>Questões</label><input type="number" id="regQuestoes" value="0" min="0"></div>
-        </div>
+      <div class="card"><h3>⏱️ Pomodoro 50/10</h3><div class="timer-display" id="timerDisplay">50:00</div><div class="timer-status" id="timerStatus">Pronto</div><div class="timer-controls"><button class="btn-start" onclick="startPomodoro()">▶</button><button class="btn-pause" onclick="pausePomodoro()">⏸</button><button class="btn-reset" onclick="resetPomodoro()">↺</button></div></div>
+      <div class="card"><h3>📝 Registrar Sessão</h3>
+        <div class="form-group"><label>Matéria</label><select id="regMateria" onchange="loadBlocos()"><option value="">Selecione...</option></select></div>
+        <div class="form-group"><label>Bloco</label><select id="regBloco" onchange="loadTopicos()"><option value="">Selecione a matéria</option></select></div>
+        <div class="form-group"><label>Tópico</label><select id="regTopico"><option value="">Selecione o bloco</option></select></div>
+        <div class="grid-2"><div class="form-group"><label>Tempo (min)</label><input type="number" id="regTempo" value="50" min="1"></div><div class="form-group"><label>Questões</label><input type="number" id="regQuestoes" value="0" min="0"></div></div>
         <div class="form-group"><label>Acertos</label><input type="number" id="regAcertos" value="0" min="0"></div>
         <button class="btn-submit" onclick="registrarEstudo()">✅ Registrar</button>
-        <div id="regStatus" style="margin-top:10px;text-align:center;font-size:0.9rem;"></div>
+        <div id="regStatus" style="margin-top:10px;text-align:center;font-size:.9rem"></div>
       </div>
     </div>
-    <div class="card">
-      <h3>🎯 Metas do Dia</h3>
-      <div class="kpi-grid" id="kpiMetas"></div>
-      <div style="margin-top:10px;">
-        <strong>Meta de horas:</strong> <span id="metaHoras">0,0h / 4h</span>
-        <div class="goal-bar"><div class="goal-fill" id="goalHoras" style="width:0%"></div></div>
-        <strong>Meta de questões:</strong> <span id="metaQuestoes">0 / 30</span>
-        <div class="goal-bar"><div class="goal-fill" id="goalQuestoes" style="width:0%"></div></div>
-      </div>
-    </div>
+    <div class="card"><h3>🎯 Metas do Dia</h3><div class="kpi-grid" id="kpiMetas"></div><div style="margin-top:10px"><strong>Horas:</strong> <span id="metaHoras">0,0h / 4h</span><div class="goal-bar"><div class="goal-fill" id="goalHoras" style="width:0%"></div></div><strong>Questões:</strong> <span id="metaQuestoes">0 / 30</span><div class="goal-bar"><div class="goal-fill" id="goalQuestoes" style="width:0%"></div></div></div></div>
   </div>
 
-  <div id="tab-overview" class="tab-panel">
-    <div class="kpi-grid" id="kpiOverview"></div>
-    <div class="grid-2">
-      <div class="card"><h3>Progresso por Matéria</h3><div class="chart-wrap"><canvas id="chartProgress"></canvas></div></div>
-      <div class="card"><h3>Cobertura</h3><div class="chart-wrap"><canvas id="chartRadar"></canvas></div></div>
-    </div>
-    <div class="grid-2">
-      <div class="card"><h3>Horas por Matéria</h3><div class="chart-wrap"><canvas id="chartHours"></canvas></div></div>
-      <div class="card"><h3>Status dos Tópicos</h3><div class="chart-wrap"><canvas id="chartDoughnut"></canvas></div></div>
-    </div>
-  </div>
+  <div id="tab-overview" class="tab-panel"><div class="kpi-grid" id="kpiOverview"></div><div class="grid-2"><div class="card"><h3>Progresso por Matéria</h3><div class="chart-wrap"><canvas id="chartProgress"></canvas></div></div><div class="card"><h3>Cobertura</h3><div class="chart-wrap"><canvas id="chartRadar"></canvas></div></div></div><div class="grid-2"><div class="card"><h3>Horas por Matéria</h3><div class="chart-wrap"><canvas id="chartHours"></canvas></div></div><div class="card"><h3>Status dos Tópicos</h3><div class="chart-wrap"><canvas id="chartDoughnut"></canvas></div></div></div></div>
 
-  <div id="tab-performance" class="tab-panel">
-    <div class="kpi-grid" id="kpiPerf"></div>
-    <div class="card"><h3>Desempenho por Matéria</h3><div class="scroll"><table id="perfTable"><thead><tr><th>Matéria</th><th>Questões</th><th>Acertos</th><th>Erros</th><th>Taxa</th><th>Status</th></tr></thead><tbody></tbody></table></div></div>
-  </div>
+  <div id="tab-performance" class="tab-panel"><div class="kpi-grid" id="kpiPerf"></div><div class="card"><h3>Desempenho por Matéria</h3><div class="scroll"><table id="perfTable"><thead><tr><th>Matéria</th><th>Questões</th><th>Acertos</th><th>Erros</th><th>Taxa</th><th>Status</th></tr></thead><tbody></tbody></table></div></div></div>
 
-  <div id="tab-evolution" class="tab-panel">
-    <div class="grid-2">
-      <div class="card"><h3>Minutos por Dia</h3><div class="chart-wrap"><canvas id="chartDailyMin"></canvas></div></div>
-      <div class="card"><h3>Horas Acumuladas</h3><div class="chart-wrap"><canvas id="chartCumHours"></canvas></div></div>
-    </div>
-  </div>
+  <div id="tab-evolution" class="tab-panel"><div class="grid-2"><div class="card"><h3>Minutos por Dia</h3><div class="chart-wrap"><canvas id="chartDailyMin"></canvas></div></div><div class="card"><h3>Horas Acumuladas</h3><div class="chart-wrap"><canvas id="chartCumHours"></canvas></div></div></div></div>
 
-  <div id="tab-subjects" class="tab-panel">
-    <div class="filters">
-      <label>Matéria:</label>
-      <select id="filterSubject" onchange="renderSubjects()"><option value="all">Todas</option></select>
-    </div>
-    <div class="kpi-grid" id="kpiSubject"></div>
-    <div class="card"><h3>Sessões</h3><div class="scroll"><table id="subjectTable"><thead><tr><th>Data</th><th>Matéria</th><th>Bloco</th><th>Tópico</th><th>Tempo</th><th>Questões</th><th>Acertos</th><th>Taxa</th></tr></thead><tbody></tbody></table></div></div>
-  </div>
+  <div id="tab-subjects" class="tab-panel"><div class="filters"><label>Matéria:</label><select id="filterSubject" onchange="renderSubjects()"><option value="all">Todas</option></select></div><div class="kpi-grid" id="kpiSubject"></div><div class="card"><h3>Sessões</h3><div class="scroll"><table id="subjectTable"><thead><tr><th>Data</th><th>Matéria</th><th>Bloco</th><th>Tópico</th><th>Tempo</th><th>Questões</th><th>Acertos</th><th>Taxa</th></tr></thead><tbody></tbody></table></div></div></div>
 
-  <div id="tab-revisions" class="tab-panel">
-    <div id="revisionAlerts"></div>
-    <div class="card"><h3>Agenda de Revisões</h3><div class="scroll"><table id="revisionTable"><thead><tr><th>Matéria</th><th>Bloco</th><th>Tópico</th><th>Último</th><th>Dias</th><th>Urgência</th></tr></thead><tbody></tbody></table></div></div>
-  </div>
+  <div id="tab-topics" class="tab-panel"><div class="filters"><label>Matéria:</label><select id="filterTopicMateria" onchange="renderTopics()"><option value="all">Todas</option></select></div><div class="kpi-grid" id="kpiTopics"></div><div class="card"><h3>Raio-X por Tópico</h3><div class="scroll"><table id="topicTable"><thead><tr><th>Matéria</th><th>Bloco</th><th>Tópico</th><th>Sessões</th><th>Horas</th><th>Questões</th><th>Taxa</th><th>Último</th></tr></thead><tbody></tbody></table></div></div></div>
+
+  <div id="tab-revisions" class="tab-panel"><div id="revisionAlerts"></div><div class="card"><h3>Agenda de Revisões</h3><div class="scroll"><table id="revisionTable"><thead><tr><th>Matéria</th><th>Bloco</th><th>Tópico</th><th>Último</th><th>Dias</th><th>Urgência</th></tr></thead><tbody></tbody></table></div></div></div>
 </div>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbzRpi_i3NI8kmK48-XBcSY9jmbADYL295ne_5y0ikO5m3TZC5viWg3_8R8S7Jd12jMycA/exec';
-let painel = [], estudos = [], charts = {};
-let pomodoroInterval, pomodoroSeconds = 3000, isStudying = true, sessionCount = 0;
-
+const API='https://script.google.com/macros/s/AKfycbzRpi_i3NI8kmK48-XBcSY9jmbADYL295ne_5y0ikO5m3TZC5viWg3_8R8S7Jd12jMycA/exec';
+let painel=[],estudos=[],charts={},pomodoroInterval,pomodoroSeconds=3000,isStudying=!0,sessionCount=0;
 Chart.register(ChartDataLabels);
-const COLORS = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f43f5e','#84cc16','#e879f9','#fb923c'];
+const COLORS=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f43f5e','#84cc16','#e879f9','#fb923c'];
 
-function parseCSV(t) { return t.trim().split('\n').map(l=>{let r=[],c='',q=!1;for(let h of l){if(h==='"')q=!q;else if(h===','&&!q){r.push(c);c=''}else c+=h}r.push(c);return r}).filter(r=>r.some(c=>c.trim())); }
-function parseNum(v) { if(!v) return 0; v=String(v).replace(/"/g,'').replace(',','.').trim(); return parseFloat(v)||0; }
-function parsePct(v) { if(!v) return 0; v=String(v).replace(/"/g,'').replace('%','').replace(',','.').trim(); let n=parseFloat(v); return isNaN(n)?0:n>1?n/100:n; }
-function fmtPct(n) { return (n*100).toFixed(1).replace('.',',')+'%'; }
-function fmtH(m) { return (m/60).toFixed(1).replace('.',',')+'h'; }
-function switchTab(id, el) { document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active')); document.getElementById('tab-'+id).classList.add('active'); el.classList.add('active'); }
-function toISO(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function parseCSV(t){return t.trim().split('\n').map(l=>{let r=[],c='',q=!1;for(let h of l){if(h==='"')q=!q;else if(h===','&&!q){r.push(c);c=''}else c+=h}r.push(c);return r}).filter(r=>r.some(c=>c.trim()))}
+function parseNum(v){if(!v)return 0;v=String(v).replace(/"/g,'').replace(',','.').trim();return parseFloat(v)||0}
+function parsePct(v){if(!v)return 0;v=String(v).replace(/"/g,'').replace('%','').replace(',','.').trim();let n=parseFloat(v);return isNaN(n)?0:n>1?n/100:n}
+function fmtPct(n){return(n*100).toFixed(1).replace('.',',')+'%'}
+function fmtH(m){return(m/60).toFixed(1).replace('.',',')+'h'}
+function switchTab(id,el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');el.classList.add('active')}
+function toISO(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 
 // Pomodoro
-function updateTimerDisplay() { const m=Math.floor(pomodoroSeconds/60),s=pomodoroSeconds%60; document.getElementById('timerDisplay').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); }
-function startPomodoro() { if(pomodoroInterval) return; document.getElementById('timerStatus').textContent='📚 Estudando'; document.getElementById('timerStatus').className='timer-status studying'; pomodoroInterval=setInterval(()=>{pomodoroSeconds--;updateTimerDisplay();if(pomodoroSeconds<=0){clearInterval(pomodoroInterval);pomodoroInterval=null;if(isStudying){sessionCount++;document.getElementById('sessionCounter').textContent='Sessões: '+sessionCount;document.getElementById('timerStatus').textContent='☕ Pausa 10min';document.getElementById('timerStatus').className='timer-status break';pomodoroSeconds=600}else{document.getElementById('timerStatus').textContent='📚 Estudar 50min';document.getElementById('timerStatus').className='timer-status studying';pomodoroSeconds=3000}isStudying=!isStudying;updateTimerDisplay()}},1000); }
-function pausePomodoro() { if(pomodoroInterval){clearInterval(pomodoroInterval);pomodoroInterval=null} }
-function resetPomodoro() { if(pomodoroInterval)clearInterval(pomodoroInterval); pomodoroInterval=null;pomodoroSeconds=3000;isStudying=!0;updateTimerDisplay();document.getElementById('timerStatus').textContent='Pronto'; }
+function updateTimerDisplay(){const m=Math.floor(pomodoroSeconds/60),s=pomodoroSeconds%60;document.getElementById('timerDisplay').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')}
+function startPomodoro(){if(pomodoroInterval)return;document.getElementById('timerStatus').textContent='📚 Estudando';pomodoroInterval=setInterval(()=>{pomodoroSeconds--;updateTimerDisplay();if(pomodoroSeconds<=0){clearInterval(pomodoroInterval);pomodoroInterval=null;if(isStudying){sessionCount++;pomodoroSeconds=600;document.getElementById('timerStatus').textContent='☕ Pausa 10min'}else{pomodoroSeconds=3000;document.getElementById('timerStatus').textContent='📚 Estudar 50min'}isStudying=!isStudying;updateTimerDisplay()}},1000)}
+function pausePomodoro(){if(pomodoroInterval){clearInterval(pomodoroInterval);pomodoroInterval=null}}
+function resetPomodoro(){if(pomodoroInterval)clearInterval(pomodoroInterval);pomodoroInterval=null;pomodoroSeconds=3000;isStudying=!0;updateTimerDisplay();document.getElementById('timerStatus').textContent='Pronto'}
 
-// Matérias
-async function loadMaterias() { try{const r=await fetch(API+'?action=getMaterias');const t=await r.text();const m=t.split('|').filter(m=>m.trim());const s=document.getElementById('regMateria');s.innerHTML='<option value="">Selecione...</option>';m.forEach(m=>s.innerHTML+=`<option value="${m}">${m}</option>`)}catch(e){} }
-const blocosPorMateria={ 'Administrativo':['Conceitos','Organização','Poderes','Atos','Licitações','Contratos','Servidores','Controle'],'Tributário':['Constitucional','CTN','IPTU','IR','ICMS','ISS','Processo'],'Contabilidade':['Conceitos','Balanço','Receitas','Despesas','CPC'],'Constitucional':['Princípios','Direitos','Controle','Ordem Social'],'Português':['Gramática','Interpretação','Redação','Sintaxe'],'default':['Geral','Específico','Avançado'] };
-function updateBlocos() { const m=document.getElementById('regMateria').value;const s=document.getElementById('regBloco');s.innerHTML='<option value="">Selecione...</option>';const b=blocosPorMateria[m]||blocosPorMateria['default'];b.forEach(b=>s.innerHTML+=`<option value="${b}">${b}</option>`); }
+// Carregar matérias, blocos e tópicos da aba Estudos
+async function loadMaterias(){try{const r=await fetch(API+'?action=getMaterias');const t=await r.text();const m=t.split('|').filter(m=>m.trim());const s=document.getElementById('regMateria');s.innerHTML='<option value="">Selecione...</option>';m.forEach(m=>s.innerHTML+=`<option value="${m}">${m}</option>`)}catch(e){}}
+async function loadBlocos(){const m=document.getElementById('regMateria').value;const s=document.getElementById('regBloco');s.innerHTML='<option value="">Carregando...</option>';if(!m){s.innerHTML='<option value="">Selecione a matéria</option>';return}try{const r=await fetch(API+'?action=getBlocos&materia='+encodeURIComponent(m));const t=await r.text();const b=t.split('|').filter(b=>b.trim());s.innerHTML='<option value="">Selecione...</option>';b.forEach(b=>s.innerHTML+=`<option value="${b}">${b}</option>`)}catch(e){s.innerHTML='<option value="">Erro</option>'}}
+async function loadTopicos(){const m=document.getElementById('regMateria').value;const b=document.getElementById('regBloco').value;const s=document.getElementById('regTopico');if(!m||!b){s.innerHTML='<option value="">Selecione o bloco</option>';return}s.innerHTML='<option value="">Carregando...</option>';const topicos=estudos.filter(e=>e.materia===m&&e.bloco===b).map(e=>e.topico).filter((v,i,a)=>a.indexOf(v)===i).sort();s.innerHTML='<option value="">Selecione...</option>';topicos.forEach(t=>s.innerHTML+=`<option value="${t}">${t}</option>`);if(topicos.length===0)s.innerHTML+='<option value="__novo__">➕ Novo tópico</option>'}
 
 // Registrar
-async function registrarEstudo() {
-  const materia=document.getElementById('regMateria').value,bloco=document.getElementById('regBloco').value,topico=document.getElementById('regTopico').value.trim(),tempo=document.getElementById('regTempo').value,questoes=document.getElementById('regQuestoes').value,acertos=document.getElementById('regAcertos').value,status=document.getElementById('regStatus');
-  if(!materia||!bloco||!topico||!tempo){status.innerHTML='<span style="color:#ef4444;">Preencha todos os campos!</span>';return}
+async function registrarEstudo(){
+  const m=document.getElementById('regMateria').value,b=document.getElementById('regBloco').value;
+  let t=document.getElementById('regTopico').value;
+  if(t==='__novo__'){t=prompt('Nome do novo tópico:');if(!t)return}
+  const tempo=document.getElementById('regTempo').value,q=document.getElementById('regQuestoes').value,a=document.getElementById('regAcertos').value,st=document.getElementById('regStatus');
+  if(!m||!b||!t||!tempo){st.innerHTML='<span style="color:#ef4444">Preencha todos os campos!</span>';return}
   try{
-    status.innerHTML='⏳ Registrando...';
-    await fetch(API+'?action=addEstudo&data='+encodeURIComponent([materia,bloco,topico,tempo,questoes,acertos].join('|')));
-    status.innerHTML='<span style="color:#10b981;">✅ Registrado!</span>';
-    document.getElementById('regTopico').value='';document.getElementById('regQuestoes').value='0';document.getElementById('regAcertos').value='0';
-    setTimeout(()=>status.innerHTML='',3000);
+    st.innerHTML='⏳ Registrando...';
+    await fetch(API+'?action=addEstudo&data='+encodeURIComponent([m,b,t,tempo,q,a].join('|')));
+    st.innerHTML='<span style="color:#10b981">✅ Registrado!</span>';
+    document.getElementById('regQuestoes').value='0';document.getElementById('regAcertos').value='0';
+    setTimeout(()=>st.innerHTML='',3000);
     await loadData();
-  }catch(e){status.innerHTML='<span style="color:#ef4444;">Erro</span>'}
+  }catch(e){st.innerHTML='<span style="color:#ef4444">Erro</span>'}
 }
 
-// Parse
-function parseData(s) { if(!s) return null; s=String(s).replace(/"/g,'').trim(); let d=null; if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)){const[a,b,c]=s.split('/');d=new Date(parseInt(c),parseInt(b)-1,parseInt(a))}else if(/^\d{4}-\d{2}-\d{2}$/.test(s)){const[a,b,c]=s.split('-');d=new Date(parseInt(a),parseInt(b)-1,parseInt(c))} return (d&&!isNaN(d.getTime()))?d:null; }
-
-function parsePainel(csv) { const rows=parseCSV(csv),data=[]; let start=!1; for(let r of rows){ if(r[0]&&r[0].includes('Matéria')){start=!0;continue} if(!start||!r[0]||r[0]==='TOTAL') continue; if(r[0].includes('📊')||r[0].includes('📖')||r[0].includes('🎨')) continue; const t=parseInt(r[1])||0; if(!t) continue; data.push({materia:r[0].trim(),total:t,estudados:parseInt(r[2])||0,pct:parsePct(r[3]),pendentes:parseInt(r[5])||0}) } return data; }
-
-function parseEstudos(csv) { const rows=parseCSV(csv),data=[]; for(let i=1;i<rows.length;i++){ const r=rows[i]; if(!r[0]||!r[1]||r[0].toLowerCase().includes('data')) continue; const d=parseData(r[0]); if(!d) continue; data.push({data:d,dataStr:toISO(d),materia:r[1].trim(),bloco:(r[2]||'').trim(),topico:(r[3]||'').trim(),tempo:parseNum(r[4]),questoes:parseNum(r[5]),acertos:parseNum(r[6])}) } return data.sort((a,b)=>b.data-a.data); }
+// Parse dados
+function parseData(s){if(!s)return null;s=String(s).replace(/"/g,'').trim();let d=null;if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)){const[a,b,c]=s.split('/');d=new Date(parseInt(c),parseInt(b)-1,parseInt(a))}else if(/^\d{4}-\d{2}-\d{2}$/.test(s)){const[a,b,c]=s.split('-');d=new Date(parseInt(a),parseInt(b)-1,parseInt(c))}return(d&&!isNaN(d.getTime()))?d:null}
+function parsePainel(csv){const rows=parseCSV(csv),data=[];let start=!1;for(let r of rows){if(r[0]&&r[0].includes('Matéria')){start=!0;continue}if(!start||!r[0]||r[0]==='TOTAL')continue;if(r[0].includes('📊')||r[0].includes('📖')||r[0].includes('🎨'))continue;const t=parseInt(r[1])||0;if(!t)continue;data.push({materia:r[0].trim(),total:t,estudados:parseInt(r[2])||0,pct:parsePct(r[3]),pendentes:parseInt(r[5])||0})}return data}
+function parseEstudos(csv){const rows=parseCSV(csv),data=[];for(let i=1;i<rows.length;i++){const r=rows[i];if(!r[0]||!r[1]||r[0].toLowerCase().includes('data'))continue;const d=parseData(r[0]);if(!d)continue;data.push({data:d,dataStr:toISO(d),materia:r[1].trim(),bloco:(r[2]||'').trim(),topico:(r[3]||'').trim(),tempo:parseNum(r[4]),questoes:parseNum(r[5]),acertos:parseNum(r[6])})}return data.sort((a,b)=>b.data-a.data)}
 
 // Load
-async function loadData() {
+async function loadData(){
   document.getElementById('loading').style.display='flex';
   try{
-    const [p,e]=await Promise.all([fetch(API+'?sheet=Painel').then(r=>r.text()),fetch(API+'?sheet=Estudos').then(r=>r.text())]);
-    painel=parsePainel(p); estudos=parseEstudos(e);
+    const[p,e]=await Promise.all([fetch(API+'?sheet=Painel').then(r=>r.text()),fetch(API+'?sheet=Estudos').then(r=>r.text())]);
+    painel=parsePainel(p);estudos=parseEstudos(e);
+    console.log('✅ Painel:',painel.length,'Estudos:',estudos.length,'Horas:',estudos.reduce((s,e)=>s+e.tempo,0));
     document.getElementById('lastUpdate').textContent='Atualizado: '+new Date().toLocaleTimeString('pt-BR');
     document.getElementById('loading').style.display='none';
     renderAll();
-  }catch(err){ document.getElementById('loading').innerHTML='<p style="color:#ef4444;">❌ '+err.message+'</p>'; }
+  }catch(err){document.getElementById('loading').innerHTML='<p style="color:#ef4444">❌ '+err.message+'</p>'}
 }
 
 // Render
-function renderAll() {
-  Object.values(charts).forEach(c=>{try{c.destroy()}catch(e){}}); charts={};
-  
-  const totalT=painel.reduce((s,m)=>s+m.total,0), totalE=painel.reduce((s,m)=>s+m.estudados,0), totalP=painel.reduce((s,m)=>s+m.pendentes,0);
-  const horas=estudos.reduce((s,e)=>s+e.tempo,0);
-  const qTotal=estudos.reduce((s,e)=>s+e.questoes,0);
-  const aTotal=estudos.reduce((s,e)=>s+e.acertos,0);
-  const eTotal=qTotal-aTotal;
-  const taxaTotal=qTotal?aTotal/qTotal:0;
+function renderAll(){
+  Object.values(charts).forEach(c=>{try{c.destroy()}catch(e){}});charts={};
+  const totalT=painel.reduce((s,m)=>s+m.total,0),totalE=painel.reduce((s,m)=>s+m.estudados,0),totalP=painel.reduce((s,m)=>s+m.pendentes,0);
+  const horas=estudos.reduce((s,e)=>s+e.tempo,0),qTotal=estudos.reduce((s,e)=>s+e.questoes,0),aTotal=estudos.reduce((s,e)=>s+e.acertos,0),eTotal=qTotal-aTotal,taxaTotal=qTotal?aTotal/qTotal:0;
 
-  // KPIs
   document.getElementById('kpiOverview').innerHTML=`<div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Cobertura</div><div class="kpi-value">${fmtPct(totalT?totalE/totalT:0)}</div><div class="kpi-sub">${totalE}/${totalT}</div></div><div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Horas</div><div class="kpi-value">${fmtH(horas)}</div><div class="kpi-sub">${estudos.length} sessões</div></div><div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Taxa</div><div class="kpi-value">${fmtPct(taxaTotal)}</div><div class="kpi-sub">${qTotal} questões</div></div><div class="kpi" style="border-top:3px solid #ef4444"><div class="kpi-label">Pendentes</div><div class="kpi-value">${totalP}</div></div><div class="kpi" style="border-top:3px solid #8b5cf6"><div class="kpi-label">Acertos</div><div class="kpi-value">${aTotal}</div></div><div class="kpi" style="border-top:3px solid #06b6d4"><div class="kpi-label">Erros</div><div class="kpi-value">${eTotal}</div></div>`;
+  document.getElementById('kpiPerf').innerHTML=`<div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Questões</div><div class="kpi-value">${qTotal}</div></div><div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Acertos</div><div class="kpi-value">${aTotal}</div></div><div class="kpi" style="border-top:3px solid #ef4444"><div class="kpi-label">Erros</div><div class="kpi-value">${eTotal}</div></div><div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Taxa</div><div class="kpi-value">${fmtPct(taxaTotal)}</div></div>`;
 
-  document.getElementById('kpiPerf').innerHTML=`<div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Total Questões</div><div class="kpi-value">${qTotal}</div></div><div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Acertos</div><div class="kpi-value">${aTotal}</div></div><div class="kpi" style="border-top:3px solid #ef4444"><div class="kpi-label">Erros</div><div class="kpi-value">${eTotal}</div></div><div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Taxa</div><div class="kpi-value">${fmtPct(taxaTotal)}</div></div>`;
-
-  // Charts
   const sp=[...painel].sort((a,b)=>b.pct-a.pct);
   charts.c1=new Chart(document.getElementById('chartProgress').getContext('2d'),{type:'bar',data:{labels:sp.map(m=>m.materia),datasets:[{data:sp.map(m=>+(m.pct*100).toFixed(1)),backgroundColor:sp.map(m=>m.pct>=.8?'#10b981':m.pct>=.5?'#f59e0b':'#ef4444'),borderRadius:4}]},options:{indexAxis:'y',responsive:!0,maintainAspectRatio:!1,layout:{padding:{right:35}},plugins:{legend:{display:!1},datalabels:{anchor:'end',align:'right',color:'#fff',font:{size:10,weight:'bold'},formatter:v=>v+'%'}},scales:{x:{max:100,grid:{color:'#1e293b'},ticks:{color:'#94a3b8'}},y:{grid:{display:!1},ticks:{color:'#cbd5e1',font:{size:10}}}}} });
-
-  if(painel.length>0){ charts.c2=new Chart(document.getElementById('chartRadar').getContext('2d'),{type:'radar',data:{labels:painel.map(m=>m.materia.substring(0,18)),datasets:[{label:'Cobertura',data:painel.map(m=>+(m.pct*100).toFixed(1)),borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.2)'},{label:'Meta 80%',data:painel.map(()=>80),borderColor:'rgba(245,158,11,0.5)',borderDash:[5,5],pointRadius:0}]},options:{responsive:!0,maintainAspectRatio:!1,scales:{r:{max:100,grid:{color:'#334155'},ticks:{display:!1},pointLabels:{color:'#cbd5e1',font:{size:10}}}},plugins:{legend:{labels:{color:'#fff'}},datalabels:{display:!1}}} }); }
-
-  const hByM={}; estudos.forEach(e=>{hByM[e.materia]=(hByM[e.materia]||0)+e.tempo});
+  if(painel.length>0){charts.c2=new Chart(document.getElementById('chartRadar').getContext('2d'),{type:'radar',data:{labels:painel.map(m=>m.materia.substring(0,18)),datasets:[{label:'Cobertura',data:painel.map(m=>+(m.pct*100).toFixed(1)),borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.2)'},{label:'Meta 80%',data:painel.map(()=>80),borderColor:'rgba(245,158,11,.5)',borderDash:[5,5],pointRadius:0}]},options:{responsive:!0,maintainAspectRatio:!1,scales:{r:{max:100,grid:{color:'#334155'},ticks:{display:!1},pointLabels:{color:'#cbd5e1',font:{size:10}}}},plugins:{legend:{labels:{color:'#fff'}},datalabels:{display:!1}}}})}
+  const hByM={};estudos.forEach(e=>{hByM[e.materia]=(hByM[e.materia]||0)+e.tempo});
   const hE=Object.entries(hByM).sort((a,b)=>b[1]-a[1]);
-  if(hE.length>0){ charts.c3=new Chart(document.getElementById('chartHours').getContext('2d'),{type:'bar',data:{labels:hE.map(e=>e[0]),datasets:[{data:hE.map(e=>+(e[1]/60).toFixed(1)),backgroundColor:hE.map((_,i)=>COLORS[i%COLORS.length]),borderRadius:4}]},options:{indexAxis:'y',responsive:!0,maintainAspectRatio:!1,layout:{padding:{right:35}},plugins:{legend:{display:!1},datalabels:{anchor:'end',align:'right',color:'#fff',font:{size:10,weight:'bold'},formatter:v=>v+'h'}},scales:{x:{grid:{color:'#1e293b'},ticks:{color:'#94a3b8'}},y:{grid:{display:!1},ticks:{color:'#cbd5e1',font:{size:10}}}}} }); }
-
-  charts.c4=new Chart(document.getElementById('chartDoughnut').getContext('2d'),{type:'doughnut',data:{labels:['Estudados','Pendentes'],datasets:[{data:[totalE,totalP],backgroundColor:['#3b82f6','#ef4444']}]},options:{responsive:!0,maintainAspectRatio:!1,cutout:'65%',plugins:{legend:{labels:{color:'#fff'}},datalabels:{color:'#fff',font:{weight:'bold',size:12},formatter:v=>v}}} });
+  if(hE.length>0){charts.c3=new Chart(document.getElementById('chartHours').getContext('2d'),{type:'bar',data:{labels:hE.map(e=>e[0]),datasets:[{data:hE.map(e=>+(e[1]/60).toFixed(1)),backgroundColor:hE.map((_,i)=>COLORS[i%COLORS.length]),borderRadius:4}]},options:{indexAxis:'y',responsive:!0,maintainAspectRatio:!1,layout:{padding:{right:35}},plugins:{legend:{display:!1},datalabels:{anchor:'end',align:'right',color:'#fff',font:{size:10,weight:'bold'},formatter:v=>v+'h'}},scales:{x:{grid:{color:'#1e293b'},ticks:{color:'#94a3b8'}},y:{grid:{display:!1},ticks:{color:'#cbd5e1',font:{size:10}}}}} })}
+  charts.c4=new Chart(document.getElementById('chartDoughnut').getContext('2d'),{type:'doughnut',data:{labels:['Estudados','Pendentes'],datasets:[{data:[totalE,totalP],backgroundColor:['#3b82f6','#ef4444']}]},options:{responsive:!0,maintainAspectRatio:!1,cutout:'65%',plugins:{legend:{labels:{color:'#fff'}},datalabels:{color:'#fff',font:{weight:'bold',size:12},formatter:v=>v}}}});
 
   // Perf table
-  const byMateria={}; estudos.forEach(e=>{if(!byMateria[e.materia])byMateria[e.materia]={q:0,a:0};byMateria[e.materia].q+=e.questoes;byMateria[e.materia].a+=e.acertos});
-  const rows=Object.entries(byMateria).sort((a,b)=>b[1].q-a[1].q).map(([mat,val])=>{const t=val.q?val.a/val.q:0;const bc=t>=.7?'badge-green':t>=.6?'badge-amber':'badge-red';return`<tr><td>${mat}</td><td>${val.q}</td><td>${val.a}</td><td>${val.q-val.a}</td><td>${fmtPct(t)}</td><td><span class="badge ${bc}">${t>=.7?'Bom':t>=.6?'Regular':'Crítico'}</span></td></tr>`}).join('');
-  document.querySelector('#perfTable tbody').innerHTML=rows+`<tr style="background:rgba(59,130,246,0.15);font-weight:bold;"><td><strong>TOTAL</strong></td><td><strong>${qTotal}</strong></td><td><strong>${aTotal}</strong></td><td><strong>${eTotal}</strong></td><td><strong>${fmtPct(taxaTotal)}</strong></td><td><span class="badge badge-blue">Geral</span></td></tr>`;
+  const byM={};estudos.forEach(e=>{if(!byM[e.materia])byM[e.materia]={q:0,a:0};byM[e.materia].q+=e.questoes;byM[e.materia].a+=e.acertos});
+  document.querySelector('#perfTable tbody').innerHTML=Object.entries(byM).sort((a,b)=>b[1].q-a[1].q).map(([mat,val])=>{const t=val.q?val.a/val.q:0,bc=t>=.7?'badge-green':t>=.6?'badge-amber':'badge-red';return`<tr><td>${mat}</td><td>${val.q}</td><td>${val.a}</td><td>${val.q-val.a}</td><td>${fmtPct(t)}</td><td><span class="badge ${bc}">${t>=.7?'Bom':t>=.6?'Regular':'Crítico'}</span></td></tr>`}).join('')+`<tr style="background:rgba(59,130,246,.15);font-weight:bold"><td><strong>TOTAL</strong></td><td><strong>${qTotal}</strong></td><td><strong>${aTotal}</strong></td><td><strong>${eTotal}</strong></td><td><strong>${fmtPct(taxaTotal)}</strong></td><td><span class="badge badge-blue">Geral</span></td></tr>`;
 
   // Evolution
-  const byDate={}; estudos.forEach(e=>{if(!byDate[e.dataStr])byDate[e.dataStr]={min:0};byDate[e.dataStr].min+=e.tempo});
-  const dates=Object.keys(byDate).sort(); const fd=d=>{const p=d.split('-');return p[2]+'/'+p[1]};
-  if(dates.length>0){
-    charts.c7=new Chart(document.getElementById('chartDailyMin').getContext('2d'),{type:'bar',data:{labels:dates.map(fd),datasets:[{data:dates.map(d=>byDate[d].min),backgroundColor:'rgba(59,130,246,0.6)',borderRadius:4}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1},datalabels:{color:'#fff',font:{size:9},formatter:v=>v>0?v+'min':''}},scales:{x:{grid:{display:!1},ticks:{color:'#94a3b8',maxRotation:45,font:{size:9}}},y:{grid:{color:'#1e293b'},ticks:{color:'#94a3b8'}}}}});
-    let cum=0;
-    charts.c8=new Chart(document.getElementById('chartCumHours').getContext('2d'),{type:'line',data:{labels:dates.map(fd),datasets:[{data:dates.map(d=>{cum+=byDate[d].min;return+(cum/60).toFixed(1)}),borderColor:'#10b981',backgroundColor:'rgba(16,185,129,0.1)',fill:!0,tension:.3,pointRadius:3}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1},datalabels:{display:!1}},scales:{x:{grid:{display:!1},ticks:{color:'#94a3b8',maxRotation:45,font:{size:9}}},y:{grid:{color:'#1e293b'},ticks:{color:'#94a3b8',callback:v=>v+'h'}}}}});
+  const byDate={};estudos.forEach(e=>{if(!byDate[e.dataStr])byDate[e.dataStr]={min:0};byDate[e.dataStr].min+=e.tempo});
+  const dates=Object.keys(byDate).sort(),fd=d=>{const p=d.split('-');return p[2]+'/'+p[1]};
+  if(dates.length>0){charts.c7=new Chart(document.getElementById('chartDailyMin').getContext('2d'),{type:'bar',data:{labels:dates.map(fd),datasets:[{data:dates.map(d=>byDate[d].min),backgroundColor:'rgba(59,130,246,.6)',borderRadius:4}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1},datalabels:{color:'#fff',font:{size:9},formatter:v=>v>0?v+'min':''}},scales:{x:{grid:{display:!1},ticks:{color:'#94a3b8',maxRotation:45,font:{size:9}}},y:{grid:{color:'#1e293b'},ticks:{color:'#94a3b8'}}}} });
+    let cum=0;charts.c8=new Chart(document.getElementById('chartCumHours').getContext('2d'),{type:'line',data:{labels:dates.map(fd),datasets:[{data:dates.map(d=>{cum+=byDate[d].min;return+(cum/60).toFixed(1)}),borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.1)',fill:!0,tension:.3,pointRadius:3}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1},datalabels:{display:!1}},scales:{x:{grid:{display:!1},ticks:{color:'#94a3b8',maxRotation:45,font:{size:9}}},y:{grid:{color:'#1e293b'},ticks:{color:'#94a3b8',callback:v=>v+'h'}}}} });
   }
 
-  // Subjects filter
+  // Filters
   const materias=[...new Set(estudos.map(e=>e.materia))].sort();
-  const sel=document.getElementById('filterSubject'); sel.innerHTML='<option value="all">Todas</option>'+materias.map(m=>`<option value="${m}">${m}</option>`).join('');
+  ['filterSubject','filterTopicMateria'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='<option value="all">Todas</option>'+materias.map(m=>`<option value="${m}">${m}</option>`).join('')});
 
   // Revisions
-  const hoje=new Date(); const topicLast={};
+  const hoje=new Date(),topicLast={};
   estudos.forEach(e=>{const k=e.materia+'|||'+e.bloco+'|||'+e.topico;if(!topicLast[k]||e.data>topicLast[k].data)topicLast[k]=e});
   const revItems=Object.values(topicLast).map(e=>{const ds=Math.floor((hoje-e.data)/(1000*60*60*24));return{...e,daysSince:ds,urgency:ds>=30?'overdue':ds>=14?'warning':'ok'}}).sort((a,b)=>b.daysSince-a.daysSince);
-  const over30=revItems.filter(r=>r.daysSince>=30).length;
-  document.getElementById('revisionAlerts').innerHTML=over30>0?`<div class="alert danger">🔴 ${over30} tópicos sem revisão há 30+ dias!</div>`:'<div class="alert success">✅ Revisões em dia!</div>';
-  document.querySelector('#revisionTable tbody').innerHTML=revItems.slice(0,50).map(r=>{const uc=r.urgency==='overdue'?'rev-overdue':r.urgency==='warning'?'rev-warning':'rev-ok';const bc=r.urgency==='overdue'?'badge-red':r.urgency==='warning'?'badge-amber':'badge-green';const lb=r.urgency==='overdue'?'URGENTE':r.urgency==='warning'?'Atenção':'OK';return`<tr><td>${r.materia}</td><td>${r.bloco}</td><td>${r.topico.substring(0,40)}</td><td>${r.dataStr.split('-').reverse().join('/')}</td><td class="${uc}">${r.daysSince}d</td><td><span class="badge ${bc}">${lb}</span></td></tr>`}).join('');
+  document.getElementById('revisionAlerts').innerHTML=revItems.filter(r=>r.daysSince>=30).length>0?`<div class="alert danger">🔴 Tópicos sem revisão há 30+ dias!</div>`:'<div class="alert success">✅ Revisões em dia!</div>';
+  document.querySelector('#revisionTable tbody').innerHTML=revItems.slice(0,50).map(r=>`<tr><td>${r.materia}</td><td>${r.bloco}</td><td>${r.topico.substring(0,40)}</td><td>${r.dataStr.split('-').reverse().join('/')}</td><td class="${r.urgency==='overdue'?'rev-overdue':'rev-ok'}">${r.daysSince}d</td><td><span class="badge ${r.urgency==='overdue'?'badge-red':'badge-green'}">${r.urgency==='overdue'?'URGENTE':'OK'}</span></td></tr>`).join('');
 
-  renderMetas();
-  renderSubjects();
+  renderMetas();renderSubjects();renderTopics();
 }
 
-function renderSubjects() {
-  const filter=document.getElementById('filterSubject').value;
-  let filt=[...estudos]; if(filter!=='all')filt=filt.filter(e=>e.materia===filter);
+function renderSubjects(){
+  const f=document.getElementById('filterSubject').value;let filt=[...estudos];if(f!=='all')filt=filt.filter(e=>e.materia===f);
   const h=filt.reduce((s,e)=>s+e.tempo,0),q=filt.reduce((s,e)=>s+e.questoes,0),a=filt.reduce((s,e)=>s+e.acertos,0);
   document.getElementById('kpiSubject').innerHTML=`<div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Horas</div><div class="kpi-value">${fmtH(h)}</div></div><div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Sessões</div><div class="kpi-value">${filt.length}</div></div><div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Questões</div><div class="kpi-value">${q}</div></div><div class="kpi" style="border-top:3px solid #8b5cf6"><div class="kpi-label">Taxa</div><div class="kpi-value">${q?fmtPct(a/q):'—'}</div></div>`;
-  document.querySelector('#subjectTable tbody').innerHTML=[...filt].sort((a,b)=>b.data-a.data).slice(0,50).map(e=>{const t=e.questoes?fmtPct(e.acertos/e.questoes):'—';return`<tr><td>${e.dataStr.split('-').reverse().join('/')}</td><td>${e.materia}</td><td>${e.bloco}</td><td>${e.topico.substring(0,35)}</td><td>${e.tempo}min</td><td>${e.questoes||'—'}</td><td>${e.acertos||'—'}</td><td>${t}</td></tr>`}).join('');
+  document.querySelector('#subjectTable tbody').innerHTML=[...filt].sort((a,b)=>b.data-a.data).slice(0,50).map(e=>`<tr><td>${e.dataStr.split('-').reverse().join('/')}</td><td>${e.materia}</td><td>${e.bloco}</td><td>${e.topico.substring(0,35)}</td><td>${e.tempo}min</td><td>${e.questoes||'—'}</td><td>${e.acertos||'—'}</td><td>${e.questoes?fmtPct(e.acertos/e.questoes):'—'}</td></tr>`).join('');
 }
 
-function renderMetas() {
-  const hoje=toISO(new Date());
-  const minH=estudos.filter(e=>e.dataStr===hoje).reduce((s,e)=>s+e.tempo,0);
-  const qHoje=estudos.filter(e=>e.dataStr===hoje).reduce((s,e)=>s+e.questoes,0);
-  document.getElementById('kpiMetas').innerHTML=`<div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Horas Hoje</div><div class="kpi-value">${fmtH(minH)}</div></div><div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Questões Hoje</div><div class="kpi-value">${qHoje}</div></div><div class="kpi" style="border-top:3px solid #8b5cf6"><div class="kpi-label">Pomodoros</div><div class="kpi-value">${sessionCount}</div></div>`;
+function renderTopics(){
+  const f=document.getElementById('filterTopicMateria').value;let filt=[...estudos];if(f!=='all')filt=filt.filter(e=>e.materia===f);
+  const map={};filt.forEach(e=>{const k=e.materia+'|||'+e.bloco+'|||'+e.topico;if(!map[k])map[k]={materia:e.materia,bloco:e.bloco,topico:e.topico,sessoes:0,tempo:0,questoes:0,acertos:0,ultimo:e.data};map[k].sessoes++;map[k].tempo+=e.tempo;map[k].questoes+=e.questoes;map[k].acertos+=e.acertos;if(e.data>map[k].ultimo)map[k].ultimo=e.data});
+  const topics=Object.values(map).sort((a,b)=>b.tempo-a.tempo);
+  document.getElementById('kpiTopics').innerHTML=`<div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Tópicos</div><div class="kpi-value">${topics.length}</div></div><div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Horas</div><div class="kpi-value">${fmtH(topics.reduce((s,t)=>s+t.tempo,0))}</div></div><div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Questões</div><div class="kpi-value">${topics.reduce((s,t)=>s+t.questoes,0)}</div></div>`;
+  document.querySelector('#topicTable tbody').innerHTML=topics.slice(0,80).map(t=>`<tr><td>${t.materia}</td><td>${t.bloco}</td><td>${t.topico.substring(0,40)}</td><td>${t.sessoes}</td><td>${fmtH(t.tempo)}</td><td>${t.questoes||'—'}</td><td>${t.questoes?fmtPct(t.acertos/t.questoes):'—'}</td><td>${toISO(t.ultimo).split('-').reverse().join('/')}</td></tr>`).join('');
+}
+
+function renderMetas(){
+  const hoje=toISO(new Date()),minH=estudos.filter(e=>e.dataStr===hoje).reduce((s,e)=>s+e.tempo,0),qHoje=estudos.filter(e=>e.dataStr===hoje).reduce((s,e)=>s+e.questoes,0);
+  document.getElementById('kpiMetas').innerHTML=`<div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Horas Hoje</div><div class="kpi-value">${fmtH(minH)}</div></div><div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Questões</div><div class="kpi-value">${qHoje}</div></div><div class="kpi" style="border-top:3px solid #8b5cf6"><div class="kpi-label">Pomodoros</div><div class="kpi-value">${sessionCount}</div></div>`;
   document.getElementById('goalHoras').style.width=Math.min(100,(minH/240)*100)+'%';
   document.getElementById('goalQuestoes').style.width=Math.min(100,(qHoje/30)*100)+'%';
   document.getElementById('metaHoras').textContent=fmtH(minH)+' / 4h';
