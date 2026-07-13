@@ -5,30 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Central de Comando — Auditor Fiscal</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: Arial, sans-serif; background: #0a0e1a; color: #f1f5f9; min-height: 100vh; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #0a0e1a; color: #e0e0e0; min-height: 100vh; }
 
 .header { background: #111827; padding: 15px 20px; border-bottom: 1px solid #1e293b; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; position:sticky; top:0; z-index:100; }
-.header h1 { font-size: 1.2rem; color: #3b82f6; }
+.header h1 { font-size: 1.2rem; color: #ffffff; }
 .header button { background: #3b82f6; color:#fff; border:none; padding:8px 16px; border-radius:5px; cursor:pointer; font-weight:bold; }
 
 .tabs { display:flex; gap:4px; padding:10px 20px; overflow-x:auto; border-bottom:1px solid #1e293b; background:#0f172a; }
-.tab { padding:8px 15px; border:none; background:none; color:#64748b; cursor:pointer; font-size:0.85rem; white-space:nowrap; border-bottom:2px solid transparent; }
-.tab:hover { color:#94a3b8; }
-.tab.active { color:#3b82f6; border-bottom-color:#3b82f6; font-weight:bold; }
+.tab { padding:8px 15px; border:none; background:none; color:#94a3b8; cursor:pointer; font-size:0.85rem; white-space:nowrap; border-bottom:2px solid transparent; }
+.tab:hover { color:#cbd5e1; }
+.tab.active { color:#ffffff; border-bottom-color:#3b82f6; font-weight:bold; }
 
 .content { max-width:1400px; margin:0 auto; padding:20px; }
 .tab-panel { display:none; }
 .tab-panel.active { display:block; }
 
 .card { background:#111827; padding:20px; border-radius:10px; margin-bottom:20px; border:1px solid #1e293b; }
-.card h3 { color:#64748b; font-size:0.8rem; text-transform:uppercase; margin-bottom:15px; letter-spacing:0.5px; }
+.card h3 { color:#ffffff; font-size:0.85rem; text-transform:uppercase; margin-bottom:15px; letter-spacing:0.5px; }
 
 .kpi-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); gap:15px; margin-bottom:20px; }
 .kpi { background:#111827; padding:18px; border-radius:10px; border:1px solid #1e293b; }
-.kpi-label { font-size:0.7rem; color:#64748b; text-transform:uppercase; }
-.kpi-value { font-size:1.8rem; font-weight:bold; margin:5px 0; }
+.kpi-label { font-size:0.7rem; color:#94a3b8; text-transform:uppercase; }
+.kpi-value { font-size:1.8rem; font-weight:bold; margin:5px 0; color:#ffffff; }
 .kpi-sub { font-size:0.7rem; color:#64748b; }
 
 .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
@@ -36,23 +37,21 @@ body { font-family: Arial, sans-serif; background: #0a0e1a; color: #f1f5f9; min-
 .chart-wrap { position:relative; width:100%; height:350px; }
 
 table { width:100%; border-collapse:collapse; font-size:0.8rem; }
-th { text-align:left; padding:10px; border-bottom:1px solid #1e293b; color:#64748b; font-size:0.7rem; text-transform:uppercase; background:#111827; position:sticky; top:0; }
-td { padding:8px 10px; border-bottom:1px solid rgba(30,41,59,0.5); }
+th { text-align:left; padding:10px; border-bottom:1px solid #1e293b; color:#ffffff; font-size:0.7rem; text-transform:uppercase; background:#111827; position:sticky; top:0; }
+td { padding:8px 10px; border-bottom:1px solid rgba(30,41,59,0.5); color:#cbd5e1; }
 
 .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.65rem; font-weight:bold; }
 .badge-green { background:rgba(16,185,129,0.2); color:#10b981; }
 .badge-amber { background:rgba(245,158,11,0.2); color:#f59e0b; }
 .badge-red { background:rgba(239,68,68,0.2); color:#ef4444; }
+.badge-blue { background:rgba(59,130,246,0.2); color:#60a5fa; }
 
-.loading { text-align:center; padding:60px; }
+.loading { text-align:center; padding:60px; color:#ffffff; }
 .loading .spinner { width:50px;height:50px; border:3px solid #1e293b; border-top-color:#3b82f6; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 15px; }
 @keyframes spin { to { transform:rotate(360deg); } }
 
-.countdown { text-align:center; padding:25px; background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(239,68,68,0.1)); border-radius:10px; margin-bottom:20px; border:1px solid rgba(245,158,11,0.3); }
-.countdown .days { font-size:3rem; font-weight:bold; color:#f59e0b; }
-
 .filters { display:flex; gap:10px; margin-bottom:20px; align-items:center; }
-.filters select { background:#1e293b; border:1px solid #1e293b; color:#f1f5f9; padding:8px 12px; border-radius:5px; }
+.filters select { background:#1e293b; border:1px solid #334155; color:#f1f5f9; padding:8px 12px; border-radius:5px; }
 
 .alert { padding:15px; border-radius:8px; margin-bottom:10px; border-left:3px solid; }
 .alert.danger { background:rgba(239,68,68,0.1); border-color:#ef4444; color:#fca5a5; }
@@ -70,9 +69,9 @@ td { padding:8px 10px; border-bottom:1px solid rgba(30,41,59,0.5); }
 <body>
 
 <div class="header">
-  <h1>📊 Central de Comando — Auditor Fiscal</h1>
+  <h1>Central de Comando — Auditor Fiscal</h1>
   <div style="display:flex;align-items:center;gap:15px">
-    <span style="background:rgba(245,158,11,0.2);color:#f59e0b;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:bold;">SEFAZ-AL · 30/08/2026</span>
+    <span style="background:rgba(245,158,11,0.2);color:#f59e0b;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:bold;">SEFAZ-AL</span>
     <span id="lastUpdate" style="font-size:0.7rem;color:#64748b;">—</span>
     <button onclick="loadData()">🔄 Atualizar</button>
   </div>
@@ -92,7 +91,6 @@ td { padding:8px 10px; border-bottom:1px solid rgba(30,41,59,0.5); }
   <div id="loading" class="loading"><div class="spinner"></div><p>Carregando dados da planilha...</p></div>
 
   <div id="tab-overview" class="tab-panel">
-    <div class="countdown"><div class="days" id="countdownDays">--</div><div>dias para a prova SEFAZ-AL (Cebraspe)</div></div>
     <div class="kpi-grid" id="kpiOverview"></div>
     <div class="grid-2">
       <div class="card"><h3>Progresso por Matéria</h3><div class="chart-wrap"><canvas id="chartProgress"></canvas></div></div>
@@ -126,7 +124,7 @@ td { padding:8px 10px; border-bottom:1px solid rgba(30,41,59,0.5); }
 
   <div id="tab-subjects" class="tab-panel">
     <div class="filters">
-      <span style="font-size:0.8rem;color:#64748b;">Filtrar:</span>
+      <span style="font-size:0.8rem;color:#94a3b8;">Filtrar:</span>
       <select id="filterSubject" onchange="renderSubjects()"><option value="all">Todas as Matérias</option></select>
     </div>
     <div class="kpi-grid" id="kpiSubject"></div>
@@ -157,8 +155,17 @@ td { padding:8px 10px; border-bottom:1px solid rgba(30,41,59,0.5); }
 
 <script>
 const URL = 'https://script.google.com/macros/s/AKfycbyJSiRC20qG0J5IXkpOmcwCvC-3SabABRqWqmDCVj3yZlPKvbOBT01fvB2F_5k6Br5ueQ/exec';
-const PROVA = new Date('2026-08-30');
 let painel = [], estudos = [], desempenho = [], charts = {};
+
+Chart.register(ChartDataLabels);
+Chart.defaults.set('plugins.datalabels', {
+  color: '#ffffff',
+  font: { size: 10, weight: 'bold' },
+  anchor: 'end',
+  align: 'end',
+  offset: 2,
+  formatter: (value) => value > 0 ? value : ''
+});
 
 function parseCSV(text) {
   const lines = text.split('\n');
@@ -172,6 +179,20 @@ function parseCSV(text) {
     r.push(c);
     return r;
   }).filter(r => r.some(c => c.trim()));
+}
+
+function parseNum(val) {
+  if (!val) return 0;
+  val = String(val).replace(/"/g, '').replace(',', '.').trim();
+  return parseFloat(val) || 0;
+}
+
+function parsePct(val) {
+  if (!val) return 0;
+  val = String(val).replace(/"/g, '').replace('%', '').replace(',', '.').trim();
+  let n = parseFloat(val);
+  if (isNaN(n)) return 0;
+  return n > 1 ? n / 100 : n;
 }
 
 async function loadData() {
@@ -190,7 +211,7 @@ async function loadData() {
     document.getElementById('lastUpdate').textContent = 'Atualizado: ' + new Date().toLocaleString('pt-BR');
     renderAll();
   } catch(err) {
-    document.getElementById('loading').innerHTML = '<p style="color:#ef4444;">❌ Erro: ' + err.message + '</p>';
+    document.getElementById('loading').innerHTML = '<p style="color:#ef4444;">❌ Erro ao carregar: ' + err.message + '</p>';
   }
 }
 
@@ -200,13 +221,13 @@ function parsePainel(csv) {
   for (let row of rows) {
     if (row[0] && row[0].includes('Matéria')) { start = true; continue; }
     if (!start || !row[0] || row[0] === 'TOTAL') continue;
-    if (row[0].includes('📊') || row[0].includes('📖') || row[0].includes('🎨')) continue;
+    if (row[0].includes('📊') || row[0].includes('📖') || row[0].includes('🎨') || row[0].includes('1️⃣')) continue;
     const t = parseInt(row[1]) || 0;
     if (t === 0) continue;
     data.push({
       materia: row[0].trim(), total: t,
       estudados: parseInt(row[2]) || 0,
-      pct: parseFloat(String(row[3]).replace('%','').replace(',','.')) || 0,
+      pct: parsePct(row[3]),
       pendentes: parseInt(row[5]) || 0
     });
   }
@@ -224,9 +245,9 @@ function parseEstudos(csv) {
     data.push({
       data: d, dataStr: d.toISOString().slice(0,10),
       materia: row[1].trim(), bloco: (row[2]||'').trim(), topico: (row[3]||'').trim(),
-      tempo: parseInt(row[4]) || 0,
-      questoes: parseInt(row[5]) || 0,
-      acertos: parseInt(row[6]) || 0
+      tempo: parseNum(row[4]),
+      questoes: parseNum(row[5]),
+      acertos: parseNum(row[6])
     });
   }
   return data;
@@ -239,10 +260,10 @@ function parseDesempenho(csv) {
     if (!row[0] || row[0].includes('índice')) continue;
     data.push({
       materia: row[0].trim(),
-      questoes: parseInt(row[1]) || 0,
-      pct: parseFloat(String(row[2]).replace('%','').replace(',','.')) || 0,
-      acertos: parseInt(row[3]) || 0,
-      erros: parseInt(row[5]) || 0
+      questoes: parseNum(row[1]),
+      pct: parsePct(row[2]),
+      acertos: parseNum(row[3]),
+      erros: parseNum(row[5])
     });
   }
   return data.sort((a,b) => b.questoes - a.questoes);
@@ -258,12 +279,11 @@ function switchTab(id) {
   event.target.classList.add('active');
 }
 
-function renderAll() {
-  const hoje = new Date();
-  const dias = Math.ceil((PROVA - hoje) / (1000*60*60*24));
-  document.getElementById('countdownDays').textContent = dias;
+function destroyChart(key) {
+  if (charts[key]) { charts[key].destroy(); delete charts[key]; }
+}
 
-  // Overview KPIs
+function renderAll() {
   const totalT = painel.reduce((s,m) => s+m.total, 0);
   const totalE = painel.reduce((s,m) => s+m.estudados, 0);
   const totalP = painel.reduce((s,m) => s+m.pendentes, 0);
@@ -272,46 +292,50 @@ function renderAll() {
   const aE = estudos.reduce((s,e) => s+e.acertos, 0);
   const qD = desempenho.reduce((s,d) => s+d.questoes, 0);
   const aD = desempenho.reduce((s,d) => s+d.acertos, 0);
+  const eD = desempenho.reduce((s,d) => s+d.erros, 0);
   
+  // Overview KPIs
   document.getElementById('kpiOverview').innerHTML = `
-    <div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Cobertura</div><div class="kpi-value" style="color:#3b82f6">${fmtPct(totalE/totalT)}</div><div class="kpi-sub">${totalE}/${totalT} tópicos</div></div>
-    <div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Horas</div><div class="kpi-value" style="color:#10b981">${fmtH(horas)}</div></div>
-    <div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Taxa Desemp.</div><div class="kpi-value" style="color:#f59e0b">${fmtPct(qD?aD/qD:0)}</div><div class="kpi-sub">${qD} questões</div></div>
-    <div class="kpi" style="border-top:3px solid #ef4444"><div class="kpi-label">Pendentes</div><div class="kpi-value" style="color:#ef4444">${totalP}</div></div>
-    <div class="kpi" style="border-top:3px solid #8b5cf6"><div class="kpi-label">Questões Est.</div><div class="kpi-value" style="color:#8b5cf6">${qE}</div><div class="kpi-sub">Taxa: ${fmtPct(qE?aE/qE:0)}</div></div>
-    <div class="kpi" style="border-top:3px solid #06b6d4"><div class="kpi-label">Dias Prova</div><div class="kpi-value" style="color:#06b6d4">${dias}</div></div>
+    <div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Cobertura</div><div class="kpi-value">${fmtPct(totalT?totalE/totalT:0)}</div><div class="kpi-sub">${totalE}/${totalT} tópicos</div></div>
+    <div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Horas</div><div class="kpi-value">${fmtH(horas)}</div></div>
+    <div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Taxa Desemp.</div><div class="kpi-value">${fmtPct(qD?aD/qD:0)}</div><div class="kpi-sub">${qD} questões</div></div>
+    <div class="kpi" style="border-top:3px solid #ef4444"><div class="kpi-label">Pendentes</div><div class="kpi-value">${totalP}</div></div>
+    <div class="kpi" style="border-top:3px solid #8b5cf6"><div class="kpi-label">Questões Est.</div><div class="kpi-value">${qE}</div><div class="kpi-sub">Taxa: ${fmtPct(qE?aE/qE:0)}</div></div>
+    <div class="kpi" style="border-top:3px solid #06b6d4"><div class="kpi-label">Erros Desemp.</div><div class="kpi-value">${eD}</div></div>
   `;
 
-  // Charts
+  // Overview charts
+  destroyChart('c1');
   const ctx1 = document.getElementById('chartProgress').getContext('2d');
-  if (charts.c1) charts.c1.destroy();
-  charts.c1 = new Chart(ctx1, { type:'bar', data:{ labels: painel.map(m=>m.materia), datasets:[{ data: painel.map(m=>Math.min(100,m.pct*100)), backgroundColor: painel.map(m=>m.pct>=0.8?'#10b981':m.pct>=0.5?'#f59e0b':'#ef4444') }] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ x:{ max:100 } } } });
+  charts.c1 = new Chart(ctx1, { type:'bar', data:{ labels: painel.map(m=>m.materia), datasets:[{ data: painel.map(m=>Math.min(100, m.pct*100)), backgroundColor: painel.map(m=>m.pct>=0.8?'#10b981':m.pct>=0.5?'#f59e0b':'#ef4444') }] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false }, datalabels:{ anchor:'end', align:'right', formatter:v=>v.toFixed(0)+'%' } }, scales:{ x:{ max:100, grid:{color:'#1e293b'}, ticks:{color:'#94a3b8'} }, y:{ grid:{display:false}, ticks:{color:'#cbd5e1', font:{size:10}} } } } });
 
+  destroyChart('c2');
   const ctx2 = document.getElementById('chartRadar').getContext('2d');
-  if (charts.c2) charts.c2.destroy();
-  charts.c2 = new Chart(ctx2, { type:'radar', data:{ labels: painel.map(m=>m.materia.substring(0,18)), datasets:[{ label:'Cobertura', data: painel.map(m=>m.pct*100), borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.2)' }, { label:'Meta 80%', data: painel.map(()=>80), borderColor:'rgba(245,158,11,0.5)', borderDash:[5,5], pointRadius:0 }] }, options:{ responsive:true, maintainAspectRatio:false, scales:{ r:{ max:100 } } } });
+  charts.c2 = new Chart(ctx2, { type:'radar', data:{ labels: painel.map(m=>m.materia.substring(0,18)), datasets:[{ label:'Cobertura', data: painel.map(m=>m.pct*100), borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.2)', pointBackgroundColor:'#3b82f6' }, { label:'Meta 80%', data: painel.map(()=>80), borderColor:'rgba(245,158,11,0.5)', borderDash:[5,5], pointRadius:0 }] }, options:{ responsive:true, maintainAspectRatio:false, scales:{ r:{ max:100, grid:{color:'#334155'}, ticks:{display:false}, pointLabels:{color:'#cbd5e1', font:{size:10}} } }, plugins:{ legend:{ labels:{color:'#ffffff'} }, datalabels:{display:false} } } });
 
-  // Horas por matéria
+  // Hours per subject
   const hByM = {};
   estudos.forEach(e => { hByM[e.materia] = (hByM[e.materia]||0) + e.tempo; });
   const hEntries = Object.entries(hByM).sort((a,b)=>b[1]-a[1]);
-  const ctx3 = document.getElementById('chartHours').getContext('2d');
-  if (charts.c3) charts.c3.destroy();
-  charts.c3 = new Chart(ctx3, { type:'bar', data:{ labels: hEntries.map(e=>e[0]), datasets:[{ data: hEntries.map(e=>+(e[1]/60).toFixed(1)), backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f43f5e','#84cc16'] }] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } } } });
+  destroyChart('c3');
+  if (hEntries.length > 0) {
+    const ctx3 = document.getElementById('chartHours').getContext('2d');
+    charts.c3 = new Chart(ctx3, { type:'bar', data:{ labels: hEntries.map(e=>e[0]), datasets:[{ data: hEntries.map(e=>+(e[1]/60).toFixed(1)), backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f43f5e','#84cc16'] }] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, datalabels:{ formatter:v=>v+'h' } }, scales:{ x:{ grid:{color:'#1e293b'}, ticks:{color:'#94a3b8'} }, y:{ grid:{display:false}, ticks:{color:'#cbd5e1', font:{size:10}} } } } });
+  }
 
   // Doughnut
+  destroyChart('c4');
   const ctx4 = document.getElementById('chartDoughnut').getContext('2d');
-  if (charts.c4) charts.c4.destroy();
-  charts.c4 = new Chart(ctx4, { type:'doughnut', data:{ labels:['Estudados','Pendentes'], datasets:[{ data:[totalE, totalP], backgroundColor:['#3b82f6','#ef4444'] }] }, options:{ responsive:true, maintainAspectRatio:false, cutout:'65%' } });
+  charts.c4 = new Chart(ctx4, { type:'doughnut', data:{ labels:['Estudados','Pendentes'], datasets:[{ data:[totalE, totalP], backgroundColor:['#3b82f6','#ef4444'] }] }, options:{ responsive:true, maintainAspectRatio:false, cutout:'65%', plugins:{ legend:{ labels:{color:'#ffffff'} }, datalabels:{ color:'#fff', formatter:v=>v } } } });
 
   // Performance
   const best = desempenho.filter(d=>d.questoes>=5).sort((a,b)=>b.pct-a.pct)[0];
   const worst = desempenho.filter(d=>d.questoes>=5).sort((a,b)=>a.pct-b.pct)[0];
   document.getElementById('kpiPerf').innerHTML = `
-    <div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Total Questões</div><div class="kpi-value" style="color:#3b82f6">${qD}</div></div>
-    <div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Taxa Geral</div><div class="kpi-value" style="color:#10b981">${fmtPct(qD?aD/qD:0)}</div></div>
-    <div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Melhor</div><div class="kpi-value" style="color:#f59e0b;font-size:1rem;">${best?best.materia.substring(0,20):'—'}</div><div class="kpi-sub">${best?fmtPct(best.pct):''}</div></div>
-    <div class="kpi" style="border-top:3px solid #ef4444"><div class="kpi-label">Pior</div><div class="kpi-value" style="color:#ef4444;font-size:1rem;">${worst?worst.materia.substring(0,20):'—'}</div><div class="kpi-sub">${worst?fmtPct(worst.pct):''}</div></div>
+    <div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Total Questões</div><div class="kpi-value">${qD}</div></div>
+    <div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Taxa Geral</div><div class="kpi-value">${fmtPct(qD?aD/qD:0)}</div></div>
+    <div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Melhor</div><div class="kpi-value" style="font-size:1rem;">${best?best.materia.substring(0,20):'—'}</div><div class="kpi-sub">${best?fmtPct(best.pct):''}</div></div>
+    <div class="kpi" style="border-top:3px solid #ef4444"><div class="kpi-label">Pior</div><div class="kpi-value" style="font-size:1rem;">${worst?worst.materia.substring(0,20):'—'}</div><div class="kpi-sub">${worst?fmtPct(worst.pct):''}</div></div>
   `;
 
   // Perf table
@@ -321,6 +345,21 @@ function renderAll() {
     const bc = d.pct >= 0.7 ? 'badge-green' : d.pct >= 0.6 ? 'badge-amber' : 'badge-red';
     tb.innerHTML += `<tr><td>${d.materia}</td><td>${d.questoes}</td><td>${d.acertos}</td><td>${d.erros}</td><td>${fmtPct(d.pct)}</td><td><span class="badge ${bc}">${d.pct>=0.7?'Bom':d.pct>=0.6?'Regular':'Crítico'}</span></td></tr>`;
   });
+
+  // Perf charts
+  const filtPerf = desempenho.filter(d=>d.questoes>=5).sort((a,b)=>b.pct-a.pct);
+  destroyChart('c5');
+  if (filtPerf.length > 0) {
+    const ctx5 = document.getElementById('chartAccuracy').getContext('2d');
+    charts.c5 = new Chart(ctx5, { type:'bar', data:{ labels: filtPerf.map(d=>d.materia), datasets:[{ data: filtPerf.map(d=>d.pct*100), backgroundColor: filtPerf.map(d=>d.pct>=0.7?'#10b981':d.pct>=0.6?'#f59e0b':'#ef4444') }] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, datalabels:{ formatter:v=>v.toFixed(0)+'%' } }, scales:{ x:{ max:100, grid:{color:'#1e293b'}, ticks:{color:'#94a3b8'} }, y:{ grid:{display:false}, ticks:{color:'#cbd5e1', font:{size:10}} } } } });
+  }
+
+  const volPerf = desempenho.filter(d=>d.questoes>=5).sort((a,b)=>b.questoes-a.questoes);
+  destroyChart('c6');
+  if (volPerf.length > 0) {
+    const ctx6 = document.getElementById('chartVolume').getContext('2d');
+    charts.c6 = new Chart(ctx6, { type:'bar', data:{ labels: volPerf.map(d=>d.materia), datasets:[{ label:'Acertos', data: volPerf.map(d=>d.acertos), backgroundColor:'#10b981' }, { label:'Erros', data: volPerf.map(d=>d.erros), backgroundColor:'#ef4444' }] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{color:'#ffffff'} }, datalabels:{ formatter:v=>v>0?v:'', color:'#fff' } }, scales:{ x:{ stacked:true, grid:{color:'#1e293b'}, ticks:{color:'#94a3b8'} }, y:{ stacked:true, grid:{display:false}, ticks:{color:'#cbd5e1', font:{size:10}} } } } });
+  }
 
   // Evolution
   const byDate = {};
@@ -332,20 +371,25 @@ function renderAll() {
     byDate[e.dataStr].a += e.acertos;
   });
   const dates = Object.keys(byDate).sort();
+  const fd = d => { const p = d.split('-'); return p[2]+'/'+p[1]; };
+
   if (dates.length > 0) {
-    const fd = d => { const p = d.split('-'); return p[2]+'/'+p[1]; };
-    const ctx5 = document.getElementById('chartDailyMin').getContext('2d');
-    if (charts.c5) charts.c5.destroy();
-    charts.c5 = new Chart(ctx5, { type:'bar', data:{ labels:dates.map(fd), datasets:[{ data:dates.map(d=>byDate[d].min), backgroundColor:'rgba(59,130,246,0.6)' }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } } } });
+    destroyChart('c7');
+    const ctx7 = document.getElementById('chartDailyMin').getContext('2d');
+    charts.c7 = new Chart(ctx7, { type:'bar', data:{ labels:dates.map(fd), datasets:[{ data:dates.map(d=>byDate[d].min), backgroundColor:'rgba(59,130,246,0.6)' }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, datalabels:{ formatter:v=>v>0?v+'min':'' } }, scales:{ x:{ grid:{display:false}, ticks:{color:'#94a3b8', maxRotation:45, font:{size:9}} }, y:{ grid:{color:'#1e293b'}, ticks:{color:'#94a3b8'} } } } });
 
+    destroyChart('c8');
+    const ctx8 = document.getElementById('chartCumHours').getContext('2d');
     let cum = 0;
-    const ctx6 = document.getElementById('chartCumHours').getContext('2d');
-    if (charts.c6) charts.c6.destroy();
-    charts.c6 = new Chart(ctx6, { type:'line', data:{ labels:dates.map(fd), datasets:[{ data:dates.map(d=>{ cum+=byDate[d].min; return +(cum/60).toFixed(1); }), borderColor:'#10b981', backgroundColor:'rgba(16,185,129,0.1)', fill:true, tension:0.3 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } } } });
+    charts.c8 = new Chart(ctx8, { type:'line', data:{ labels:dates.map(fd), datasets:[{ data:dates.map(d=>{ cum+=byDate[d].min; return +(cum/60).toFixed(1); }), borderColor:'#10b981', backgroundColor:'rgba(16,185,129,0.1)', fill:true, tension:0.3, pointRadius:3, pointBackgroundColor:'#10b981' }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, datalabels:{display:false} }, scales:{ x:{ grid:{display:false}, ticks:{color:'#94a3b8', maxRotation:45, font:{size:9}} }, y:{ grid:{color:'#1e293b'}, ticks:{color:'#94a3b8', callback:v=>v+'h'} } } } });
 
-    const ctx7 = document.getElementById('chartSessions').getContext('2d');
-    if (charts.c7) charts.c7.destroy();
-    charts.c7 = new Chart(ctx7, { type:'bar', data:{ labels:dates.map(fd), datasets:[{ data:dates.map(d=>byDate[d].sess), backgroundColor:'rgba(139,92,246,0.6)' }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } } } });
+    destroyChart('c9');
+    const ctx9 = document.getElementById('chartSessions').getContext('2d');
+    charts.c9 = new Chart(ctx9, { type:'bar', data:{ labels:dates.map(fd), datasets:[{ data:dates.map(d=>byDate[d].sess), backgroundColor:'rgba(139,92,246,0.6)' }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, datalabels:{ formatter:v=>v>0?v:'' } }, scales:{ x:{ grid:{display:false}, ticks:{color:'#94a3b8', maxRotation:45, font:{size:9}} }, y:{ grid:{color:'#1e293b'}, ticks:{color:'#94a3b8'} } } } });
+
+    destroyChart('c10');
+    const ctx10 = document.getElementById('chartDailyQ').getContext('2d');
+    charts.c10 = new Chart(ctx10, { type:'bar', data:{ labels:dates.map(fd), datasets:[{ label:'Acertos', data:dates.map(d=>byDate[d].a), backgroundColor:'#10b981' }, { label:'Erros', data:dates.map(d=>byDate[d].q-byDate[d].a), backgroundColor:'#ef4444' }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{color:'#ffffff'} }, datalabels:{display:false} }, scales:{ x:{ stacked:true, grid:{display:false}, ticks:{color:'#94a3b8', maxRotation:45, font:{size:9}} }, y:{ stacked:true, grid:{color:'#1e293b'}, ticks:{color:'#94a3b8'} } } } });
   }
 
   // Subjects filter
@@ -356,40 +400,53 @@ function renderAll() {
 
   // Questions
   document.getElementById('kpiQuest').innerHTML = `
-    <div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Q. Desempenho</div><div class="kpi-value" style="color:#3b82f6">${qD}</div><div class="kpi-sub">Taxa: ${fmtPct(qD?aD/qD:0)}</div></div>
-    <div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Q. Estudos</div><div class="kpi-value" style="color:#10b981">${qE}</div><div class="kpi-sub">Taxa: ${fmtPct(qE?aE/qE:0)}</div></div>
-    <div class="kpi" style="border-top:3px solid #ef4444"><div class="kpi-label">Erros Desemp.</div><div class="kpi-value" style="color:#ef4444">${desempenho.reduce((s,d)=>s+d.erros,0)}</div></div>
+    <div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Q. Desempenho</div><div class="kpi-value">${qD}</div><div class="kpi-sub">Taxa: ${fmtPct(qD?aD/qD:0)}</div></div>
+    <div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Q. Estudos</div><div class="kpi-value">${qE}</div><div class="kpi-sub">Taxa: ${fmtPct(qE?aE/qE:0)}</div></div>
+    <div class="kpi" style="border-top:3px solid #ef4444"><div class="kpi-label">Erros Desemp.</div><div class="kpi-value">${eD}</div></div>
   `;
 
-  const ctx8 = document.getElementById('chartQuestPie').getContext('2d');
-  if (charts.c8) charts.c8.destroy();
-  charts.c8 = new Chart(ctx8, { type:'doughnut', data:{ labels:['Acertos Des.','Erros Des.','Acertos Est.','Erros Est.'], datasets:[{ data:[aD,qD-aD,aE,qE-aE], backgroundColor:['#10b981','#ef4444','#06b6d4','#f59e0b'] }] }, options:{ responsive:true, maintainAspectRatio:false, cutout:'55%' } });
+  destroyChart('c11');
+  const ctx11 = document.getElementById('chartQuestPie').getContext('2d');
+  charts.c11 = new Chart(ctx11, { type:'doughnut', data:{ labels:['Acertos Des.','Erros Des.','Acertos Est.','Erros Est.'], datasets:[{ data:[aD,qD-aD,aE,qE-aE], backgroundColor:['#10b981','#ef4444','#06b6d4','#f59e0b'] }] }, options:{ responsive:true, maintainAspectRatio:false, cutout:'55%', plugins:{ legend:{ labels:{color:'#ffffff'} }, datalabels:{ color:'#fff', formatter:v=>v } } } });
+
+  // Quest evolution
+  const datesQ = [...new Set(estudos.filter(e=>e.questoes>0).map(e=>e.dataStr))].sort();
+  if (datesQ.length > 0) {
+    const accByDate = {};
+    estudos.filter(e=>e.questoes>0).forEach(e => {
+      if (!accByDate[e.dataStr]) accByDate[e.dataStr] = { q:0, a:0 };
+      accByDate[e.dataStr].q += e.questoes;
+      accByDate[e.dataStr].a += e.acertos;
+    });
+    destroyChart('c12');
+    const ctx12 = document.getElementById('chartQuestEvo').getContext('2d');
+    charts.c12 = new Chart(ctx12, { type:'line', data:{ labels:datesQ.map(fd), datasets:[{ label:'Taxa de Acerto', data:datesQ.map(d=>accByDate[d]?(accByDate[d].a/accByDate[d].q*100).toFixed(1):null), borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.1)', fill:true, tension:0.3, pointRadius:4, pointBackgroundColor:'#3b82f6' }, { label:'Meta 70%', data:datesQ.map(()=>70), borderColor:'rgba(245,158,11,0.5)', borderDash:[5,5], pointRadius:0 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{color:'#ffffff'} }, datalabels:{display:false} }, scales:{ x:{ grid:{display:false}, ticks:{color:'#94a3b8', maxRotation:45, font:{size:9}} }, y:{ max:100, grid:{color:'#1e293b'}, ticks:{color:'#94a3b8', callback:v=>v+'%'} } } } });
+  }
 
   // Strategic
   const priorities = painel.map(p => {
     const des = desempenho.find(d => d.materia.toLowerCase().includes(p.materia.toLowerCase()) || p.materia.toLowerCase().includes(d.materia.toLowerCase()));
-    return { materia: p.materia, cob: p.pct, taxa: des ? des.pct : 0.5, pend: p.pendentes, q: des ? des.questoes : 0 };
+    return { materia: p.materia, cob: p.pct, taxa: des ? des.pct : 0.5, pend: p.pendentes };
   }).sort((a,b) => ((1-a.cob)*0.5+(1-a.taxa)*0.5) - ((1-b.cob)*0.5+(1-b.taxa)*0.5));
 
   document.getElementById('priorityList').innerHTML = priorities.map((m,i) => `
     <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(30,41,59,0.4);">
-      <div style="width:25px;height:25px;border-radius:50%;background:${m.cob<0.4||m.taxa<0.55?'rgba(239,68,68,0.2)':m.cob<0.7?'rgba(245,158,11,0.2)':'rgba(59,130,246,0.2)'};color:${m.cob<0.4||m.taxa<0.55?'#ef4444':m.cob<0.7?'#f59e0b':'#3b82f6'};display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:bold;">${i+1}</div>
-      <div style="flex:1;"><strong>${m.materia}</strong><br><span style="font-size:0.7rem;color:#64748b;">Cob: ${fmtPct(m.cob)} · Acerto: ${fmtPct(m.taxa)} · Pend: ${m.pend}</span></div>
+      <div style="width:25px;height:25px;border-radius:50%;background:${m.cob<0.4||m.taxa<0.55?'rgba(239,68,68,0.2)':m.cob<0.7?'rgba(245,158,11,0.2)':'rgba(59,130,246,0.2)'};color:${m.cob<0.4||m.taxa<0.55?'#ef4444':m.cob<0.7?'#f59e0b':'#60a5fa'};display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:bold;">${i+1}</div>
+      <div style="flex:1;"><strong>${m.materia}</strong><br><span style="font-size:0.7rem;color:#94a3b8;">Cob: ${fmtPct(m.cob)} · Acerto: ${fmtPct(m.taxa)} · Pend: ${m.pend}</span></div>
     </div>
   `).join('');
 
   const alerts = [];
   const crit = priorities.filter(m => m.cob < 0.4);
   if (crit.length) alerts.push(`<div class="alert danger"><strong>🚨 Críticas:</strong> ${crit.map(m=>m.materia).join(', ')}</div>`);
-  if (dias > 0 && totalP > 0) alerts.push(`<div class="alert info"><strong>📊 Ritmo:</strong> ~${(totalP/dias).toFixed(1)} tópicos/dia</div>`);
   document.getElementById('strategicAlerts').innerHTML = alerts.join('');
 
-  // Gap chart
-  const ctx9 = document.getElementById('chartGap').getContext('2d');
-  if (charts.c9) charts.c9.destroy();
-  charts.c9 = new Chart(ctx9, { type:'bar', data:{ labels: painel.map(m=>m.materia), datasets:[{ label:'Atual', data: painel.map(m=>Math.min(100,m.pct*100)), backgroundColor:'rgba(59,130,246,0.7)' }, { label:'Gap', data: painel.map(m=>Math.max(0,80-m.pct*100)), backgroundColor:'rgba(239,68,68,0.3)' }] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, scales:{ x:{ stacked:true, max:100 } } } });
+  destroyChart('c13');
+  const ctx13 = document.getElementById('chartGap').getContext('2d');
+  charts.c13 = new Chart(ctx13, { type:'bar', data:{ labels: painel.map(m=>m.materia), datasets:[{ label:'Atual', data: painel.map(m=>Math.min(100, m.pct*100)), backgroundColor:'rgba(59,130,246,0.7)' }, { label:'Gap', data: painel.map(m=>Math.max(0, 80 - m.pct*100)), backgroundColor:'rgba(239,68,68,0.3)' }] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{color:'#ffffff'} }, datalabels:{ formatter:v=>v>0?v+'%':'' } }, scales:{ x:{ stacked:true, max:100, grid:{color:'#1e293b'}, ticks:{color:'#94a3b8'} }, y:{ stacked:true, grid:{display:false}, ticks:{color:'#cbd5e1', font:{size:10}} } } } });
 
   // Revisions
+  const hoje = new Date();
   const topicLast = {};
   estudos.forEach(e => {
     const key = e.materia + '|||' + e.bloco + '|||' + e.topico;
@@ -421,10 +478,10 @@ function renderSubjects() {
   const a = filt.reduce((s,e) => s+e.acertos, 0);
   
   document.getElementById('kpiSubject').innerHTML = `
-    <div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Horas</div><div class="kpi-value" style="color:#3b82f6">${fmtH(h)}</div></div>
-    <div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Sessões</div><div class="kpi-value" style="color:#10b981">${filt.length}</div></div>
-    <div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Questões</div><div class="kpi-value" style="color:#f59e0b">${q}</div></div>
-    <div class="kpi" style="border-top:3px solid #8b5cf6"><div class="kpi-label">Taxa</div><div class="kpi-value" style="color:#8b5cf6">${q?fmtPct(a/q):'—'}</div></div>
+    <div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Horas</div><div class="kpi-value">${fmtH(h)}</div></div>
+    <div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Sessões</div><div class="kpi-value">${filt.length}</div></div>
+    <div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Questões</div><div class="kpi-value">${q}</div></div>
+    <div class="kpi" style="border-top:3px solid #8b5cf6"><div class="kpi-label">Taxa</div><div class="kpi-value">${q?fmtPct(a/q):'—'}</div></div>
   `;
 
   const tb = document.querySelector('#subjectTable tbody');
