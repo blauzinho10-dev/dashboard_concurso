@@ -70,6 +70,24 @@ td { padding:8px 10px; border-bottom:1px solid rgba(30,41,59,0.5); color:#cbd5e1
 .rev-overdue { color:#ef4444; font-weight:bold; }
 .rev-warning { color:#f59e0b; font-weight:bold; }
 .rev-ok { color:#10b981; }
+.pomodoro-container { text-align:center; }
+.timer-display { font-size:5rem; font-weight:bold; color:#3b82f6; margin:20px 0; font-family:monospace; }
+.timer-controls { display:flex; gap:10px; justify-content:center; margin:15px 0; }
+.timer-controls button { padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:1rem; }
+.btn-start { background:#10b981; color:#fff; }
+.btn-pause { background:#f59e0b; color:#000; }
+.btn-reset { background:#ef4444; color:#fff; }
+.timer-status { font-size:1.2rem; margin:10px 0; }
+.timer-status.studying { color:#10b981; }
+.timer-status.break { color:#f59e0b; }
+.session-counter { color:#94a3b8; font-size:0.9rem; }
+.form-group { margin-bottom:12px; }
+.form-group label { display:block; font-size:0.8rem; color:#94a3b8; margin-bottom:4px; }
+.form-group select, .form-group input { width:100%; background:#1e293b; border:1px solid #334155; color:#f1f5f9; padding:10px; border-radius:5px; font-family:inherit; }
+.btn-submit { background:#3b82f6; color:#fff; border:none; padding:12px 25px; border-radius:8px; font-weight:bold; cursor:pointer; width:100%; font-size:1rem; }
+.btn-submit:hover { background:#2563eb; }
+.goal-bar { height:12px; background:#1e293b; border-radius:6px; margin:5px 0; overflow:hidden; }
+.goal-fill { height:100%; background:linear-gradient(90deg, #3b82f6, #10b981); border-radius:6px; transition:width 0.5s; }
 
 @media(max-width:768px) { .grid-2 { grid-template-columns:1fr; } .kpi-grid { grid-template-columns: repeat(2,1fr); } .header h1 { font-size:1rem; } }
 </style>
@@ -86,6 +104,7 @@ td { padding:8px 10px; border-bottom:1px solid rgba(30,41,59,0.5); color:#cbd5e1
 </div>
 
 <div class="tabs">
+  <button class="tab active" onclick="switchTab('study')">🎯 Estudar Agora</button>
   <button class="tab active" onclick="switchTab('overview')">Visão Geral</button>
   <button class="tab" onclick="switchTab('performance')">Desempenho</button>
   <button class="tab" onclick="switchTab('evolution')">Evolução</button>
@@ -108,6 +127,54 @@ td { padding:8px 10px; border-bottom:1px solid rgba(30,41,59,0.5); color:#cbd5e1
     <div class="grid-2">
       <div class="card"><h3>Horas por Matéria</h3><div class="chart-wrap h350"><canvas id="chartHours"></canvas></div></div>
       <div class="card"><h3>Status dos Tópicos</h3><div class="chart-wrap h350"><canvas id="chartDoughnut"></canvas></div></div>
+    </div>
+  </div>
+    <!-- 🆕 ABA ESTUDAR AGORA -->
+  <div id="tab-study" class="tab-panel active">
+    <div class="grid-2">
+      <div class="card pomodoro-container">
+        <h3>⏱️ Pomodoro 50/10</h3>
+        <div class="timer-display" id="timerDisplay">50:00</div>
+        <div class="timer-status" id="timerStatus">Pronto para começar</div>
+        <div class="session-counter" id="sessionCounter">Sessões hoje: 0</div>
+        <div class="timer-controls">
+          <button class="btn-start" onclick="startPomodoro()">▶ Iniciar</button>
+          <button class="btn-pause" onclick="pausePomodoro()">⏸ Pausar</button>
+          <button class="btn-reset" onclick="resetPomodoro()">↺ Resetar</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3>📝 Registrar Sessão</h3>
+        <div class="form-group"><label>Matéria</label><select id="regMateria" onchange="updateBlocos()"><option value="">Selecione...</option></select></div>
+        <div class="form-group"><label>Bloco</label><select id="regBloco"><option value="">Selecione a matéria primeiro</option></select></div>
+        <div class="form-group"><label>Tópico</label><input type="text" id="regTopico" placeholder="Ex: Princípios Constitucionais"></div>
+        <div class="grid-2">
+          <div class="form-group"><label>Tempo (minutos)</label><input type="number" id="regTempo" value="50" min="1"></div>
+          <div class="form-group"><label>Questões</label><input type="number" id="regQuestoes" value="0" min="0"></div>
+        </div>
+        <div class="form-group"><label>Acertos</label><input type="number" id="regAcertos" value="0" min="0"></div>
+        <button class="btn-submit" onclick="registrarEstudo()">✅ Registrar Estudo</button>
+        <div id="regStatus" style="margin-top:10px;text-align:center;font-size:0.9rem;"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>🎯 Metas do Dia</h3>
+      <div class="kpi-grid" id="kpiMetas"></div>
+      <div style="margin-top:10px;">
+        <strong>Meta de horas:</strong> <span id="metaHoras">0,0h / 4h</span>
+        <div class="goal-bar"><div class="goal-fill" id="goalHoras" style="width:0%"></div></div>
+        <strong>Meta de questões:</strong> <span id="metaQuestoes">0 / 30</span>
+        <div class="goal-bar"><div class="goal-fill" id="goalQuestoes" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>➕ Adicionar Nova Matéria</h3>
+      <div class="grid-2">
+        <div class="form-group"><label>Nome da Matéria</label><input type="text" id="newMateriaNome" placeholder="Ex: Direito Penal"></div>
+        <div class="form-group"><label>Total de Tópicos</label><input type="number" id="newMateriaTotal" value="10" min="1"></div>
+      </div>
+      <button class="btn-submit" onclick="adicionarMateria()">➕ Adicionar Matéria</button>
+      <div id="addMateriaStatus" style="margin-top:10px;text-align:center;font-size:0.9rem;"></div>
     </div>
   </div>
 
@@ -175,6 +242,148 @@ td { padding:8px 10px; border-bottom:1px solid rgba(30,41,59,0.5); color:#cbd5e1
 <script>
 const URL_API = 'https://script.google.com/macros/s/AKfycbyJSiRC20qG0J5IXkpOmcwCvC-3SabABRqWqmDCVj3yZlPKvbOBT01fvB2F_5k6Br5ueQ/exec';
 let painel = [], estudos = [], desempenho = [], charts = {};
+// Variáveis do Pomodoro
+let pomodoroInterval, pomodoroSeconds = 3000, isStudying = true, sessionCount = 0;
+
+// Funções do Pomodoro
+function updateTimerDisplay() {
+  const m = Math.floor(pomodoroSeconds / 60);
+  const s = pomodoroSeconds % 60;
+  document.getElementById('timerDisplay').textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+
+function startPomodoro() {
+  if (pomodoroInterval) return;
+  pomodoroInterval = setInterval(() => {
+    pomodoroSeconds--;
+    updateTimerDisplay();
+    if (pomodoroSeconds <= 0) {
+      clearInterval(pomodoroInterval);
+      pomodoroInterval = null;
+      if (isStudying) {
+        sessionCount++;
+        document.getElementById('sessionCounter').textContent = 'Sessões hoje: ' + sessionCount;
+        document.getElementById('timerStatus').textContent = '☕ Pausa! Descanse 10 minutos';
+        document.getElementById('timerStatus').className = 'timer-status break';
+        pomodoroSeconds = 600;
+      } else {
+        document.getElementById('timerStatus').textContent = '📚 Estudar! 50 minutos';
+        document.getElementById('timerStatus').className = 'timer-status studying';
+        pomodoroSeconds = 3000;
+      }
+      isStudying = !isStudying;
+      updateTimerDisplay();
+      if (Notification.permission === 'granted') {
+        new Notification(isStudying ? '🔔 Hora de estudar!' : '☕ Hora do descanso!');
+      }
+    }
+  }, 1000);
+  document.getElementById('timerStatus').textContent = '📚 Estudando...';
+  document.getElementById('timerStatus').className = 'timer-status studying';
+}
+
+function pausePomodoro() {
+  if (pomodoroInterval) { clearInterval(pomodoroInterval); pomodoroInterval = null; }
+}
+
+function resetPomodoro() {
+  if (pomodoroInterval) clearInterval(pomodoroInterval);
+  pomodoroInterval = null;
+  pomodoroSeconds = 3000;
+  isStudying = true;
+  updateTimerDisplay();
+  document.getElementById('timerStatus').textContent = 'Pronto para começar';
+}
+
+// Carregar matérias
+async function loadMaterias() {
+  try {
+    const resp = await fetch(API + '?action=getMaterias');
+    const text = await resp.text();
+    const materias = text.split('|').filter(m => m);
+    const sel = document.getElementById('regMateria');
+    sel.innerHTML = '<option value="">Selecione...</option>';
+    materias.forEach(m => { sel.innerHTML += '<option value="' + m + '">' + m + '</option>'; });
+  } catch(e) {}
+}
+
+const blocosPorMateria = {
+  'Administrativo': ['Conceitos','Organização','Poderes','Atos','Licitações','Contratos','Servidores','Controle'],
+  'Tributário': ['Constitucional','CTN','IPTU','IR','ICMS','ISS','Processo'],
+  'Contabilidade': ['Conceitos','Balanço','Receitas','Despesas','CPC'],
+  'Constitucional': ['Princípios','Direitos','Controle','Ordem Social'],
+  'Português': ['Gramática','Interpretação','Redação','Sintaxe'],
+  'default': ['Geral','Específico','Avançado']
+};
+
+function updateBlocos() {
+  const materia = document.getElementById('regMateria').value;
+  const sel = document.getElementById('regBloco');
+  sel.innerHTML = '<option value="">Selecione...</option>';
+  const blocos = blocosPorMateria[materia] || blocosPorMateria['default'];
+  blocos.forEach(b => { sel.innerHTML += '<option value="' + b + '">' + b + '</option>'; });
+}
+
+async function registrarEstudo() {
+  const materia = document.getElementById('regMateria').value;
+  const bloco = document.getElementById('regBloco').value;
+  const topico = document.getElementById('regTopico').value;
+  const tempo = document.getElementById('regTempo').value;
+  const questoes = document.getElementById('regQuestoes').value;
+  const acertos = document.getElementById('regAcertos').value;
+  
+  if (!materia || !bloco || !topico || !tempo) {
+    document.getElementById('regStatus').innerHTML = '<span style="color:#ef4444;">Preencha todos os campos!</span>';
+    return;
+  }
+  
+  try {
+    document.getElementById('regStatus').innerHTML = '⏳ Registrando...';
+    const data = [materia, bloco, topico, tempo, questoes, acertos].join('|');
+    await fetch(API + '?action=addEstudo&data=' + encodeURIComponent(data));
+    document.getElementById('regStatus').innerHTML = '<span style="color:#10b981;">✅ Registrado!</span>';
+    document.getElementById('regTopico').value = '';
+    document.getElementById('regQuestoes').value = '0';
+    document.getElementById('regAcertos').value = '0';
+    setTimeout(() => document.getElementById('regStatus').innerHTML = '', 3000);
+    loadData();
+  } catch(e) {
+    document.getElementById('regStatus').innerHTML = '<span style="color:#ef4444;">Erro</span>';
+  }
+}
+
+async function adicionarMateria() {
+  const nome = document.getElementById('newMateriaNome').value;
+  const total = document.getElementById('newMateriaTotal').value;
+  if (!nome) return;
+  try {
+    await fetch(API + '?action=addMateria&nome=' + encodeURIComponent(nome) + '&total=' + total);
+    document.getElementById('newMateriaNome').value = '';
+    alert('Matéria adicionada!');
+    loadMaterias();
+    loadData();
+  } catch(e) {}
+}
+
+function renderMetas() {
+  const hoje = new Date().toISOString().slice(0,10);
+  const minHoje = estudos.filter(e => e.dataStr === hoje).reduce((s,e) => s+e.tempo, 0);
+  const qHoje = estudos.filter(e => e.dataStr === hoje).reduce((s,e) => s+e.questoes, 0);
+  
+  document.getElementById('kpiMetas').innerHTML = `
+    <div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Horas Hoje</div><div class="kpi-value">${fmtH(minHoje)}</div></div>
+    <div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Questões Hoje</div><div class="kpi-value">${qHoje}</div></div>
+    <div class="kpi" style="border-top:3px solid #8b5cf6"><div class="kpi-label">Sessões</div><div class="kpi-value">${sessionCount}</div></div>
+  `;
+  
+  document.getElementById('goalHoras').style.width = Math.min(100, (minHoje/240)*100) + '%';
+  document.getElementById('goalQuestoes').style.width = Math.min(100, (qHoje/30)*100) + '%';
+  document.getElementById('metaHoras').textContent = fmtH(minHoje) + ' / 4h';
+  document.getElementById('metaQuestoes').textContent = qHoje + ' / 30';
+}
+
+// Solicitar permissão para notificações
+if (Notification.permission === 'default') Notification.requestPermission();
 
 Chart.register(ChartDataLabels);
 
@@ -225,6 +434,7 @@ async function loadData() {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('lastUpdate').textContent = 'Atualizado: ' + new Date().toLocaleString('pt-BR');
     renderAll();
+    renderMetas();
   } catch(err) {
     document.getElementById('loading').innerHTML = '<p style="color:#ef4444;">❌ Erro: ' + err.message + '</p>';
   }
@@ -665,8 +875,10 @@ function renderTopics() {
   }).join('');
 }
 
-document.getElementById('tab-overview').classList.add('active');
+document.getElementById('tab-study').classList.add('active');
+loadMaterias();
 loadData();
+updateTimerDisplay();
 </script>
 </body>
 </html>
