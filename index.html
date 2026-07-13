@@ -419,17 +419,14 @@ async function loadData() {
   try {
     document.getElementById('loading').style.display = 'flex';
     const [p, e, d] = await Promise.all([
-     fetch(API + '?sheet=Painel')
-     fetch(API + '?sheet=Estudos')
-     fetch(API + '?sheet=Desempenho')
+      fetch(API + '?sheet=Painel').then(r => r.text()),
+      fetch(API + '?sheet=Estudos').then(r => r.text()),
+      fetch(API + '?sheet=Desempenho').then(r => r.text())
     ]);
     
     painel = parsePainel(p);
     estudos = parseEstudos(e);
     desempenho = parseDesempenho(d);
-    
-    console.log('Painel:', painel.length, 'Estudos:', estudos.length, 'Desempenho:', desempenho.length);
-    console.log('Horas total:', estudos.reduce((s,e) => s+e.tempo, 0), 'min');
     
     document.getElementById('loading').style.display = 'none';
     document.getElementById('lastUpdate').textContent = 'Atualizado: ' + new Date().toLocaleString('pt-BR');
