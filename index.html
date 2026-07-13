@@ -1,99 +1,210 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Central de Comando — Auditor Fiscal</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-body{background:#0a0e1a;color:white;font-family:Arial;margin:20px}
-.card{background:#111827;padding:20px;margin:10px 0;border-radius:10px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px}
-.kpi{background:#111827;padding:20px;border-radius:10px;border-top:3px solid #3b82f6}
-.kpi-value{font-size:36px;font-weight:bold;color:#3b82f6}
-canvas{max-height:300px}
-table{width:100%;border-collapse:collapse;margin-top:10px}
-td,th{padding:8px;border-bottom:1px solid #333;text-align:left}
-.loading{text-align:center;padding:50px;font-size:20px}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: Arial, sans-serif; background: #0a0e1a; color: #f1f5f9; min-height: 100vh; }
+
+.header { background: #111827; padding: 15px 20px; border-bottom: 1px solid #1e293b; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; position:sticky; top:0; z-index:100; }
+.header h1 { font-size: 1.2rem; color: #3b82f6; }
+.header button { background: #3b82f6; color:#fff; border:none; padding:8px 16px; border-radius:5px; cursor:pointer; font-weight:bold; }
+
+.tabs { display:flex; gap:4px; padding:10px 20px; overflow-x:auto; border-bottom:1px solid #1e293b; background:#0f172a; }
+.tab { padding:8px 15px; border:none; background:none; color:#64748b; cursor:pointer; font-size:0.85rem; white-space:nowrap; border-bottom:2px solid transparent; }
+.tab:hover { color:#94a3b8; }
+.tab.active { color:#3b82f6; border-bottom-color:#3b82f6; font-weight:bold; }
+
+.content { max-width:1400px; margin:0 auto; padding:20px; }
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+
+.card { background:#111827; padding:20px; border-radius:10px; margin-bottom:20px; border:1px solid #1e293b; }
+.card h3 { color:#64748b; font-size:0.8rem; text-transform:uppercase; margin-bottom:15px; letter-spacing:0.5px; }
+
+.kpi-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); gap:15px; margin-bottom:20px; }
+.kpi { background:#111827; padding:18px; border-radius:10px; border:1px solid #1e293b; }
+.kpi-label { font-size:0.7rem; color:#64748b; text-transform:uppercase; }
+.kpi-value { font-size:1.8rem; font-weight:bold; margin:5px 0; }
+.kpi-sub { font-size:0.7rem; color:#64748b; }
+
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
+
+.chart-wrap { position:relative; width:100%; height:350px; }
+
+table { width:100%; border-collapse:collapse; font-size:0.8rem; }
+th { text-align:left; padding:10px; border-bottom:1px solid #1e293b; color:#64748b; font-size:0.7rem; text-transform:uppercase; background:#111827; position:sticky; top:0; }
+td { padding:8px 10px; border-bottom:1px solid rgba(30,41,59,0.5); }
+
+.badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.65rem; font-weight:bold; }
+.badge-green { background:rgba(16,185,129,0.2); color:#10b981; }
+.badge-amber { background:rgba(245,158,11,0.2); color:#f59e0b; }
+.badge-red { background:rgba(239,68,68,0.2); color:#ef4444; }
+
+.loading { text-align:center; padding:60px; }
+.loading .spinner { width:50px;height:50px; border:3px solid #1e293b; border-top-color:#3b82f6; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 15px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+.countdown { text-align:center; padding:25px; background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(239,68,68,0.1)); border-radius:10px; margin-bottom:20px; border:1px solid rgba(245,158,11,0.3); }
+.countdown .days { font-size:3rem; font-weight:bold; color:#f59e0b; }
+
+.filters { display:flex; gap:10px; margin-bottom:20px; align-items:center; }
+.filters select { background:#1e293b; border:1px solid #1e293b; color:#f1f5f9; padding:8px 12px; border-radius:5px; }
+
+.alert { padding:15px; border-radius:8px; margin-bottom:10px; border-left:3px solid; }
+.alert.danger { background:rgba(239,68,68,0.1); border-color:#ef4444; color:#fca5a5; }
+.alert.warning { background:rgba(245,158,11,0.1); border-color:#f59e0b; color:#fcd34d; }
+.alert.success { background:rgba(16,185,129,0.1); border-color:#10b981; color:#6ee7b7; }
+.alert.info { background:rgba(59,130,246,0.1); border-color:#3b82f6; color:#93c5fd; }
+
+.scroll { max-height:400px; overflow-y:auto; }
+.scroll::-webkit-scrollbar { width:5px; }
+.scroll::-webkit-scrollbar-thumb { background:#334155; border-radius:3px; }
+
+@media(max-width:768px) { .grid-2 { grid-template-columns:1fr; } .kpi-grid { grid-template-columns: repeat(2,1fr); } }
 </style>
 </head>
 <body>
 
-<div id="loading" class="loading">🔄 Carregando dados...</div>
-<div id="content" style="display:none">
-  <h1>📊 Dashboard - Auditor Fiscal</h1>
-  <div id="countdown" style="text-align:center;padding:20px;background:#1a1a2e;border-radius:10px;margin:20px 0">
-    <div style="font-size:48px;font-weight:bold;color:#f59e0b" id="days">--</div>
-    <div>dias para SEFAZ-AL (30/08/2026)</div>
+<div class="header">
+  <h1>📊 Central de Comando — Auditor Fiscal</h1>
+  <div style="display:flex;align-items:center;gap:15px">
+    <span style="background:rgba(245,158,11,0.2);color:#f59e0b;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:bold;">SEFAZ-AL · 30/08/2026</span>
+    <span id="lastUpdate" style="font-size:0.7rem;color:#64748b;">—</span>
+    <button onclick="loadData()">🔄 Atualizar</button>
   </div>
-  
-  <div class="grid" id="kpis"></div>
-  
-  <div class="card">
-    <h3>Progresso por Matéria</h3>
-    <canvas id="chart1"></canvas>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('overview')">Visão Geral</button>
+  <button class="tab" onclick="switchTab('performance')">Desempenho</button>
+  <button class="tab" onclick="switchTab('evolution')">Evolução</button>
+  <button class="tab" onclick="switchTab('subjects')">Por Matéria</button>
+  <button class="tab" onclick="switchTab('questions')">Questões</button>
+  <button class="tab" onclick="switchTab('strategic')">Estratégico</button>
+  <button class="tab" onclick="switchTab('revisions')">Revisões</button>
+</div>
+
+<div class="content">
+  <div id="loading" class="loading"><div class="spinner"></div><p>Carregando dados da planilha...</p></div>
+
+  <div id="tab-overview" class="tab-panel">
+    <div class="countdown"><div class="days" id="countdownDays">--</div><div>dias para a prova SEFAZ-AL (Cebraspe)</div></div>
+    <div class="kpi-grid" id="kpiOverview"></div>
+    <div class="grid-2">
+      <div class="card"><h3>Progresso por Matéria</h3><div class="chart-wrap"><canvas id="chartProgress"></canvas></div></div>
+      <div class="card"><h3>Distribuição de Cobertura</h3><div class="chart-wrap"><canvas id="chartRadar"></canvas></div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card"><h3>Horas por Matéria</h3><div class="chart-wrap"><canvas id="chartHours"></canvas></div></div>
+      <div class="card"><h3>Status dos Tópicos</h3><div class="chart-wrap"><canvas id="chartDoughnut"></canvas></div></div>
+    </div>
   </div>
-  
-  <div class="card">
-    <h3>Desempenho</h3>
-    <canvas id="chart2"></canvas>
+
+  <div id="tab-performance" class="tab-panel">
+    <div class="kpi-grid" id="kpiPerf"></div>
+    <div class="grid-2">
+      <div class="card"><h3>Taxa de Acerto por Matéria</h3><div class="chart-wrap"><canvas id="chartAccuracy"></canvas></div></div>
+      <div class="card"><h3>Volume de Questões</h3><div class="chart-wrap"><canvas id="chartVolume"></canvas></div></div>
+    </div>
+    <div class="card"><h3>Ranking Detalhado</h3><div class="scroll"><table id="perfTable"><thead><tr><th>Matéria</th><th>Questões</th><th>Acertos</th><th>Erros</th><th>Taxa</th><th>Status</th></tr></thead><tbody></tbody></table></div></div>
   </div>
-  
-  <div class="card">
-    <h3>Últimos Estudos</h3>
-    <table id="table"></table>
+
+  <div id="tab-evolution" class="tab-panel">
+    <div class="grid-2">
+      <div class="card"><h3>Minutos por Dia</h3><div class="chart-wrap"><canvas id="chartDailyMin"></canvas></div></div>
+      <div class="card"><h3>Horas Acumuladas</h3><div class="chart-wrap"><canvas id="chartCumHours"></canvas></div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card"><h3>Sessões por Dia</h3><div class="chart-wrap"><canvas id="chartSessions"></canvas></div></div>
+      <div class="card"><h3>Questões por Dia</h3><div class="chart-wrap"><canvas id="chartDailyQ"></canvas></div></div>
+    </div>
+  </div>
+
+  <div id="tab-subjects" class="tab-panel">
+    <div class="filters">
+      <span style="font-size:0.8rem;color:#64748b;">Filtrar:</span>
+      <select id="filterSubject" onchange="renderSubjects()"><option value="all">Todas as Matérias</option></select>
+    </div>
+    <div class="kpi-grid" id="kpiSubject"></div>
+    <div class="card"><h3>Detalhamento de Sessões</h3><div class="scroll"><table id="subjectTable"><thead><tr><th>Data</th><th>Matéria</th><th>Bloco</th><th>Tópico</th><th>Tempo</th><th>Questões</th><th>Acertos</th></tr></thead><tbody></tbody></table></div></div>
+  </div>
+
+  <div id="tab-questions" class="tab-panel">
+    <div class="kpi-grid" id="kpiQuest"></div>
+    <div class="grid-2">
+      <div class="card"><h3>Acerto vs Erro</h3><div class="chart-wrap"><canvas id="chartQuestPie"></canvas></div></div>
+      <div class="card"><h3>Evolução da Taxa</h3><div class="chart-wrap"><canvas id="chartQuestEvo"></canvas></div></div>
+    </div>
+  </div>
+
+  <div id="tab-strategic" class="tab-panel">
+    <div id="strategicAlerts"></div>
+    <div class="grid-2">
+      <div class="card"><h3>Plano de Ação Prioritário</h3><div id="priorityList" style="max-height:350px;overflow-y:auto;"></div></div>
+      <div class="card"><h3>Gap de Cobertura</h3><div class="chart-wrap"><canvas id="chartGap"></canvas></div></div>
+    </div>
+  </div>
+
+  <div id="tab-revisions" class="tab-panel">
+    <div id="revisionAlerts"></div>
+    <div class="card"><h3>Agenda de Revisões</h3><div class="scroll"><table id="revisionTable"><thead><tr><th>Matéria</th><th>Bloco</th><th>Tópico</th><th>Último Estudo</th><th>Dias</th><th>Urgência</th></tr></thead><tbody></tbody></table></div></div>
   </div>
 </div>
 
 <script>
 const URL = 'https://script.google.com/macros/s/AKfycbyJSiRC20qG0J5IXkpOmcwCvC-3SabABRqWqmDCVj3yZlPKvbOBT01fvB2F_5k6Br5ueQ/exec';
+const PROVA = new Date('2026-08-30');
+let painel = [], estudos = [], desempenho = [], charts = {};
 
-async function load() {
+function parseCSV(text) {
+  const lines = text.split('\n');
+  return lines.map(line => {
+    const r = []; let c = '', q = false;
+    for (let ch of line) {
+      if (ch === '"') q = !q;
+      else if (ch === ',' && !q) { r.push(c); c = ''; }
+      else c += ch;
+    }
+    r.push(c);
+    return r;
+  }).filter(r => r.some(c => c.trim()));
+}
+
+async function loadData() {
   try {
-    const [painel, estudos, desempenho] = await Promise.all([
+    const [p, e, d] = await Promise.all([
       fetch(URL + '?sheet=Painel').then(r => r.text()),
       fetch(URL + '?sheet=Estudos').then(r => r.text()),
       fetch(URL + '?sheet=Desempenho').then(r => r.text())
     ]);
     
-    const painelData = parsePainel(painel);
-    const estudosData = parseEstudos(estudos);
-    const desempenhoData = parseDesempenho(desempenho);
+    painel = parsePainel(p);
+    estudos = parseEstudos(e);
+    desempenho = parseDesempenho(d);
     
-    render(painelData, estudosData, desempenhoData);
-  } catch(e) {
-    document.getElementById('loading').innerHTML = '❌ Erro: ' + e.message;
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('lastUpdate').textContent = 'Atualizado: ' + new Date().toLocaleString('pt-BR');
+    renderAll();
+  } catch(err) {
+    document.getElementById('loading').innerHTML = '<p style="color:#ef4444;">❌ Erro: ' + err.message + '</p>';
   }
 }
 
-function parseCSV(text) {
-  const lines = text.split('\n');
-  return lines.map(line => {
-    const result = [];
-    let current = '';
-    let inQuotes = false;
-    for (let ch of line) {
-      if (ch === '"') { inQuotes = !inQuotes; }
-      else if (ch === ',' && !inQuotes) { result.push(current); current = ''; }
-      else { current += ch; }
-    }
-    result.push(current);
-    return result;
-  }).filter(r => r.some(c => c.trim() !== ''));
-}
-
 function parsePainel(csv) {
-  const rows = parseCSV(csv);
-  const data = [];
+  const rows = parseCSV(csv), data = [];
   let start = false;
   for (let row of rows) {
     if (row[0] && row[0].includes('Matéria')) { start = true; continue; }
     if (!start || !row[0] || row[0] === 'TOTAL') continue;
-    if (row[0].includes('📊') || row[0].includes('📖') || row[0].includes('🎨') || row[0].includes('1️⃣')) continue;
-    const total = parseInt(row[1]) || 0;
-    if (total === 0) continue;
+    if (row[0].includes('📊') || row[0].includes('📖') || row[0].includes('🎨')) continue;
+    const t = parseInt(row[1]) || 0;
+    if (t === 0) continue;
     data.push({
-      materia: row[0].trim(),
-      total: total,
+      materia: row[0].trim(), total: t,
       estudados: parseInt(row[2]) || 0,
       pct: parseFloat(String(row[3]).replace('%','').replace(',','.')) || 0,
       pendentes: parseInt(row[5]) || 0
@@ -103,16 +214,16 @@ function parsePainel(csv) {
 }
 
 function parseEstudos(csv) {
-  const rows = parseCSV(csv);
-  const data = [];
+  const rows = parseCSV(csv), data = [];
   for (let i = 1; i < rows.length; i++) {
     const row = rows[i];
     if (!row[0] || !row[1]) continue;
+    const parts = row[0].trim().split('/');
+    const d = parts.length === 3 ? new Date(parseInt(parts[2]), parseInt(parts[1])-1, parseInt(parts[0])) : null;
+    if (!d || isNaN(d.getTime())) continue;
     data.push({
-      data: row[0].trim(),
-      materia: row[1].trim(),
-      bloco: (row[2]||'').trim(),
-      topico: (row[3]||'').trim(),
+      data: d, dataStr: d.toISOString().slice(0,10),
+      materia: row[1].trim(), bloco: (row[2]||'').trim(), topico: (row[3]||'').trim(),
       tempo: parseInt(row[4]) || 0,
       questoes: parseInt(row[5]) || 0,
       acertos: parseInt(row[6]) || 0
@@ -122,11 +233,10 @@ function parseEstudos(csv) {
 }
 
 function parseDesempenho(csv) {
-  const rows = parseCSV(csv);
-  const data = [];
+  const rows = parseCSV(csv), data = [];
   for (let i = 1; i < rows.length; i++) {
     const row = rows[i];
-    if (!row[0]) continue;
+    if (!row[0] || row[0].includes('índice')) continue;
     data.push({
       materia: row[0].trim(),
       questoes: parseInt(row[1]) || 0,
@@ -135,83 +245,197 @@ function parseDesempenho(csv) {
       erros: parseInt(row[5]) || 0
     });
   }
-  return data;
+  return data.sort((a,b) => b.questoes - a.questoes);
 }
 
-function render(painel, estudos, desempenho) {
-  document.getElementById('loading').style.display = 'none';
-  document.getElementById('content').style.display = 'block';
-  
-  // Countdown
-  const prova = new Date('2026-08-30');
+function fmtPct(n) { return (n*100).toFixed(1).replace('.',',') + '%'; }
+function fmtH(min) { return (min/60).toFixed(1).replace('.',',') + 'h'; }
+
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function renderAll() {
   const hoje = new Date();
-  const dias = Math.ceil((prova - hoje) / (1000 * 60 * 60 * 24));
-  document.getElementById('days').textContent = dias;
+  const dias = Math.ceil((PROVA - hoje) / (1000*60*60*24));
+  document.getElementById('countdownDays').textContent = dias;
+
+  // Overview KPIs
+  const totalT = painel.reduce((s,m) => s+m.total, 0);
+  const totalE = painel.reduce((s,m) => s+m.estudados, 0);
+  const totalP = painel.reduce((s,m) => s+m.pendentes, 0);
+  const horas = estudos.reduce((s,e) => s+e.tempo, 0);
+  const qE = estudos.reduce((s,e) => s+e.questoes, 0);
+  const aE = estudos.reduce((s,e) => s+e.acertos, 0);
+  const qD = desempenho.reduce((s,d) => s+d.questoes, 0);
+  const aD = desempenho.reduce((s,d) => s+d.acertos, 0);
   
-  // KPIs
-  const totalTopicos = painel.reduce((s,m) => s + m.total, 0);
-  const totalEstudados = painel.reduce((s,m) => s + m.estudados, 0);
-  const totalPendentes = painel.reduce((s,m) => s + m.pendentes, 0);
-  const horas = estudos.reduce((s,e) => s + e.tempo, 0);
-  const totalQ = desempenho.reduce((s,d) => s + d.questoes, 0);
-  const totalA = desempenho.reduce((s,d) => s + d.acertos, 0);
-  const taxa = totalQ > 0 ? (totalA / totalQ * 100) : 0;
-  
-  document.getElementById('kpis').innerHTML = `
-    <div class="kpi"><div>Cobertura</div><div class="kpi-value">${(totalEstudados/totalTopicos*100).toFixed(1)}%</div><div>${totalEstudados}/${totalTopicos}</div></div>
-    <div class="kpi" style="border-top-color:#10b981"><div style="color:#10b981">Horas</div><div class="kpi-value" style="color:#10b981">${(horas/60).toFixed(1)}h</div></div>
-    <div class="kpi" style="border-top-color:#f59e0b"><div style="color:#f59e0b">Taxa Acerto</div><div class="kpi-value" style="color:#f59e0b">${taxa.toFixed(1)}%</div><div>${totalQ} questões</div></div>
-    <div class="kpi" style="border-top-color:#ef4444"><div style="color:#ef4444">Pendentes</div><div class="kpi-value" style="color:#ef4444">${totalPendentes}</div></div>
+  document.getElementById('kpiOverview').innerHTML = `
+    <div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Cobertura</div><div class="kpi-value" style="color:#3b82f6">${fmtPct(totalE/totalT)}</div><div class="kpi-sub">${totalE}/${totalT} tópicos</div></div>
+    <div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Horas</div><div class="kpi-value" style="color:#10b981">${fmtH(horas)}</div></div>
+    <div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Taxa Desemp.</div><div class="kpi-value" style="color:#f59e0b">${fmtPct(qD?aD/qD:0)}</div><div class="kpi-sub">${qD} questões</div></div>
+    <div class="kpi" style="border-top:3px solid #ef4444"><div class="kpi-label">Pendentes</div><div class="kpi-value" style="color:#ef4444">${totalP}</div></div>
+    <div class="kpi" style="border-top:3px solid #8b5cf6"><div class="kpi-label">Questões Est.</div><div class="kpi-value" style="color:#8b5cf6">${qE}</div><div class="kpi-sub">Taxa: ${fmtPct(qE?aE/qE:0)}</div></div>
+    <div class="kpi" style="border-top:3px solid #06b6d4"><div class="kpi-label">Dias Prova</div><div class="kpi-value" style="color:#06b6d4">${dias}</div></div>
   `;
-  
-  // Chart 1 - Progresso
-  const ctx1 = document.getElementById('chart1').getContext('2d');
-  new Chart(ctx1, {
-    type: 'bar',
-    data: {
-      labels: painel.map(m => m.materia),
-      datasets: [{
-        label: 'Concluído (%)',
-        data: painel.map(m => Math.min(100, m.pct * 100)),
-        backgroundColor: painel.map(m => m.pct >= 0.8 ? '#10b981' : m.pct >= 0.5 ? '#f59e0b' : '#ef4444')
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: true,
-      scales: { x: { max: 100 } },
-      plugins: { legend: { display: false } }
-    }
+
+  // Charts
+  const ctx1 = document.getElementById('chartProgress').getContext('2d');
+  if (charts.c1) charts.c1.destroy();
+  charts.c1 = new Chart(ctx1, { type:'bar', data:{ labels: painel.map(m=>m.materia), datasets:[{ data: painel.map(m=>Math.min(100,m.pct*100)), backgroundColor: painel.map(m=>m.pct>=0.8?'#10b981':m.pct>=0.5?'#f59e0b':'#ef4444') }] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ x:{ max:100 } } } });
+
+  const ctx2 = document.getElementById('chartRadar').getContext('2d');
+  if (charts.c2) charts.c2.destroy();
+  charts.c2 = new Chart(ctx2, { type:'radar', data:{ labels: painel.map(m=>m.materia.substring(0,18)), datasets:[{ label:'Cobertura', data: painel.map(m=>m.pct*100), borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.2)' }, { label:'Meta 80%', data: painel.map(()=>80), borderColor:'rgba(245,158,11,0.5)', borderDash:[5,5], pointRadius:0 }] }, options:{ responsive:true, maintainAspectRatio:false, scales:{ r:{ max:100 } } } });
+
+  // Horas por matéria
+  const hByM = {};
+  estudos.forEach(e => { hByM[e.materia] = (hByM[e.materia]||0) + e.tempo; });
+  const hEntries = Object.entries(hByM).sort((a,b)=>b[1]-a[1]);
+  const ctx3 = document.getElementById('chartHours').getContext('2d');
+  if (charts.c3) charts.c3.destroy();
+  charts.c3 = new Chart(ctx3, { type:'bar', data:{ labels: hEntries.map(e=>e[0]), datasets:[{ data: hEntries.map(e=>+(e[1]/60).toFixed(1)), backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f43f5e','#84cc16'] }] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } } } });
+
+  // Doughnut
+  const ctx4 = document.getElementById('chartDoughnut').getContext('2d');
+  if (charts.c4) charts.c4.destroy();
+  charts.c4 = new Chart(ctx4, { type:'doughnut', data:{ labels:['Estudados','Pendentes'], datasets:[{ data:[totalE, totalP], backgroundColor:['#3b82f6','#ef4444'] }] }, options:{ responsive:true, maintainAspectRatio:false, cutout:'65%' } });
+
+  // Performance
+  const best = desempenho.filter(d=>d.questoes>=5).sort((a,b)=>b.pct-a.pct)[0];
+  const worst = desempenho.filter(d=>d.questoes>=5).sort((a,b)=>a.pct-b.pct)[0];
+  document.getElementById('kpiPerf').innerHTML = `
+    <div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Total Questões</div><div class="kpi-value" style="color:#3b82f6">${qD}</div></div>
+    <div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Taxa Geral</div><div class="kpi-value" style="color:#10b981">${fmtPct(qD?aD/qD:0)}</div></div>
+    <div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Melhor</div><div class="kpi-value" style="color:#f59e0b;font-size:1rem;">${best?best.materia.substring(0,20):'—'}</div><div class="kpi-sub">${best?fmtPct(best.pct):''}</div></div>
+    <div class="kpi" style="border-top:3px solid #ef4444"><div class="kpi-label">Pior</div><div class="kpi-value" style="color:#ef4444;font-size:1rem;">${worst?worst.materia.substring(0,20):'—'}</div><div class="kpi-sub">${worst?fmtPct(worst.pct):''}</div></div>
+  `;
+
+  // Perf table
+  const tb = document.querySelector('#perfTable tbody');
+  tb.innerHTML = '';
+  desempenho.forEach(d => {
+    const bc = d.pct >= 0.7 ? 'badge-green' : d.pct >= 0.6 ? 'badge-amber' : 'badge-red';
+    tb.innerHTML += `<tr><td>${d.materia}</td><td>${d.questoes}</td><td>${d.acertos}</td><td>${d.erros}</td><td>${fmtPct(d.pct)}</td><td><span class="badge ${bc}">${d.pct>=0.7?'Bom':d.pct>=0.6?'Regular':'Crítico'}</span></td></tr>`;
   });
-  
-  // Chart 2 - Desempenho
-  const ctx2 = document.getElementById('chart2').getContext('2d');
-  new Chart(ctx2, {
-    type: 'bar',
-    data: {
-      labels: desempenho.map(d => d.materia.substring(0, 20)),
-      datasets: [
-        { label: 'Acertos', data: desempenho.map(d => d.acertos), backgroundColor: '#10b981' },
-        { label: 'Erros', data: desempenho.map(d => d.erros), backgroundColor: '#ef4444' }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      scales: { x: { stacked: true }, y: { stacked: true } }
-    }
+
+  // Evolution
+  const byDate = {};
+  estudos.forEach(e => {
+    if (!byDate[e.dataStr]) byDate[e.dataStr] = { min:0, sess:0, q:0, a:0 };
+    byDate[e.dataStr].min += e.tempo;
+    byDate[e.dataStr].sess++;
+    byDate[e.dataStr].q += e.questoes;
+    byDate[e.dataStr].a += e.acertos;
   });
-  
-  // Table
-  const tbody = document.getElementById('table');
-  tbody.innerHTML = '<tr><th>Data</th><th>Matéria</th><th>Tópico</th><th>Tempo</th></tr>';
-  estudos.slice(0, 20).forEach(e => {
-    tbody.innerHTML += `<tr><td>${e.data}</td><td>${e.materia}</td><td>${e.topico.substring(0,40)}</td><td>${e.tempo}min</td></tr>`;
+  const dates = Object.keys(byDate).sort();
+  if (dates.length > 0) {
+    const fd = d => { const p = d.split('-'); return p[2]+'/'+p[1]; };
+    const ctx5 = document.getElementById('chartDailyMin').getContext('2d');
+    if (charts.c5) charts.c5.destroy();
+    charts.c5 = new Chart(ctx5, { type:'bar', data:{ labels:dates.map(fd), datasets:[{ data:dates.map(d=>byDate[d].min), backgroundColor:'rgba(59,130,246,0.6)' }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } } } });
+
+    let cum = 0;
+    const ctx6 = document.getElementById('chartCumHours').getContext('2d');
+    if (charts.c6) charts.c6.destroy();
+    charts.c6 = new Chart(ctx6, { type:'line', data:{ labels:dates.map(fd), datasets:[{ data:dates.map(d=>{ cum+=byDate[d].min; return +(cum/60).toFixed(1); }), borderColor:'#10b981', backgroundColor:'rgba(16,185,129,0.1)', fill:true, tension:0.3 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } } } });
+
+    const ctx7 = document.getElementById('chartSessions').getContext('2d');
+    if (charts.c7) charts.c7.destroy();
+    charts.c7 = new Chart(ctx7, { type:'bar', data:{ labels:dates.map(fd), datasets:[{ data:dates.map(d=>byDate[d].sess), backgroundColor:'rgba(139,92,246,0.6)' }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } } } });
+  }
+
+  // Subjects filter
+  const sel = document.getElementById('filterSubject');
+  sel.innerHTML = '<option value="all">Todas as Matérias</option>';
+  [...new Set(estudos.map(e=>e.materia))].sort().forEach(m => { sel.innerHTML += `<option value="${m}">${m}</option>`; });
+  renderSubjects();
+
+  // Questions
+  document.getElementById('kpiQuest').innerHTML = `
+    <div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Q. Desempenho</div><div class="kpi-value" style="color:#3b82f6">${qD}</div><div class="kpi-sub">Taxa: ${fmtPct(qD?aD/qD:0)}</div></div>
+    <div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Q. Estudos</div><div class="kpi-value" style="color:#10b981">${qE}</div><div class="kpi-sub">Taxa: ${fmtPct(qE?aE/qE:0)}</div></div>
+    <div class="kpi" style="border-top:3px solid #ef4444"><div class="kpi-label">Erros Desemp.</div><div class="kpi-value" style="color:#ef4444">${desempenho.reduce((s,d)=>s+d.erros,0)}</div></div>
+  `;
+
+  const ctx8 = document.getElementById('chartQuestPie').getContext('2d');
+  if (charts.c8) charts.c8.destroy();
+  charts.c8 = new Chart(ctx8, { type:'doughnut', data:{ labels:['Acertos Des.','Erros Des.','Acertos Est.','Erros Est.'], datasets:[{ data:[aD,qD-aD,aE,qE-aE], backgroundColor:['#10b981','#ef4444','#06b6d4','#f59e0b'] }] }, options:{ responsive:true, maintainAspectRatio:false, cutout:'55%' } });
+
+  // Strategic
+  const priorities = painel.map(p => {
+    const des = desempenho.find(d => d.materia.toLowerCase().includes(p.materia.toLowerCase()) || p.materia.toLowerCase().includes(d.materia.toLowerCase()));
+    return { materia: p.materia, cob: p.pct, taxa: des ? des.pct : 0.5, pend: p.pendentes, q: des ? des.questoes : 0 };
+  }).sort((a,b) => ((1-a.cob)*0.5+(1-a.taxa)*0.5) - ((1-b.cob)*0.5+(1-b.taxa)*0.5));
+
+  document.getElementById('priorityList').innerHTML = priorities.map((m,i) => `
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(30,41,59,0.4);">
+      <div style="width:25px;height:25px;border-radius:50%;background:${m.cob<0.4||m.taxa<0.55?'rgba(239,68,68,0.2)':m.cob<0.7?'rgba(245,158,11,0.2)':'rgba(59,130,246,0.2)'};color:${m.cob<0.4||m.taxa<0.55?'#ef4444':m.cob<0.7?'#f59e0b':'#3b82f6'};display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:bold;">${i+1}</div>
+      <div style="flex:1;"><strong>${m.materia}</strong><br><span style="font-size:0.7rem;color:#64748b;">Cob: ${fmtPct(m.cob)} · Acerto: ${fmtPct(m.taxa)} · Pend: ${m.pend}</span></div>
+    </div>
+  `).join('');
+
+  const alerts = [];
+  const crit = priorities.filter(m => m.cob < 0.4);
+  if (crit.length) alerts.push(`<div class="alert danger"><strong>🚨 Críticas:</strong> ${crit.map(m=>m.materia).join(', ')}</div>`);
+  if (dias > 0 && totalP > 0) alerts.push(`<div class="alert info"><strong>📊 Ritmo:</strong> ~${(totalP/dias).toFixed(1)} tópicos/dia</div>`);
+  document.getElementById('strategicAlerts').innerHTML = alerts.join('');
+
+  // Gap chart
+  const ctx9 = document.getElementById('chartGap').getContext('2d');
+  if (charts.c9) charts.c9.destroy();
+  charts.c9 = new Chart(ctx9, { type:'bar', data:{ labels: painel.map(m=>m.materia), datasets:[{ label:'Atual', data: painel.map(m=>Math.min(100,m.pct*100)), backgroundColor:'rgba(59,130,246,0.7)' }, { label:'Gap', data: painel.map(m=>Math.max(0,80-m.pct*100)), backgroundColor:'rgba(239,68,68,0.3)' }] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, scales:{ x:{ stacked:true, max:100 } } } });
+
+  // Revisions
+  const topicLast = {};
+  estudos.forEach(e => {
+    const key = e.materia + '|||' + e.bloco + '|||' + e.topico;
+    if (!topicLast[key] || e.data > topicLast[key].data) topicLast[key] = e;
+  });
+  const revItems = Object.values(topicLast).map(e => {
+    const ds = Math.floor((hoje - e.data) / (1000*60*60*24));
+    return { ...e, daysSince: ds, urgency: ds >= 30 ? 'overdue' : ds >= 14 ? 'warning' : ds >= 7 ? 'soon' : 'ok' };
+  }).sort((a,b) => b.daysSince - a.daysSince);
+
+  const over30 = revItems.filter(r => r.daysSince >= 30).length;
+  document.getElementById('revisionAlerts').innerHTML = over30 > 0 ? `<div class="alert danger"><strong>🔴 ${over30} tópicos sem revisão há 30+ dias!</strong></div>` : '';
+
+  const rt = document.querySelector('#revisionTable tbody');
+  rt.innerHTML = '';
+  revItems.slice(0, 100).forEach(r => {
+    const bc = r.urgency === 'overdue' ? 'badge-red' : r.urgency === 'warning' ? 'badge-amber' : r.urgency === 'soon' ? 'badge-blue' : 'badge-green';
+    rt.innerHTML += `<tr><td>${r.materia}</td><td>${r.bloco}</td><td>${r.topico.substring(0,40)}</td><td>${r.dataStr.split('-').reverse().join('/')}</td><td style="color:${r.urgency==='overdue'?'#ef4444':r.urgency==='warning'?'#f59e0b':'#10b981'};font-weight:bold;">${r.daysSince}d</td><td><span class="badge ${bc}">${r.urgency==='overdue'?'URGENTE':r.urgency==='warning'?'Atenção':r.urgency==='soon'?'Em breve':'OK'}</span></td></tr>`;
   });
 }
 
-load();
+function renderSubjects() {
+  const filter = document.getElementById('filterSubject').value;
+  let filt = [...estudos];
+  if (filter !== 'all') filt = filt.filter(e => e.materia === filter);
+  
+  const h = filt.reduce((s,e) => s+e.tempo, 0);
+  const q = filt.reduce((s,e) => s+e.questoes, 0);
+  const a = filt.reduce((s,e) => s+e.acertos, 0);
+  
+  document.getElementById('kpiSubject').innerHTML = `
+    <div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Horas</div><div class="kpi-value" style="color:#3b82f6">${fmtH(h)}</div></div>
+    <div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Sessões</div><div class="kpi-value" style="color:#10b981">${filt.length}</div></div>
+    <div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Questões</div><div class="kpi-value" style="color:#f59e0b">${q}</div></div>
+    <div class="kpi" style="border-top:3px solid #8b5cf6"><div class="kpi-label">Taxa</div><div class="kpi-value" style="color:#8b5cf6">${q?fmtPct(a/q):'—'}</div></div>
+  `;
+
+  const tb = document.querySelector('#subjectTable tbody');
+  tb.innerHTML = '';
+  [...filt].sort((a,b) => b.data - a.data).slice(0, 100).forEach(e => {
+    tb.innerHTML += `<tr><td>${e.dataStr.split('-').reverse().join('/')}</td><td>${e.materia}</td><td>${e.bloco}</td><td>${e.topico.substring(0,40)}</td><td>${e.tempo}min</td><td>${e.questoes||'—'}</td><td>${e.acertos||'—'}</td></tr>`;
+  });
+}
+
+document.getElementById('tab-overview').classList.add('active');
+loadData();
 </script>
 </body>
 </html>
