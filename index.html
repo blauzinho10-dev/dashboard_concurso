@@ -240,7 +240,7 @@ td { padding:8px 10px; border-bottom:1px solid rgba(30,41,59,0.5); color:#cbd5e1
 </div>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbzRpi_i3NI8kmK48-XBcSY9jmbADYL295ne_5y0ikO5m3TZC5viWg3_8R8S7Jd12jMycA/exec';;
+const API = 'https://script.google.com/macros/s/AKfycbzRpi_i3NI8kmK48-XBcSY9jmbADYL295ne_5y0ikO5m3TZC5viWg3_8R8S7Jd12jMycA/exec';
 let painel = [], estudos = [], desempenho = [], charts = {};
 // Variáveis do Pomodoro
 let pomodoroInterval, pomodoroSeconds = 3000, isStudying = true, sessionCount = 0;
@@ -419,10 +419,9 @@ async function loadData() {
   try {
     document.getElementById('loading').style.display = 'flex';
     const [p, e, d] = await Promise.all([
-      fetch(API + '?sheet=Painel')
-      fetch(API + '?action=getMaterias')
-      fetch(API + '?action=addEstudo&data=')
-      fetch(API + '?action=addMateria&nome=')
+     fetch(API + '?sheet=Painel')
+     fetch(API + '?sheet=Estudos')
+     fetch(API + '?sheet=Desempenho')
     ]);
     
     painel = parsePainel(p);
@@ -878,7 +877,6 @@ function renderTopics() {
 
 document.getElementById('tab-study').classList.add('active');
 loadMaterias();
-loadData();
 updateTimerDisplay();
 </script>
 </body>
