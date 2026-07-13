@@ -522,14 +522,11 @@ function renderAll() {
   const totalP = painel.reduce((s, m) => s + m.pendentes, 0);
   const horas  = estudos.reduce((s, e) => s + e.tempo, 0);
   
-  // Questões e acertos dos estudos (novos, a partir de 03/07/2026)
-  const qE = estudos.reduce((s, e) => s + e.questoes, 0);
-  const aE = estudos.reduce((s, e) => s + e.acertos, 0);
-  
-  // Questões e acertos do desempenho (histórico, até 03/03/2026)
-  const qD = desempenho.reduce((s, d) => s + d.questoes, 0);
-  const aD = desempenho.reduce((s, d) => s + d.acertos, 0);
-  const eD = desempenho.reduce((s, d) => s + d.erros, 0);
+   // TUDO vem da aba ESTUDOS
+  const qTotal = estudos.reduce((s, e) => s + e.questoes, 0);
+  const aTotal = estudos.reduce((s, e) => s + e.acertos, 0);
+  const eTotal = qTotal - aTotal;
+  const taxaTotal = qTotal ? aTotal / qTotal : 0;
   
   // TOTAL CONSOLIDADO = Histórico + Novo
   const qTotal = qD + qE;
@@ -591,7 +588,7 @@ function renderAll() {
   const best = desempenho.filter(d => d.questoes >= 5).sort((a, b) => b.pct - a.pct)[0];
   const worst = desempenho.filter(d => d.questoes >= 5).sort((a, b) => a.pct - b.pct)[0];
   document.getElementById('kpiPerf').innerHTML = `
-    <div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Total Questões</div><div class="kpi-value">${qTotal.toLocaleString('pt-BR')}</div><div class="kpi-sub">${qD} históricas + ${qE} estudos</div></div>
+    <div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Total Questões</div><div class="kpi-value">${qTotal.toLocaleString('pt-BR')}</div><div class="kpi-sub">${qTotal} questões</div></div>
     <div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Taxa Geral</div><div class="kpi-value">${fmtPct(taxaTotal)}</div></div>
     <div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Melhor</div><div class="kpi-value" style="font-size:1rem;">${best ? best.materia.substring(0,18) : '—'}</div>${best ? `<div class="kpi-sub">${fmtPct(best.pct)}</div>` : ''}</div>
     <div class="kpi" style="border-top:3px solid #ef4444"><div class="kpi-label">Precisa Atenção</div><div class="kpi-value" style="font-size:1rem;">${worst ? worst.materia.substring(0,18) : '—'}</div>${worst ? `<div class="kpi-sub">${fmtPct(worst.pct)}</div>` : ''}</div>
@@ -615,27 +612,39 @@ function renderAll() {
   }
 
   // Tabela de desempenho (mostra os históricos + totais dos estudos)
-  document.querySelector('#perfTable tbody').innerHTML = desempenho.map(d => {
-    const bc = d.pct >= 0.7 ? 'badge-green' : d.pct >= 0.6 ? 'badge-amber' : 'badge-red';
-    return `<tr><td>${d.materia}</td><td>${d.questoes}</td><td>${d.acertos}</td><td>${d.erros}</td><td>${fmtPct(d.pct)}</td><td><span class="badge ${bc}">${d.pct >= 0.7 ? 'Bom' : d.pct >= 0.6 ? 'Regular' : 'Crítico'}</span></td></tr>`;
-  }).join('') + `
-    <tr style="background:rgba(59,130,246,0.1);font-weight:bold;">
-      <td>📝 Estudos (novo)</td>
-      <td>${qE}</td>
-      <td>${aE}</td>
-      <td>${qE - aE}</td>
-      <td>${fmtPct(qE ? aE/qE : 0)}</td>
-      <td><span class="badge badge-blue">Atual</span></td>
-    </tr>
-    <tr style="background:rgba(16,185,129,0.1);font-weight:bold;">
-      <td>📊 TOTAL CONSOLIDADO</td>
-      <td>${qTotal}</td>
-      <td>${aTotal}</td>
-      <td>${eTotal}</td>
-      <td>${fmtPct(taxaTotal)}</td>
-      <td><span class="badge badge-green">Total</span></td>
-    </tr>
-  `;
+   // Tabela de desempenho vazia (não usa mais a aba Desempenho)
+  const byMateria = {};
+estudos.forEach(e => {
+  if (!byMateria[e.materia]) byMateria[e.materia] = { q: 0, a: 0 };
+  byMateria[e.materia].q += e.questoes;
+  byMateria[e.materia].a += e.acertos;
+});
+
+const rows = Object.entries(byMateria)
+  .sort((a, b) => b[1].q - a[1].q)
+  .map(([mat, val]) => {
+    const taxa = val.q ? val.a / val.q : 0;
+    const bc = taxa >= 0.7 ? 'badge-green' : taxa >= 0.6 ? 'badge-amber' : 'badge-red';
+    return `<tr>
+      <td>${mat}</td>
+      <td>${val.q}</td>
+      <td>${val.a}</td>
+      <td>${val.q - val.a}</td>
+      <td>${fmtPct(taxa)}</td>
+      <td><span class="badge ${bc}">${taxa >= 0.7 ? 'Bom' : taxa >= 0.6 ? 'Regular' : 'Crítico'}</span></td>
+    </tr>`;
+  }).join('');
+
+document.querySelector('#perfTable tbody').innerHTML = rows + `
+  <tr style="background:rgba(59,130,246,0.15);font-weight:bold;">
+    <td><strong>📊 TOTAL</strong></td>
+    <td><strong>${qTotal}</strong></td>
+    <td><strong>${aTotal}</strong></td>
+    <td><strong>${eTotal}</strong></td>
+    <td><strong>${fmtPct(taxaTotal)}</strong></td>
+    <td><span class="badge badge-blue">Geral</span></td>
+  </tr>
+`;
 
   // ── Preenche selects de filtros ──
   const materias = [...new Set(estudos.map(e => e.materia))].sort();
