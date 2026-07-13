@@ -9,78 +9,81 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',Arial,sans-serif;background:#0a0e1a;color:#e0e0e0;min-height:100vh}
-.header{background:#111827;padding:15px 20px;border-bottom:1px solid #1e293b;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:100}
-.header h1{font-size:1.1rem;color:#fff}
-.header button{background:#3b82f6;color:#fff;border:none;padding:8px 16px;border-radius:5px;cursor:pointer;font-weight:bold;font-size:.85rem}
-.tabs{display:flex;gap:2px;padding:8px 15px;overflow-x:auto;border-bottom:1px solid #1e293b;background:#0f172a}
-.tab{padding:8px 12px;border:none;background:none;color:#94a3b8;cursor:pointer;font-size:.78rem;white-space:nowrap;border-bottom:2px solid transparent;font-family:inherit}
+.header{background:#111827;padding:12px 20px;border-bottom:1px solid #1e293b;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:100}
+.header h1{font-size:1rem;color:#fff}
+.header button{background:#3b82f6;color:#fff;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-weight:bold;font-size:.8rem}
+.tabs{display:flex;gap:2px;padding:6px 15px;overflow-x:auto;border-bottom:1px solid #1e293b;background:#0f172a}
+.tab{padding:7px 11px;border:none;background:none;color:#94a3b8;cursor:pointer;font-size:.75rem;white-space:nowrap;border-bottom:2px solid transparent;font-family:inherit}
 .tab:hover{color:#cbd5e1}
 .tab.active{color:#fff;border-bottom-color:#3b82f6;font-weight:bold}
-.content{max-width:1400px;margin:0 auto;padding:15px}
+.content{max-width:1400px;margin:0 auto;padding:12px}
 .tab-panel{display:none}
 .tab-panel.active{display:block}
-.card{background:#111827;padding:18px;border-radius:10px;margin-bottom:15px;border:1px solid #1e293b}
-.card h3{color:#fff;font-size:.8rem;text-transform:uppercase;margin-bottom:12px}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:15px}
-.kpi{background:#111827;padding:15px;border-radius:10px;border:1px solid #1e293b}
-.kpi-label{font-size:.65rem;color:#94a3b8;text-transform:uppercase}
-.kpi-value{font-size:1.4rem;font-weight:bold;margin:3px 0;color:#fff}
+.card{background:#111827;padding:15px;border-radius:10px;margin-bottom:12px;border:1px solid #1e293b}
+.card h3{color:#fff;font-size:.75rem;text-transform:uppercase;margin-bottom:10px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px}
+.kpi{background:#111827;padding:12px;border-radius:8px;border:1px solid #1e293b;position:relative}
+.kpi-label{font-size:.6rem;color:#94a3b8;text-transform:uppercase}
+.kpi-value{font-size:1.3rem;font-weight:bold;margin:2px 0;color:#fff}
 .kpi-sub{font-size:.6rem;color:#64748b}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:15px}
-.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:15px;margin-bottom:15px}
+.kpi-comp{font-size:.65rem;margin-top:4px;font-weight:bold}
+.kpi-comp.up{color:#10b981}
+.kpi-comp.down{color:#ef4444}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
 .chart-wrap{position:relative;width:100%;height:300px}
-.chart-wrap-lg{position:relative;width:100%;height:400px}
-table{width:100%;border-collapse:collapse;font-size:.75rem}
-th{text-align:left;padding:8px;border-bottom:1px solid #1e293b;color:#fff;font-size:.65rem;text-transform:uppercase;background:#111827;position:sticky;top:0}
-td{padding:6px 8px;border-bottom:1px solid rgba(30,41,59,.5);color:#cbd5e1}
-.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.6rem;font-weight:bold}
+.chart-wrap-sm{position:relative;width:100%;height:250px}
+table{width:100%;border-collapse:collapse;font-size:.7rem}
+th{text-align:left;padding:6px 8px;border-bottom:1px solid #1e293b;color:#fff;font-size:.6rem;text-transform:uppercase;background:#111827;position:sticky;top:0}
+td{padding:5px 8px;border-bottom:1px solid rgba(30,41,59,.5);color:#cbd5e1}
+.badge{display:inline-block;padding:2px 6px;border-radius:15px;font-size:.55rem;font-weight:bold}
 .badge-green{background:rgba(16,185,129,.2);color:#10b981}
 .badge-amber{background:rgba(245,158,11,.2);color:#f59e0b}
 .badge-red{background:rgba(239,68,68,.2);color:#ef4444}
 .badge-blue{background:rgba(59,130,246,.2);color:#60a5fa}
-.loading{text-align:center;padding:60px;color:#fff;display:flex;flex-direction:column;align-items:center}
-.spinner{width:50px;height:50px;border:3px solid #1e293b;border-top-color:#3b82f6;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 15px}
+.loading{text-align:center;padding:40px;color:#fff;display:flex;flex-direction:column;align-items:center}
+.spinner{width:40px;height:40px;border:3px solid #1e293b;border-top-color:#3b82f6;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.filters{display:flex;gap:8px;margin-bottom:15px;align-items:center;flex-wrap:wrap}
-.filters label{font-size:.7rem;color:#94a3b8}
-.filters select,.filters input{background:#1e293b;border:1px solid #334155;color:#f1f5f9;padding:6px 10px;border-radius:5px;font-family:inherit;font-size:.78rem}
-.alert{padding:12px;border-radius:8px;margin-bottom:10px;border-left:3px solid;font-size:.8rem}
+.filters{display:flex;gap:6px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
+.filters label{font-size:.65rem;color:#94a3b8}
+.filters select,.filters input{background:#1e293b;border:1px solid #334155;color:#f1f5f9;padding:5px 8px;border-radius:4px;font-family:inherit;font-size:.7rem}
+.alert{padding:10px;border-radius:6px;margin-bottom:8px;border-left:3px solid;font-size:.7rem}
 .alert.danger{background:rgba(239,68,68,.1);border-color:#ef4444;color:#fca5a5}
 .alert.warning{background:rgba(245,158,11,.1);border-color:#f59e0b;color:#fcd34d}
 .alert.success{background:rgba(16,185,129,.1);border-color:#10b981;color:#6ee7b7}
-.alert.info{background:rgba(59,130,246,.1);border-color:#3b82f6;color:#93c5fd}
-.scroll{max-height:350px;overflow-y:auto}
-.scroll::-webkit-scrollbar{width:5px}
+.scroll{max-height:300px;overflow-y:auto}
+.scroll::-webkit-scrollbar{width:4px}
 .scroll::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
-.timer-display{font-size:3.5rem;font-weight:bold;color:#3b82f6;margin:10px 0;font-family:monospace;text-align:center}
-.timer-controls{display:flex;gap:6px;justify-content:center;margin:8px 0}
-.timer-controls button{padding:8px 16px;border:none;border-radius:6px;font-weight:bold;cursor:pointer;font-size:.85rem}
+.timer-display{font-size:3rem;font-weight:bold;color:#3b82f6;margin:8px 0;font-family:monospace;text-align:center}
+.timer-controls{display:flex;gap:5px;justify-content:center;margin:6px 0}
+.timer-controls button{padding:7px 14px;border:none;border-radius:5px;font-weight:bold;cursor:pointer;font-size:.8rem}
 .btn-start{background:#10b981;color:#fff}
 .btn-pause{background:#f59e0b;color:#000}
 .btn-reset{background:#ef4444;color:#fff}
-.timer-status{font-size:.9rem;margin:6px 0;text-align:center}
-.form-group{margin-bottom:8px}
-.form-group label{display:block;font-size:.7rem;color:#94a3b8;margin-bottom:2px}
-.form-group select,.form-group input{width:100%;background:#1e293b;border:1px solid #334155;color:#f1f5f9;padding:7px;border-radius:5px;font-family:inherit;font-size:.82rem}
-.btn-submit{background:#3b82f6;color:#fff;border:none;padding:10px;border-radius:6px;font-weight:bold;cursor:pointer;width:100%;font-size:.85rem}
-.goal-bar{height:10px;background:#1e293b;border-radius:5px;margin:4px 0;overflow:hidden}
-.goal-fill{height:100%;background:linear-gradient(90deg,#3b82f6,#10b981);border-radius:5px;transition:width .5s}
+.timer-status{font-size:.8rem;margin:4px 0;text-align:center}
+.form-group{margin-bottom:6px}
+.form-group label{display:block;font-size:.65rem;color:#94a3b8;margin-bottom:2px}
+.form-group select,.form-group input{width:100%;background:#1e293b;border:1px solid #334155;color:#f1f5f9;padding:6px;border-radius:4px;font-family:inherit;font-size:.78rem}
+.btn-submit{background:#3b82f6;color:#fff;border:none;padding:8px;border-radius:5px;font-weight:bold;cursor:pointer;width:100%;font-size:.8rem}
+.goal-bar{height:8px;background:#1e293b;border-radius:4px;margin:3px 0;overflow:hidden}
+.goal-fill{height:100%;background:linear-gradient(90deg,#3b82f6,#10b981);border-radius:4px;transition:width .5s}
 .rev-overdue{color:#ef4444;font-weight:bold}
 .rev-warning{color:#f59e0b;font-weight:bold}
 .rev-ok{color:#10b981}
-.empty-state{text-align:center;padding:40px;color:#475569;font-size:.85rem}
-.streak-badge{background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;padding:4px 10px;border-radius:20px;font-weight:bold;font-size:.7rem;display:inline-block}
-@media(max-width:768px){.grid-2,.grid-3{grid-template-columns:1fr}.timer-display{font-size:2.5rem}}
+.streak-badge{background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;padding:3px 8px;border-radius:15px;font-weight:bold;font-size:.65rem}
+.empty-state{text-align:center;padding:30px;color:#475569;font-size:.75rem}
+.arrow-up{color:#10b981}
+.arrow-down{color:#ef4444}
+@media(max-width:768px){.grid-2{grid-template-columns:1fr}.timer-display{font-size:2rem}}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>📊 Dashboard — Auditor Fiscal SEFAZ-AL</h1>
-  <div style="display:flex;align-items:center;gap:10px">
-    <span style="background:rgba(245,158,11,.2);color:#f59e0b;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:bold">SEFAZ-AL</span>
-    <span id="streakBadge" class="streak-badge">🔥 0 dias</span>
-    <span id="lastUpdate" style="font-size:.65rem;color:#64748b">—</span>
+  <h1>📊 Dashboard SEFAZ-AL</h1>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span style="background:rgba(245,158,11,.2);color:#f59e0b;padding:2px 8px;border-radius:15px;font-size:.65rem;font-weight:bold">SEFAZ-AL</span>
+    <span id="streakBadge" class="streak-badge">🔥 0</span>
+    <span id="lastUpdate" style="font-size:.6rem;color:#64748b">—</span>
     <button onclick="loadData()">🔄</button>
     <button onclick="window.print()" style="background:#8b5cf6">🖨️</button>
   </div>
@@ -89,78 +92,82 @@ td{padding:6px 8px;border-bottom:1px solid rgba(30,41,59,.5);color:#cbd5e1}
 <div class="tabs">
   <button class="tab active" onclick="switchTab('study',this)">🎯 Estudar</button>
   <button class="tab" onclick="switchTab('overview',this)">Visão Geral</button>
-  <button class="tab" onclick="switchTab('performance',this)">Desempenho</button>
   <button class="tab" onclick="switchTab('evolution',this)">Evolução</button>
-  <button class="tab" onclick="switchTab('subjects',this)">Por Matéria</button>
-  <button class="tab" onclick="switchTab('topics',this)">Por Tópico</button>
+  <button class="tab" onclick="switchTab('subjects',this)">Matérias/Tópicos</button>
   <button class="tab" onclick="switchTab('revisions',this)">Revisões</button>
 </div>
 
 <div class="content">
-  <div id="loading" class="loading"><div class="spinner"></div><p>Carregando dados...</p></div>
+  <div id="loading" class="loading"><div class="spinner"></div><p>Carregando...</p></div>
 
-  <!-- ABA ESTUDAR -->
+  <!-- ESTUDAR -->
   <div id="tab-study" class="tab-panel active">
-    <div class="grid-3">
+    <div class="grid-2">
       <div class="card"><h3>⏱️ Pomodoro 50/10</h3><div class="timer-display" id="timerDisplay">50:00</div><div class="timer-status" id="timerStatus">Pronto</div><div class="timer-controls"><button class="btn-start" onclick="startPomodoro()">▶</button><button class="btn-pause" onclick="pausePomodoro()">⏸</button><button class="btn-reset" onclick="resetPomodoro()">↺</button></div></div>
       <div class="card"><h3>📝 Registrar</h3>
         <div class="form-group"><label>Matéria</label><select id="regMateria" onchange="loadBlocos()"><option value="">Selecione...</option></select></div>
         <div class="form-group"><label>Bloco</label><select id="regBloco" onchange="loadTopicos()"><option value="">Matéria primeiro</option></select></div>
         <div class="form-group"><label>Tópico</label><select id="regTopico"><option value="">Bloco primeiro</option></select></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><div class="form-group"><label>Tempo(min)</label><input type="number" id="regTempo" value="50" min="1"></div><div class="form-group"><label>Questões</label><input type="number" id="regQuestoes" value="0" min="0"></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px"><div class="form-group"><label>Tempo(min)</label><input type="number" id="regTempo" value="50" min="1"></div><div class="form-group"><label>Questões</label><input type="number" id="regQuestoes" value="0" min="0"></div></div>
         <div class="form-group"><label>Acertos</label><input type="number" id="regAcertos" value="0" min="0"></div>
         <button class="btn-submit" onclick="registrarEstudo()">✅ Registrar</button>
-        <div id="regStatus" style="margin-top:6px;text-align:center;font-size:.75rem"></div>
+        <div id="regStatus" style="margin-top:5px;text-align:center;font-size:.7rem"></div>
       </div>
-      <div class="card"><h3>🎯 Hoje</h3><div class="kpi-grid" id="kpiMetas"></div><div style="font-size:.7rem"><strong>Horas:</strong> <span id="metaHoras">0,0h / 4h</span><div class="goal-bar"><div class="goal-fill" id="goalHoras" style="width:0%"></div></div><strong>Questões:</strong> <span id="metaQuestoes">0 / 30</span><div class="goal-bar"><div class="goal-fill" id="goalQuestoes" style="width:0%"></div></div><hr style="border-color:#1e293b;margin:8px 0"><strong>📅 Previsão conclusão:</strong><br><span id="previsaoConclusao" style="color:#f59e0b">—</span></div></div>
     </div>
+    <div class="card"><h3>🎯 Hoje</h3><div class="kpi-grid" id="kpiMetas"></div><div style="font-size:.7rem"><strong>Horas:</strong> <span id="metaHoras">0,0h / 4h</span><div class="goal-bar"><div class="goal-fill" id="goalHoras" style="width:0%"></div></div><strong>Questões:</strong> <span id="metaQuestoes">0 / 30</span><div class="goal-bar"><div class="goal-fill" id="goalQuestoes" style="width:0%"></div></div><hr style="border-color:#1e293b;margin:6px 0"><strong>📅 Previsão:</strong> <span id="previsaoConclusao" style="color:#f59e0b">—</span></div></div>
   </div>
 
-  <!-- ABA VISÃO GERAL -->
-  <div id="tab-overview" class="tab-panel"><div class="kpi-grid" id="kpiOverview"></div><div class="grid-2"><div class="card"><h3>Progresso por Matéria</h3><div class="chart-wrap"><canvas id="chartProgress"></canvas></div></div><div class="card"><h3>Cobertura do Edital</h3><div class="chart-wrap"><canvas id="chartRadar"></canvas></div></div></div><div class="grid-2"><div class="card"><h3>Horas por Matéria</h3><div class="chart-wrap"><canvas id="chartHours"></canvas></div></div><div class="card"><h3>Distribuição por Dia da Semana</h3><div class="chart-wrap"><canvas id="chartDiaSemana"></canvas></div></div></div></div>
+  <!-- VISÃO GERAL -->
+  <div id="tab-overview" class="tab-panel">
+    <div class="filters"><label>Período:</label><select id="overviewPeriodo" onchange="renderOverview()"><option value="mes">Este mês</option><option value="semana">Esta semana</option><option value="15d">Últimos 15 dias</option><option value="30d">Últimos 30 dias</option><option value="tudo">Tudo</option></select><label>Matéria:</label><select id="overviewMateria" onchange="renderOverview()"><option value="all">Todas</option></select></div>
+    <div class="kpi-grid" id="kpiOverview"></div>
+    <div class="grid-2"><div class="card"><h3>Progresso por Matéria</h3><div class="chart-wrap"><canvas id="chartProgress"></canvas></div></div><div class="card"><h3>Horas por Matéria</h3><div class="chart-wrap"><canvas id="chartHours"></canvas></div></div></div>
+  </div>
 
-  <!-- ABA DESEMPENHO -->
-  <div id="tab-performance" class="tab-panel"><div class="kpi-grid" id="kpiPerf"></div><div class="card"><h3>Ranking por Matéria</h3><div class="scroll"><table id="perfTable"><thead><tr><th>Matéria</th><th>Questões</th><th>Acertos</th><th>Erros</th><th>Taxa</th><th>Status</th></tr></thead><tbody></tbody></table></div></div></div>
-
-  <!-- ABA EVOLUÇÃO -->
+  <!-- EVOLUÇÃO -->
   <div id="tab-evolution" class="tab-panel">
     <div class="filters"><label>De:</label><input type="date" id="evolDe" onchange="renderEvolution()"><label>Até:</label><input type="date" id="evolAte" onchange="renderEvolution()"><label>Matéria:</label><select id="evolMateria" onchange="renderEvolution()"><option value="all">Todas</option></select></div>
     <div class="grid-2"><div class="card"><h3>Horas por Dia</h3><div class="chart-wrap"><canvas id="chartDailyHours"></canvas></div></div><div class="card"><h3>Horas Acumuladas</h3><div class="chart-wrap"><canvas id="chartCumHours"></canvas></div></div></div>
-    <div class="grid-2"><div class="card"><h3>Questões e Acertos por Dia</h3><div class="chart-wrap"><canvas id="chartDailyQ"></canvas></div></div><div class="card"><h3>Taxa de Acerto Semanal</h3><div class="chart-wrap"><canvas id="chartAcertoSemanal"></canvas></div></div></div>
-    <div class="card"><h3>Horas por Matéria ao Longo do Tempo</h3><div class="chart-wrap-lg"><canvas id="chartHorasMateriaTempo"></canvas></div></div>
+    <div class="grid-2"><div class="card"><h3>Questões/Acertos por Dia</h3><div class="chart-wrap"><canvas id="chartDailyQ"></canvas></div></div><div class="card"><h3>Taxa de Acerto Semanal</h3><div class="chart-wrap"><canvas id="chartAcertoSemanal"></canvas></div></div></div>
+    <div class="card"><h3>Evolução por Matéria (barras lado a lado)</h3><div class="chart-wrap-lg" style="height:400px"><canvas id="chartEvoMateria"></canvas></div></div>
   </div>
 
-  <!-- ABA POR MATÉRIA -->
+  <!-- MATÉRIAS/TÓPICOS (UNIFICADO) -->
   <div id="tab-subjects" class="tab-panel">
-    <div class="filters"><label>Matéria:</label><select id="filterSubject" onchange="renderSubjects()"><option value="all">Todas</option></select><label>Bloco:</label><select id="filterSubjectBloco" onchange="renderSubjects()"><option value="all">Todos</option></select><label>Tópico:</label><select id="filterSubjectTopico" onchange="renderSubjects()"><option value="all">Todos</option></select><label>De:</label><input type="date" id="subjectDe" onchange="renderSubjects()"><label>Até:</label><input type="date" id="subjectAte" onchange="renderSubjects()"></div>
-    <div class="kpi-grid" id="kpiSubject"></div>
-    <div class="card"><h3>Sessões</h3><div class="scroll"><table id="subjectTable"><thead><tr><th>Data</th><th>Matéria</th><th>Bloco</th><th>Tópico</th><th>Tempo</th><th>Q</th><th>A</th><th>Taxa</th></tr></thead><tbody></tbody></table></div></div>
+    <div class="filters"><label>Matéria:</label><select id="subjMateria" onchange="renderSubjects()"><option value="all">Todas</option></select><label>Bloco:</label><select id="subjBloco" onchange="renderSubjects()"><option value="all">Todos</option></select><label>Tópico:</label><select id="subjTopico" onchange="renderSubjects()"><option value="all">Todos</option></select><label>De:</label><input type="date" id="subjDe" onchange="renderSubjects()"><label>Até:</label><input type="date" id="subjAte" onchange="renderSubjects()"></div>
+    <div class="kpi-grid" id="kpiSubjects"></div>
+    <div class="card"><h3>📊 Comparativo por Matéria</h3><div class="scroll"><table id="compTable"><thead><tr><th>Matéria</th><th>Horas</th><th>vs Ant.</th><th>Questões</th><th>vs Ant.</th><th>Taxa</th><th>vs Ant.</th><th>Sessões</th><th>vs Ant.</th></tr></thead><tbody></tbody></table></div></div>
+    <div class="card"><h3>🔍 Raio-X por Tópico</h3><div class="scroll"><table id="topicTable"><thead><tr><th>Matéria</th><th>Bloco</th><th>Tópico</th><th>Horas</th><th>Q</th><th>Taxa</th><th>Dificuldade</th><th>Último</th></tr></thead><tbody></tbody></table></div></div>
   </div>
 
-  <!-- ABA POR TÓPICO -->
-  <div id="tab-topics" class="tab-panel">
-    <div class="filters"><label>Matéria:</label><select id="filterTopicMateria" onchange="renderTopics()"><option value="all">Todas</option></select><label>Bloco:</label><select id="filterTopicBloco" onchange="renderTopics()"><option value="all">Todos</option></select><label>Ordenar:</label><select id="filterTopicSort" onchange="renderTopics()"><option value="horas">Mais horas</option><option value="acerto">Maior acerto</option><option value="questoes">Mais questões</option><option value="recente">Mais recente</option></select></div>
-    <div class="kpi-grid" id="kpiTopics"></div>
-    <div class="card"><h3>Raio-X por Tópico</h3><div class="scroll"><table id="topicTable"><thead><tr><th>Matéria</th><th>Bloco</th><th>Tópico</th><th>Sessões</th><th>Horas</th><th>Q</th><th>Taxa</th><th>Dificuldade</th><th>Último</th></tr></thead><tbody></tbody></table></div></div>
-  </div>
-
-  <!-- ABA REVISÕES -->
-  <div id="tab-revisions" class="tab-panel"><div id="revisionAlerts"></div><div class="card"><h3>Agenda de Revisões</h3><div class="scroll"><table id="revisionTable"><thead><tr><th>Matéria</th><th>Bloco</th><th>Tópico</th><th>Último</th><th>Dias</th><th>Urgência</th></tr></thead><tbody></tbody></table></div></div></div>
+  <!-- REVISÕES -->
+  <div id="tab-revisions" class="tab-panel"><div id="revisionAlerts"></div><div class="card"><h3>Revisões</h3><div class="scroll"><table id="revisionTable"><thead><tr><th>Matéria</th><th>Bloco</th><th>Tópico</th><th>Último</th><th>Dias</th><th>Urgência</th></tr></thead><tbody></tbody></table></div></div></div>
 </div>
 
 <script>
 const API='https://script.google.com/macros/s/AKfycbyWKWYrs9bOpaQe9-QN-t3QsXUodlG9eiEUmqFTPqPnlWScpi1s3dRa5wHhSFFYjWsgJA/exec';
 let painel=[],estudos=[],charts={},pomodoroInterval,pomodoroSeconds=3000,isStudying=!0;
 Chart.register(ChartDataLabels);
-const COLORS=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f43f5e','#84cc16','#e879f9','#fb923c','#a78bfa','#34d399'];
+const COLORS=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f43f5e','#84cc16','#e879f9','#fb923c','#a78bfa','#34d399','#fbbf24','#f472b6','#22d3ee','#64748b'];
 
-// Utilidades
 function parseNum(v){if(v===null||v===undefined||v==='')return 0;v=String(v).replace(/"/g,'').replace(',','.').trim();return parseFloat(v)||0}
 function parsePct(v){if(!v)return 0;v=String(v).replace(/"/g,'').replace('%','').replace(',','.').trim();let n=parseFloat(v);return isNaN(n)?0:n>1?n/100:n}
 function fmtPct(n){return(n*100).toFixed(1).replace('.',',')+'%'}
 function fmtH(m){if(!m||m===0)return'0,0h';return(m/60).toFixed(1).replace('.',',')+'h'}
 function switchTab(id,el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');el.classList.add('active')}
 function toISO(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function getPeriodo(periodo){
+  const hoje=new Date(),fim=toISO(hoje);let ini;
+  if(periodo==='mes'){ini=toISO(new Date(hoje.getFullYear(),hoje.getMonth(),1))}
+  else if(periodo==='semana'){const d=new Date(hoje);d.setDate(d.getDate()-d.getDay());ini=toISO(d)}
+  else if(periodo==='15d'){const d=new Date(hoje);d.setDate(d.getDate()-15);ini=toISO(d)}
+  else if(periodo==='30d'){const d=new Date(hoje);d.setDate(d.getDate()-30);ini=toISO(d)}
+  else{ini='2000-01-01'}
+  const duracao=Math.floor((new Date(fim)-new Date(ini))/(1000*60*60*24));
+  const iniAnt=new Date(ini);iniAnt.setDate(iniAnt.getDate()-duracao-1);const fimAnt=new Date(ini);fimAnt.setDate(fimAnt.getDate()-1);
+  return{ini,fim,iniAnt:toISO(iniAnt),fimAnt:toISO(fimAnt),duracao};
+}
+function calcComp(atual,anterior){if(anterior===0)return atual>0?{val:'+100%',cls:'up'}:{val:'—',cls:''};const pct=((atual-anterior)/anterior*100);return{val:(pct>=0?'+':'')+pct.toFixed(1)+'%',cls:pct>=0?'up':'down'}}
 
 // Pomodoro
 function updateTimerDisplay(){const m=Math.floor(pomodoroSeconds/60),s=pomodoroSeconds%60;document.getElementById('timerDisplay').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')}
@@ -173,27 +180,17 @@ async function loadMaterias(){try{const r=await fetch(API+'?action=getMaterias')
 async function loadBlocos(){const m=document.getElementById('regMateria').value;const s=document.getElementById('regBloco');if(!m){s.innerHTML='<option value="">Matéria primeiro</option>';return}s.innerHTML='<option value="">Carregando...</option>';try{const r=await fetch(API+'?action=getBlocos&materia='+encodeURIComponent(m));const t=await r.text();const b=t.split('|').filter(b=>b.trim());s.innerHTML='<option value="">Selecione...</option>';b.forEach(b=>s.innerHTML+=`<option value="${b}">${b}</option>`)}catch(e){s.innerHTML='<option value="">Erro</option>'}}
 async function loadTopicos(){const m=document.getElementById('regMateria').value,b=document.getElementById('regBloco').value,s=document.getElementById('regTopico');if(!m||!b){s.innerHTML='<option value="">Bloco primeiro</option>';return}const topicos=estudos.filter(e=>e.materia===m&&e.bloco===b).map(e=>e.topico).filter((v,i,a)=>a.indexOf(v)===i).sort();s.innerHTML='<option value="">Selecione...</option>';topicos.forEach(t=>s.innerHTML+=`<option value="${t}">${t}</option>`);if(topicos.length===0)s.innerHTML+='<option value="__novo__">➕ Novo</option>'}
 
-// Registrar
 async function registrarEstudo(){
   const m=document.getElementById('regMateria').value,b=document.getElementById('regBloco').value;let t=document.getElementById('regTopico').value;
-  if(t==='__novo__'){t=prompt('Nome do novo tópico:');if(!t)return}
+  if(t==='__novo__'){t=prompt('Novo tópico:');if(!t)return}
   const tempo=document.getElementById('regTempo').value,q=document.getElementById('regQuestoes').value,a=document.getElementById('regAcertos').value,st=document.getElementById('regStatus');
-  if(!m||!b||!t||!tempo){st.innerHTML='<span style="color:#ef4444">Preencha todos os campos!</span>';return}
-  try{st.innerHTML='⏳ Salvando...';await fetch(API+'?action=addEstudo&data='+encodeURIComponent([m,b,t,tempo,q,a].join('|')));st.innerHTML='<span style="color:#10b981">✅ Registrado!</span>';document.getElementById('regQuestoes').value='0';document.getElementById('regAcertos').value='0';setTimeout(()=>st.innerHTML='',3000);await loadData()}catch(e){st.innerHTML='<span style="color:#ef4444">Erro</span>'}
+  if(!m||!b||!t||!tempo){st.innerHTML='<span style="color:#ef4444">Preencha todos!</span>';return}
+  try{st.innerHTML='⏳';await fetch(API+'?action=addEstudo&data='+encodeURIComponent([m,b,t,tempo,q,a].join('|')));st.innerHTML='<span style="color:#10b981">✅</span>';document.getElementById('regQuestoes').value='0';document.getElementById('regAcertos').value='0';setTimeout(()=>st.innerHTML='',2000);await loadData()}catch(e){st.innerHTML='<span style="color:#ef4444">Erro</span>'}
 }
 
-// Parse Estudos
 function parseEstudos(csvText){
   const lines=csvText.trim().split('\n');const data=[];
-  for(let i=1;i<lines.length;i++){
-    const row=[];let c='',q=!1;for(let ch of lines[i]){if(ch==='"')q=!q;else if(ch===','&&!q){row.push(c);c=''}else c+=ch}row.push(c);
-    if(!row[0]||row[0].includes('Data'))continue;
-    const dateStr=row[0].replace(/"/g,'').trim();let d=new Date(dateStr);
-    if(isNaN(d.getTime())){const parts=dateStr.split('/');if(parts.length===3)d=new Date(parseInt(parts[2]),parseInt(parts[1])-1,parseInt(parts[0]))}
-    if(isNaN(d.getTime()))continue;
-    const materia=row[1].replace(/"/g,'').trim(),bloco=row[2].replace(/"/g,'').trim(),topico=row[3].replace(/"/g,'').trim(),tempo=parseNum(row[4]),questoes=parseNum(row[5]),acertos=parseNum(row[6]);
-    if(materia&&tempo>0)data.push({data:d,dataStr:toISO(d),materia,bloco,topico,tempo,questoes,acertos});
-  }
+  for(let i=1;i<lines.length;i++){const row=[];let c='',q=!1;for(let ch of lines[i]){if(ch==='"')q=!q;else if(ch===','&&!q){row.push(c);c=''}else c+=ch}row.push(c);if(!row[0]||row[0].includes('Data'))continue;const ds=row[0].replace(/"/g,'').trim();let d=new Date(ds);if(isNaN(d.getTime())){const parts=ds.split('/');if(parts.length===3)d=new Date(parseInt(parts[2]),parseInt(parts[1])-1,parseInt(parts[0]))}if(isNaN(d.getTime()))continue;const materia=row[1].replace(/"/g,'').trim(),bloco=row[2].replace(/"/g,'').trim(),topico=row[3].replace(/"/g,'').trim(),tempo=parseNum(row[4]),questoes=parseNum(row[5]),acertos=parseNum(row[6]);if(materia&&tempo>0)data.push({data:d,dataStr:toISO(d),materia,bloco,topico,tempo,questoes,acertos})}
   return data.sort((a,b)=>b.data-a.data);
 }
 function parsePainel(csvText){
@@ -202,147 +199,130 @@ function parsePainel(csvText){
   return data;
 }
 
-// Load
 async function loadData(){
   document.getElementById('loading').style.display='flex';
-  try{
-    const[p,e]=await Promise.all([fetch(API+'?sheet=Painel').then(r=>r.text()),fetch(API+'?sheet=Estudos').then(r=>r.text())]);
-    painel=parsePainel(p);estudos=parseEstudos(e);
-    document.getElementById('lastUpdate').textContent=new Date().toLocaleTimeString('pt-BR');document.getElementById('loading').style.display='none';
-    renderAll();
-  }catch(err){document.getElementById('loading').innerHTML='<p style="color:#ef4444">❌ '+err.message+'</p>'}
+  try{const[p,e]=await Promise.all([fetch(API+'?sheet=Painel').then(r=>r.text()),fetch(API+'?sheet=Estudos').then(r=>r.text())]);painel=parsePainel(p);estudos=parseEstudos(e);document.getElementById('loading').style.display='none';document.getElementById('lastUpdate').textContent=new Date().toLocaleTimeString('pt-BR');const streak=calcStreak();document.getElementById('streakBadge').textContent='🔥 '+streak;renderOverview();renderEvolution();renderSubjects();renderMetas();document.getElementById('previsaoConclusao').textContent=calcPrevisao()}catch(err){document.getElementById('loading').innerHTML='<p style="color:#ef4444">❌ '+err.message+'</p>'}
 }
 
-// Streak
-function calcStreak(){const dias=[...new Set(estudos.map(e=>e.dataStr))].sort().reverse();if(!dias.length)return 0;let streak=0;const hoje=toISO(new Date());for(let i=0;i<dias.length;i++){const expected=new Date(hoje);expected.setDate(expected.getDate()-i);const expStr=toISO(expected);if(dias[i]===expStr)streak++;else break}return streak}
+function calcStreak(){const dias=[...new Set(estudos.map(e=>e.dataStr))].sort().reverse();if(!dias.length)return 0;let s=0;const hoje=toISO(new Date());for(let i=0;i<dias.length;i++){const exp=new Date(hoje);exp.setDate(exp.getDate()-i);if(dias[i]===toISO(exp))s++;else break}return s}
+function calcPrevisao(){const tT=painel.reduce((s,m)=>s+m.total,0),tE=painel.reduce((s,m)=>s+m.estudados,0);if(tE===0||tT===0)return'—';const dE=[...new Set(estudos.map(e=>e.dataStr))].length;if(dE<3)return'Precisa de +dados';const r=tE/dE,f=tT-tE,dF=Math.ceil(f/r),h=new Date();h.setDate(h.getDate()+dF);return h.toLocaleDateString('pt-BR')+' ('+dF+'d)'}
 
-// Previsão
-function calcPrevisao(){const totalT=painel.reduce((s,m)=>s+m.total,0),totalE=painel.reduce((s,m)=>s+m.estudados,0);if(totalE===0||totalT===0)return'—';const diasEstudo=[...new Set(estudos.map(e=>e.dataStr))].length;if(diasEstudo<3)return'Precisa de mais dados';const ritmo=totalE/diasEstudo,faltam=totalT-totalE,diasFaltam=Math.ceil(faltam/ritmo),hoje=new Date();hoje.setDate(hoje.getDate()+diasFaltam);return hoje.toLocaleDateString('pt-BR')+' ('+diasFaltam+' dias)'}
-
-// ==================== RENDER PRINCIPAL ====================
-function renderAll(){
+// ==================== VISÃO GERAL ====================
+function renderOverview(){
   Object.values(charts).forEach(c=>{try{c.destroy()}catch(e){}});charts={};
+  const periodo=document.getElementById('overviewPeriodo')?.value||'mes';
+  const matFilt=document.getElementById('overviewMateria')?.value||'all';
+  const p=getPeriodo(periodo);
+  let filt=estudos.filter(e=>e.dataStr>=p.ini&&e.dataStr<=p.fim);if(matFilt!=='all')filt=filt.filter(e=>e.materia===matFilt);
+  let filtAnt=estudos.filter(e=>e.dataStr>=p.iniAnt&&e.dataStr<=p.fimAnt);if(matFilt!=='all')filtAnt=filtAnt.filter(e=>e.materia===matFilt);
   
   const totalT=painel.reduce((s,m)=>s+m.total,0),totalE=painel.reduce((s,m)=>s+m.estudados,0),totalP=painel.reduce((s,m)=>s+m.pendentes,0);
-  const horas=estudos.reduce((s,e)=>s+e.tempo,0),qTotal=estudos.reduce((s,e)=>s+e.questoes,0),aTotal=estudos.reduce((s,e)=>s+e.acertos,0),eTotal=qTotal-aTotal,taxaTotal=qTotal?aTotal/qTotal:0;
-  const streak=calcStreak();document.getElementById('streakBadge').textContent='🔥 '+streak+' dias';
+  const h=filt.reduce((s,e)=>s+e.tempo,0),q=filt.reduce((s,e)=>s+e.questoes,0),a=filt.reduce((s,e)=>s+e.acertos,0),e=q-a,taxa=q?a/q:0,sessoes=filt.length;
+  const hAnt=filtAnt.reduce((s,e)=>s+e.tempo,0),qAnt=filtAnt.reduce((s,e)=>s+e.questoes,0),aAnt=filtAnt.reduce((s,e)=>s+e.acertos,0),eAnt=qAnt-aAnt,sAnt=filtAnt.length;
+  
+  const compH=calcComp(h,hAnt),compQ=calcComp(q,qAnt),compA=calcComp(a,aAnt),compE=calcComp(e,eAnt),compS=calcComp(sessoes,sAnt);
+  
+  document.getElementById('kpiOverview').innerHTML=`
+    <div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Cobertura</div><div class="kpi-value">${fmtPct(totalT?totalE/totalT:0)}</div><div class="kpi-sub">${totalE}/${totalT}</div></div>
+    <div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Horas</div><div class="kpi-value">${fmtH(h)}</div><div class="kpi-comp ${compH.cls}">${compH.val} vs ant.</div></div>
+    <div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Taxa</div><div class="kpi-value">${fmtPct(taxa)}</div><div class="kpi-sub">${q} questões</div></div>
+    <div class="kpi" style="border-top:3px solid #ef4444"><div class="kpi-label">Pendentes</div><div class="kpi-value">${totalP}</div></div>
+    <div class="kpi" style="border-top:3px solid #8b5cf6"><div class="kpi-label">Acertos</div><div class="kpi-value">${a}</div><div class="kpi-comp ${compA.cls}">${compA.val} vs ant.</div></div>
+    <div class="kpi" style="border-top:3px solid #06b6d4"><div class="kpi-label">Erros</div><div class="kpi-value">${e}</div><div class="kpi-comp ${compE.cls}">${compE.val} vs ant.</div></div>
+    <div class="kpi" style="border-top:3px solid #84cc16"><div class="kpi-label">Sessões</div><div class="kpi-value">${sessoes}</div><div class="kpi-comp ${compS.cls}">${compS.val} vs ant.</div></div>
+  `;
 
-  // KPIs Overview
-  document.getElementById('kpiOverview').innerHTML=`<div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Cobertura</div><div class="kpi-value">${fmtPct(totalT?totalE/totalT:0)}</div><div class="kpi-sub">${totalE}/${totalT}</div></div><div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Horas</div><div class="kpi-value">${fmtH(horas)}</div><div class="kpi-sub">${estudos.length} sessões</div></div><div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Taxa</div><div class="kpi-value">${fmtPct(taxaTotal)}</div><div class="kpi-sub">${qTotal} questões</div></div><div class="kpi" style="border-top:3px solid #ef4444"><div class="kpi-label">Pendentes</div><div class="kpi-value">${totalP}</div></div><div class="kpi" style="border-top:3px solid #8b5cf6"><div class="kpi-label">Acertos</div><div class="kpi-value">${aTotal}</div></div><div class="kpi" style="border-top:3px solid #06b6d4"><div class="kpi-label">Erros</div><div class="kpi-value">${eTotal}</div></div>`;
-  document.getElementById('kpiPerf').innerHTML=`<div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Questões</div><div class="kpi-value">${qTotal}</div></div><div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Acertos</div><div class="kpi-value">${aTotal}</div></div><div class="kpi" style="border-top:3px solid #ef4444"><div class="kpi-label">Erros</div><div class="kpi-value">${eTotal}</div></div><div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Taxa</div><div class="kpi-value">${fmtPct(taxaTotal)}</div></div>`;
-
-  // Charts Overview
+  // Charts
   const sp=[...painel].sort((a,b)=>b.pct-a.pct);
-  charts.c1=new Chart(document.getElementById('chartProgress').getContext('2d'),{type:'bar',data:{labels:sp.map(m=>m.materia),datasets:[{data:sp.map(m=>+(m.pct*100).toFixed(1)),backgroundColor:sp.map(m=>m.pct>=.8?'#10b981':m.pct>=.5?'#f59e0b':'#ef4444'),borderRadius:4}]},options:{indexAxis:'y',responsive:!0,maintainAspectRatio:!1,layout:{padding:{right:35}},plugins:{legend:{display:!1},datalabels:{anchor:'end',align:'right',color:'#fff',font:{size:10,weight:'bold'},formatter:v=>v+'%'}},scales:{x:{max:100,grid:{color:'#1e293b'},ticks:{color:'#94a3b8'}},y:{grid:{display:!1},ticks:{color:'#cbd5e1',font:{size:10}}}}} });
-  if(painel.length>0){charts.c2=new Chart(document.getElementById('chartRadar').getContext('2d'),{type:'radar',data:{labels:painel.map(m=>m.materia.substring(0,18)),datasets:[{label:'Cobertura',data:painel.map(m=>+(m.pct*100).toFixed(1)),borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.2)'},{label:'Meta 80%',data:painel.map(()=>80),borderColor:'rgba(245,158,11,.5)',borderDash:[5,5],pointRadius:0}]},options:{responsive:!0,maintainAspectRatio:!1,scales:{r:{max:100,grid:{color:'#334155'},ticks:{display:!1},pointLabels:{color:'#cbd5e1',font:{size:10}}}},plugins:{legend:{labels:{color:'#fff'}},datalabels:{display:!1}}}})}
-
-  // Horas por matéria
-  const hByM={};estudos.forEach(e=>{hByM[e.materia]=(hByM[e.materia]||0)+e.tempo});
+  charts.c1=new Chart(document.getElementById('chartProgress').getContext('2d'),{type:'bar',data:{labels:sp.map(m=>m.materia),datasets:[{data:sp.map(m=>+(m.pct*100).toFixed(1)),backgroundColor:sp.map(m=>m.pct>=.8?'#10b981':m.pct>=.5?'#f59e0b':'#ef4444'),borderRadius:4}]},options:{indexAxis:'y',responsive:!0,maintainAspectRatio:!1,layout:{padding:{right:30}},plugins:{legend:{display:!1},datalabels:{anchor:'end',align:'right',color:'#fff',font:{size:9,weight:'bold'},formatter:v=>v+'%'}},scales:{x:{max:100,grid:{color:'#1e293b'},ticks:{color:'#94a3b8'}},y:{grid:{display:!1},ticks:{color:'#cbd5e1',font:{size:9}}}}} });
+  
+  const hByM={};filt.forEach(e=>{hByM[e.materia]=(hByM[e.materia]||0)+e.tempo});const hByMAnt={};filtAnt.forEach(e=>{hByMAnt[e.materia]=(hByMAnt[e.materia]||0)+e.tempo});
   const hE=Object.entries(hByM).sort((a,b)=>b[1]-a[1]);
-  if(hE.length>0){charts.c3=new Chart(document.getElementById('chartHours').getContext('2d'),{type:'bar',data:{labels:hE.map(e=>e[0]),datasets:[{data:hE.map(e=>+(e[1]/60).toFixed(1)),backgroundColor:hE.map((_,i)=>COLORS[i%COLORS.length]),borderRadius:4}]},options:{indexAxis:'y',responsive:!0,maintainAspectRatio:!1,layout:{padding:{right:35}},plugins:{legend:{display:!1},datalabels:{anchor:'end',align:'right',color:'#fff',font:{size:10,weight:'bold'},formatter:v=>v+'h'}},scales:{x:{grid:{color:'#1e293b'},ticks:{color:'#94a3b8'}},y:{grid:{display:!1},ticks:{color:'#cbd5e1',font:{size:10}}}}} })}
-
-  // Distribuição por dia da semana
-  const diasSem=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];const byDia={};estudos.forEach(e=>{const d=e.data.getDay();byDia[d]=(byDia[d]||0)+e.tempo});
-  charts.cDia=new Chart(document.getElementById('chartDiaSemana').getContext('2d'),{type:'bar',data:{labels:diasSem,datasets:[{data:diasSem.map((_,i)=>+(byDia[i]||0)/60).map(v=>+v.toFixed(1)),backgroundColor:'rgba(139,92,246,.6)',borderRadius:4}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1},datalabels:{color:'#fff',font:{size:10,weight:'bold'},formatter:v=>v>0?v+'h':''}},scales:{x:{grid:{display:!1},ticks:{color:'#94a3b8'}},y:{grid:{color:'#1e293b'},ticks:{color:'#94a3b8',callback:v=>v+'h'}}}} });
-
-  // Perf table
-  const byM={};estudos.forEach(e=>{if(!byM[e.materia])byM[e.materia]={q:0,a:0};byM[e.materia].q+=e.questoes;byM[e.materia].a+=e.acertos});
-  document.querySelector('#perfTable tbody').innerHTML=Object.entries(byM).sort((a,b)=>b[1].q-a[1].q).map(([mat,val])=>{const t=val.q?val.a/val.q:0,bc=t>=.7?'badge-green':t>=.6?'badge-amber':'badge-red';return`<tr><td>${mat}</td><td>${val.q}</td><td>${val.a}</td><td>${val.q-val.a}</td><td>${fmtPct(t)}</td><td><span class="badge ${bc}">${t>=.7?'Bom':t>=.6?'Regular':'Crítico'}</span></td></tr>`}).join('')+`<tr style="background:rgba(59,130,246,.15);font-weight:bold"><td><strong>TOTAL</strong></td><td><strong>${qTotal}</strong></td><td><strong>${aTotal}</strong></td><td><strong>${eTotal}</strong></td><td><strong>${fmtPct(taxaTotal)}</strong></td><td><span class="badge badge-blue">Geral</span></td></tr>`;
-
-  // Revisions
-  const hoje=new Date(),topicLast={};estudos.forEach(e=>{const k=e.materia+'|||'+e.bloco+'|||'+e.topico;if(!topicLast[k]||e.data>topicLast[k].data)topicLast[k]=e});
-  const revItems=Object.values(topicLast).map(e=>{const ds=Math.floor((hoje-e.data)/(1000*60*60*24));return{...e,daysSince:ds,urgency:ds>=30?'overdue':ds>=14?'warning':'ok'}}).sort((a,b)=>b.daysSince-a.daysSince);
-  document.getElementById('revisionAlerts').innerHTML=(revItems.filter(r=>r.daysSince>=30).length>0?`<div class="alert danger">🔴 Tópicos sem revisão há 30+ dias!</div>`:'')+(revItems.filter(r=>r.daysSince>=14&&r.daysSince<30).length>0?`<div class="alert warning">🟡 Tópicos sem revisão há 14-30 dias.</div>`:'')+(revItems.filter(r=>r.daysSince>=30).length===0&&revItems.filter(r=>r.daysSince>=14).length===0?'<div class="alert success">✅ Revisões em dia!</div>':'');
-  document.querySelector('#revisionTable tbody').innerHTML=revItems.slice(0,50).map(r=>{const uc=r.urgency==='overdue'?'rev-overdue':r.urgency==='warning'?'rev-warning':'rev-ok',bc=r.urgency==='overdue'?'badge-red':r.urgency==='warning'?'badge-amber':'badge-green',lb=r.urgency==='overdue'?'URGENTE':r.urgency==='warning'?'Atenção':'OK';return`<tr><td>${r.materia}</td><td>${r.bloco}</td><td>${r.topico.substring(0,40)}</td><td>${r.dataStr.split('-').reverse().join('/')}</td><td class="${uc}">${r.daysSince}d</td><td><span class="badge ${bc}">${lb}</span></td></tr>`}).join('');
+  if(hE.length>0){charts.c2=new Chart(document.getElementById('chartHours').getContext('2d'),{type:'bar',data:{labels:hE.map(e=>e[0]),datasets:[{label:'Período atual',data:hE.map(e=>+(e[1]/60).toFixed(1)),backgroundColor:'#3b82f6',borderRadius:4},{label:'Período anterior',data:hE.map(e=>+((hByMAnt[e[0]]||0)/60).toFixed(1)),backgroundColor:'rgba(148,163,184,.3)',borderRadius:4}]},options:{indexAxis:'y',responsive:!0,maintainAspectRatio:!1,layout:{padding:{right:30}},plugins:{legend:{labels:{color:'#fff',font:{size:9}}},datalabels:{anchor:'end',align:'right',color:'#fff',font:{size:9,weight:'bold'},formatter:v=>v>0?v+'h':''}},scales:{x:{grid:{color:'#1e293b'},ticks:{color:'#94a3b8'}},y:{grid:{display:!1},ticks:{color:'#cbd5e1',font:{size:9}}}}} })}
 
   // Preenche filtros
   const materias=[...new Set(estudos.map(e=>e.materia))].sort();
-  ['filterSubject','filterTopicMateria','evolMateria'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='<option value="all">Todas</option>'+materias.map(m=>`<option value="${m}">${m}</option>`).join('')});
-
-  // Renderiza abas
-  renderEvolution();renderSubjects();renderTopics();renderMetas();
-  document.getElementById('previsaoConclusao').textContent=calcPrevisao();
+  ['overviewMateria','evolMateria','subjMateria'].forEach(id=>{const el=document.getElementById(id);if(el){const v=el.value;el.innerHTML='<option value="all">Todas</option>'+materias.map(m=>`<option value="${m}">${m}</option>`).join('');if(v)el.value=v}});
 }
 
 // ==================== EVOLUÇÃO ====================
 function renderEvolution(){
-  destroyCharts('cE1','cE2','cE3','cE4','cE5');
-  let filt=[...estudos];
-  const de=document.getElementById('evolDe')?.value,ate=document.getElementById('evolAte')?.value,mat=document.getElementById('evolMateria')?.value;
+  ['cE1','cE2','cE3','cE4','cE5'].forEach(k=>{if(charts[k]){try{charts[k].destroy()}catch(e){}delete charts[k]}});
+  let filt=[...estudos];const de=document.getElementById('evolDe')?.value,ate=document.getElementById('evolAte')?.value,mat=document.getElementById('evolMateria')?.value;
   if(de)filt=filt.filter(e=>e.dataStr>=de);if(ate)filt=filt.filter(e=>e.dataStr<=ate);if(mat!=='all')filt=filt.filter(e=>e.materia===mat);
-  if(!filt.length){['chartDailyHours','chartCumHours','chartDailyQ','chartAcertoSemanal','chartHorasMateriaTempo'].forEach(id=>{const el=document.getElementById(id);if(el)el.parentElement.innerHTML='<div class="empty-state">Sem dados no período.</div>'});return}
+  if(!filt.length){['chartDailyHours','chartCumHours','chartDailyQ','chartAcertoSemanal','chartEvoMateria'].forEach(id=>{const el=document.getElementById(id);if(el)el.parentElement.innerHTML='<div class="empty-state">Sem dados</div>'});return}
   
   const byDate={};filt.forEach(e=>{if(!byDate[e.dataStr])byDate[e.dataStr]={h:0,q:0,a:0};byDate[e.dataStr].h+=e.tempo;byDate[e.dataStr].q+=e.questoes;byDate[e.dataStr].a+=e.acertos});
   const dates=Object.keys(byDate).sort(),fd=d=>{const p=d.split('-');return p[2]+'/'+p[1]};
 
-  // Horas por dia
-  charts.cE1=new Chart(document.getElementById('chartDailyHours').getContext('2d'),{type:'bar',data:{labels:dates.map(fd),datasets:[{data:dates.map(d=>+(byDate[d].h/60).toFixed(1)),backgroundColor:'rgba(59,130,246,.6)',borderRadius:4}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1},datalabels:{color:'#fff',font:{size:9,weight:'bold'},formatter:v=>v>0?v+'h':'',anchor:'end',align:'top'}},scales:{x:{grid:{display:!1},ticks:{color:'#94a3b8',maxRotation:45,font:{size:9}}},y:{grid:{color:'#1e293b'},ticks:{color:'#94a3b8',callback:v=>v+'h'}}}}});
-
-  // Horas acumuladas
-  let cum=0;charts.cE2=new Chart(document.getElementById('chartCumHours').getContext('2d'),{type:'line',data:{labels:dates.map(fd),datasets:[{data:dates.map(d=>{cum+=byDate[d].h;return+(cum/60).toFixed(1)}),borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.1)',fill:!0,tension:.3,pointRadius:3,pointBackgroundColor:'#10b981'}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1},datalabels:{display:!1}},scales:{x:{grid:{display:!1},ticks:{color:'#94a3b8',maxRotation:45,font:{size:9}}},y:{grid:{color:'#1e293b'},ticks:{color:'#94a3b8',callback:v=>v+'h'}}}}});
-
-  // Questões/Acertos por dia
-  charts.cE3=new Chart(document.getElementById('chartDailyQ').getContext('2d'),{type:'bar',data:{labels:dates.map(fd),datasets:[{label:'Acertos',data:dates.map(d=>byDate[d].a),backgroundColor:'#10b981',borderRadius:4},{label:'Erros',data:dates.map(d=>byDate[d].q-byDate[d].a),backgroundColor:'#ef4444',borderRadius:4}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{labels:{color:'#fff',font:{size:10}}},datalabels:{display:!1}},scales:{x:{stacked:!0,grid:{display:!1},ticks:{color:'#94a3b8',maxRotation:45,font:{size:9}}},y:{stacked:!0,grid:{color:'#1e293b'},ticks:{color:'#94a3b8'}}}}});
+  charts.cE1=new Chart(document.getElementById('chartDailyHours').getContext('2d'),{type:'bar',data:{labels:dates.map(fd),datasets:[{data:dates.map(d=>+(byDate[d].h/60).toFixed(1)),backgroundColor:'rgba(59,130,246,.6)',borderRadius:4}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1},datalabels:{color:'#fff',font:{size:8,weight:'bold'},formatter:v=>v>0?v+'h':'',anchor:'end',align:'top'}},scales:{x:{grid:{display:!1},ticks:{color:'#94a3b8',maxRotation:45,font:{size:8}}},y:{grid:{color:'#1e293b'},ticks:{color:'#94a3b8',callback:v=>v+'h'}}}}});
+  
+  let cum=0;charts.cE2=new Chart(document.getElementById('chartCumHours').getContext('2d'),{type:'line',data:{labels:dates.map(fd),datasets:[{data:dates.map(d=>{cum+=byDate[d].h;return+(cum/60).toFixed(1)}),borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.1)',fill:!0,tension:.3,pointRadius:3}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1},datalabels:{display:!1}},scales:{x:{grid:{display:!1},ticks:{color:'#94a3b8',maxRotation:45,font:{size:8}}},y:{grid:{color:'#1e293b'},ticks:{color:'#94a3b8',callback:v=>v+'h'}}}}});
+  
+  charts.cE3=new Chart(document.getElementById('chartDailyQ').getContext('2d'),{type:'bar',data:{labels:dates.map(fd),datasets:[{label:'Acertos',data:dates.map(d=>byDate[d].a),backgroundColor:'#10b981',borderRadius:4},{label:'Erros',data:dates.map(d=>byDate[d].q-byDate[d].a),backgroundColor:'#ef4444',borderRadius:4}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{labels:{color:'#fff',font:{size:9}}},datalabels:{display:!1}},scales:{x:{stacked:!0,grid:{display:!1},ticks:{color:'#94a3b8',maxRotation:45,font:{size:8}}},y:{stacked:!0,grid:{color:'#1e293b'},ticks:{color:'#94a3b8'}}}}});
 
   // Taxa semanal
-  const byWeek={};filt.forEach(e=>{if(e.questoes<1)return;const d=new Date(e.data);d.setHours(0,0,0,0);d.setDate(d.getDate()+3-(d.getDay()+6)%7);const w=d.getFullYear()+'-S'+String(Math.ceil((d.getTime()-new Date(d.getFullYear(),0,4).getTime())/(7*86400000))).padStart(2,'0');if(!byWeek[w])byWeek[w]={q:0,a:0};byWeek[w].q+=e.questoes;byWeek[w].a+=e.acertos});
+  const byWeek={};filt.forEach(e=>{if(e.questoes<1)return;const d=new Date(e.data);d.setHours(0,0,0,0);d.setDate(d.getDate()+3-(d.getDay()+6)%7);const w=toISO(d).substring(0,7)+'-S'+Math.ceil((d.getTime()-new Date(d.getFullYear(),0,4).getTime())/(7*86400000));if(!byWeek[w])byWeek[w]={q:0,a:0};byWeek[w].q+=e.questoes;byWeek[w].a+=e.acertos});
   const weeks=Object.keys(byWeek).sort().filter(w=>byWeek[w].q>=5);
-  if(weeks.length>0){charts.cE4=new Chart(document.getElementById('chartAcertoSemanal').getContext('2d'),{type:'line',data:{labels:weeks,datasets:[{label:'Taxa %',data:weeks.map(w=>+((byWeek[w].a/byWeek[w].q)*100).toFixed(1)),borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.1)',fill:!0,tension:.3,pointRadius:4,yAxisID:'y'},{label:'Questões',data:weeks.map(w=>byWeek[w].q),borderColor:'#3b82f6',borderDash:[4,4],tension:.2,pointRadius:3,yAxisID:'y1'}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{labels:{color:'#fff'}},datalabels:{display:!1}},scales:{y:{position:'left',max:100,grid:{color:'#1e293b'},ticks:{color:'#94a3b8',callback:v=>v+'%'}},y1:{position:'right',grid:{display:!1},ticks:{color:'#60a5fa'}},x:{grid:{display:!1},ticks:{color:'#94a3b8',font:{size:9}}}}}})}
+  if(weeks.length>0){charts.cE4=new Chart(document.getElementById('chartAcertoSemanal').getContext('2d'),{type:'line',data:{labels:weeks,datasets:[{label:'Taxa %',data:weeks.map(w=>+((byWeek[w].a/byWeek[w].q)*100).toFixed(1)),borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.1)',fill:!0,tension:.3,pointRadius:4,yAxisID:'y'}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1},datalabels:{display:!1}},scales:{y:{max:100,grid:{color:'#1e293b'},ticks:{color:'#94a3b8',callback:v=>v+'%'}},x:{grid:{display:!1},ticks:{color:'#94a3b8',font:{size:8}}}}}})}
 
-  // Horas por matéria ao longo do tempo (mensal)
+  // Evolução por matéria (barras agrupadas por mês)
   const meses=[...new Set(filt.map(e=>e.dataStr.substring(0,7)))].sort();
-  const mats=[...new Set(filt.map(e=>e.materia))].sort();
-  if(meses.length>0&&mats.length>0){const fmtMes=m=>{const[n,a]=m.split('-');const nomes=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];return nomes[parseInt(a)-1]+'/'+n.substring(2)};charts.cE5=new Chart(document.getElementById('chartHorasMateriaTempo').getContext('2d'),{type:'bar',data:{labels:meses.map(fmtMes),datasets:mats.map((mat,i)=>({label:mat,data:meses.map(mes=>+((filt.filter(e=>e.materia===mat&&e.dataStr.substring(0,7)===mes).reduce((s,e)=>s+e.tempo,0))/60).toFixed(1)),backgroundColor:COLORS[i%COLORS.length],borderRadius:3,stack:'s'}))},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{labels:{color:'#fff',font:{size:9}}},datalabels:{display:!1}},scales:{x:{stacked:!0,grid:{display:!1},ticks:{color:'#94a3b8'}},y:{stacked:!0,grid:{color:'#1e293b'},ticks:{color:'#94a3b8',callback:v=>v+'h'}}}}})}
+  const mats=[...new Set(filt.map(e=>e.materia))].slice(0,8);
+  if(meses.length>0&&mats.length>0){const fmtMes=m=>{const[n,a]=m.split('-');return['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(a)-1]+'/'+n.substring(2)};charts.cE5=new Chart(document.getElementById('chartEvoMateria').getContext('2d'),{type:'bar',data:{labels:meses.map(fmtMes),datasets:mats.map((mat,i)=>({label:mat,data:meses.map(mes=>+((filt.filter(e=>e.materia===mat&&e.dataStr.substring(0,7)===mes).reduce((s,e)=>s+e.tempo,0))/60).toFixed(1)),backgroundColor:COLORS[i%COLORS.length],borderRadius:2}))},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{labels:{color:'#fff',font:{size:8}}},datalabels:{display:!1}},scales:{x:{grid:{display:!1},ticks:{color:'#94a3b8',font:{size:8}}},y:{grid:{color:'#1e293b'},ticks:{color:'#94a3b8',callback:v=>v+'h'}}}}})}
 }
 
-function destroyCharts(...keys){keys.forEach(k=>{if(charts[k]){try{charts[k].destroy()}catch(e){}delete charts[k]}})}
-
-// ==================== SUBJECTS ====================
+// ==================== MATÉRIAS/TÓPICOS ====================
 function renderSubjects(){
   let filt=[...estudos];
-  const mat=document.getElementById('filterSubject')?.value,bloco=document.getElementById('filterSubjectBloco')?.value,topico=document.getElementById('filterSubjectTopico')?.value,de=document.getElementById('subjectDe')?.value,ate=document.getElementById('subjectAte')?.value;
+  const mat=document.getElementById('subjMateria')?.value,bloco=document.getElementById('subjBloco')?.value,topico=document.getElementById('subjTopico')?.value,de=document.getElementById('subjDe')?.value,ate=document.getElementById('subjAte')?.value;
   if(mat!=='all')filt=filt.filter(e=>e.materia===mat);if(bloco!=='all')filt=filt.filter(e=>e.bloco===bloco);if(topico!=='all')filt=filt.filter(e=>e.topico===topico);if(de)filt=filt.filter(e=>e.dataStr>=de);if(ate)filt=filt.filter(e=>e.dataStr<=ate);
   
-  // Atualiza filtros de bloco e tópico
-  const blocos=[...new Set(filt.map(e=>e.bloco))].sort(),topicos=[...new Set(filt.map(e=>e.topico))].sort();
-  const selB=document.getElementById('filterSubjectBloco'),selT=document.getElementById('filterSubjectTopico');
-  if(selB)selB.innerHTML='<option value="all">Todos</option>'+blocos.map(b=>`<option value="${b}">${b}</option>`).join('');
-  if(selT)selT.innerHTML='<option value="all">Todos</option>'+topicos.map(t=>`<option value="${t}">${t.substring(0,40)}</option>`).join('');
+  const p=getPeriodo('mes');let filtAnt=estudos.filter(e=>e.dataStr>=p.iniAnt&&e.dataStr<=p.fimAnt);if(mat!=='all')filtAnt=filtAnt.filter(e=>e.materia===mat);if(bloco!=='all')filtAnt=filtAnt.filter(e=>e.bloco===bloco);if(topico!=='all')filtAnt=filtAnt.filter(e=>e.topico===topico);
   
-  const h=filt.reduce((s,e)=>s+e.tempo,0),q=filt.reduce((s,e)=>s+e.questoes,0),a=filt.reduce((s,e)=>s+e.acertos,0);
-  document.getElementById('kpiSubject').innerHTML=`<div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Horas</div><div class="kpi-value">${fmtH(h)}</div></div><div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Sessões</div><div class="kpi-value">${filt.length}</div></div><div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Questões</div><div class="kpi-value">${q}</div></div><div class="kpi" style="border-top:3px solid #8b5cf6"><div class="kpi-label">Taxa</div><div class="kpi-value">${q?fmtPct(a/q):'—'}</div></div>`;
-  document.querySelector('#subjectTable tbody').innerHTML=[...filt].sort((a,b)=>b.data-a.data).slice(0,60).map(e=>`<tr><td>${e.dataStr.split('-').reverse().join('/')}</td><td>${e.materia}</td><td>${e.bloco}</td><td>${e.topico.substring(0,35)}</td><td>${e.tempo}min</td><td>${e.questoes||'—'}</td><td>${e.acertos||'—'}</td><td>${e.questoes?fmtPct(e.acertos/e.questoes):'—'}</td></tr>`).join('');
+  const blocos=[...new Set(filt.map(e=>e.bloco))].sort(),topicos=[...new Set(filt.map(e=>e.topico))].sort();
+  ['subjBloco','subjTopico'].forEach((id,i)=>{const el=document.getElementById(id);if(el){const v=el.value;el.innerHTML='<option value="all">Todos</option>'+(i===0?blocos:topicos).map(x=>`<option value="${x}">${x.substring(0,30)}</option>`).join('');if(v)el.value=v}});
+  
+  const h=filt.reduce((s,e)=>s+e.tempo,0),q=filt.reduce((s,e)=>s+e.questoes,0),a=filt.reduce((s,e)=>s+e.acertos,0),s=filt.length,taxa=q?a/q:0;
+  const hAnt=filtAnt.reduce((s,e)=>s+e.tempo,0),qAnt=filtAnt.reduce((s,e)=>s+e.questoes,0),sAnt=filtAnt.length;
+  const compH=calcComp(h,hAnt),compQ=calcComp(q,qAnt),compS=calcComp(s,sAnt);
+  
+  document.getElementById('kpiSubjects').innerHTML=`<div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Horas</div><div class="kpi-value">${fmtH(h)}</div><div class="kpi-comp ${compH.cls}">${compH.val} vs ant.</div></div><div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Questões</div><div class="kpi-value">${q}</div><div class="kpi-comp ${compQ.cls}">${compQ.val} vs ant.</div></div><div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Taxa</div><div class="kpi-value">${q?fmtPct(taxa):'—'}</div></div><div class="kpi" style="border-top:3px solid #8b5cf6"><div class="kpi-label">Sessões</div><div class="kpi-value">${s}</div><div class="kpi-comp ${compS.cls}">${compS.val} vs ant.</div></div>`;
+
+  // Tabela comparativa por matéria
+  const byM={};filt.forEach(e=>{if(!byM[e.materia])byM[e.materia]={h:0,q:0,a:0,s:0};byM[e.materia].h+=e.tempo;byM[e.materia].q+=e.questoes;byM[e.materia].a+=e.acertos;byM[e.materia].s++});
+  const byMAnt={};filtAnt.forEach(e=>{if(!byMAnt[e.materia])byMAnt[e.materia]={h:0,q:0,s:0};byMAnt[e.materia].h+=e.tempo;byMAnt[e.materia].q+=e.questoes;byMAnt[e.materia].s++});
+  document.querySelector('#compTable tbody').innerHTML=Object.entries(byM).sort((a,b)=>b[1].h-a[1].h).map(([mat,val])=>{const ant=byMAnt[mat]||{h:0,q:0,s:0};const t=val.q?val.a/val.q:0;return`<tr><td>${mat}</td><td>${fmtH(val.h)}</td><td>${fmtComp(val.h,ant.h)}</td><td>${val.q}</td><td>${fmtComp(val.q,ant.q)}</td><td>${fmtPct(t)}</td><td>—</td><td>${val.s}</td><td>${fmtComp(val.s,ant.s)}</td></tr>`}).join('')||'<tr><td colspan="9" class="empty-state">Sem dados</td></tr>';
+  
+  // Raio-X por tópico
+  const byT={};filt.forEach(e=>{const k=e.materia+'|||'+e.bloco+'|||'+e.topico;if(!byT[k])byT[k]={materia:e.materia,bloco:e.bloco,topico:e.topico,h:0,q:0,a:0,ultimo:e.data};byT[k].h+=e.tempo;byT[k].q+=e.questoes;byT[k].a+=e.acertos;if(e.data>byT[k].ultimo)byT[k].ultimo=e.data});
+  document.querySelector('#topicTable tbody').innerHTML=Object.values(byT).sort((a,b)=>b.h-a.h).slice(0,50).map(t=>{const taxa=t.q?t.a/t.q:0,df=taxa>=.7?'Fácil':taxa>=.5?'Médio':'Difícil',bc=taxa>=.7?'badge-green':taxa>=.5?'badge-amber':'badge-red';return`<tr><td>${t.materia}</td><td>${t.bloco}</td><td>${t.topico.substring(0,35)}</td><td>${fmtH(t.h)}</td><td>${t.q||'—'}</td><td><span class="badge ${bc}">${t.q?fmtPct(taxa):'—'}</span></td><td><span class="badge ${bc}">${df}</span></td><td>${toISO(t.ultimo).split('-').reverse().join('/')}</td></tr>`}).join('');
 }
 
-// ==================== TOPICS ====================
-function renderTopics(){
-  let filt=[...estudos];
-  const mat=document.getElementById('filterTopicMateria')?.value,bloco=document.getElementById('filterTopicBloco')?.value,sort=document.getElementById('filterTopicSort')?.value;
-  if(mat!=='all')filt=filt.filter(e=>e.materia===mat);if(bloco!=='all')filt=filt.filter(e=>e.bloco===bloco);
-  
-  const blocos=[...new Set(filt.map(e=>e.bloco))].sort();
-  const selB=document.getElementById('filterTopicBloco');if(selB)selB.innerHTML='<option value="all">Todos</option>'+blocos.map(b=>`<option value="${b}">${b}</option>`).join('');
-  
-  const map={};filt.forEach(e=>{const k=e.materia+'|||'+e.bloco+'|||'+e.topico;if(!map[k])map[k]={materia:e.materia,bloco:e.bloco,topico:e.topico,sessoes:0,tempo:0,questoes:0,acertos:0,ultimo:e.data};map[k].sessoes++;map[k].tempo+=e.tempo;map[k].questoes+=e.questoes;map[k].acertos+=e.acertos;if(e.data>map[k].ultimo)map[k].ultimo=e.data});
-  let topics=Object.values(map);
-  if(sort==='horas')topics.sort((a,b)=>b.tempo-a.tempo);else if(sort==='acerto')topics.sort((a,b)=>(b.questoes?b.acertos/b.questoes:0)-(a.questoes?a.acertos/a.questoes:0));else if(sort==='questoes')topics.sort((a,b)=>b.questoes-a.questoes);else if(sort==='recente')topics.sort((a,b)=>b.ultimo-a.ultimo);
-  
-  document.getElementById('kpiTopics').innerHTML=`<div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Tópicos</div><div class="kpi-value">${topics.length}</div></div><div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Horas</div><div class="kpi-value">${fmtH(topics.reduce((s,t)=>s+t.tempo,0))}</div></div><div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Questões</div><div class="kpi-value">${topics.reduce((s,t)=>s+t.questoes,0)}</div></div>`;
-  document.querySelector('#topicTable tbody').innerHTML=topics.slice(0,80).map(t=>{const taxa=t.questoes?t.acertos/t.questoes:0,dificuldade=taxa>=.7?'Fácil':taxa>=.5?'Médio':'Difícil',bc=taxa>=.7?'badge-green':taxa>=.5?'badge-amber':'badge-red';return`<tr><td>${t.materia}</td><td>${t.bloco}</td><td>${t.topico.substring(0,40)}</td><td>${t.sessoes}</td><td>${fmtH(t.tempo)}</td><td>${t.questoes||'—'}</td><td>${t.questoes?fmtPct(taxa):'—'}</td><td><span class="badge ${bc}">${dificuldade}</span></td><td>${toISO(t.ultimo).split('-').reverse().join('/')}</td></tr>`}).join('');
-}
+function fmtComp(at,ant){if(ant===0&&at===0)return'—';if(ant===0)return'<span class="arrow-up">+100%</span>';const p=((at-ant)/ant*100);return p>=0?`<span class="arrow-up">▲${p.toFixed(0)}%</span>`:`<span class="arrow-down">▼${Math.abs(p).toFixed(0)}%</span>`}
 
 // ==================== METAS ====================
 function renderMetas(){
   const hoje=toISO(new Date()),minH=estudos.filter(e=>e.dataStr===hoje).reduce((s,e)=>s+e.tempo,0),qHoje=estudos.filter(e=>e.dataStr===hoje).reduce((s,e)=>s+e.questoes,0);
-  document.getElementById('kpiMetas').innerHTML=`<div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Horas Hoje</div><div class="kpi-value" style="font-size:1.1rem">${fmtH(minH)}</div></div><div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Questões</div><div class="kpi-value" style="font-size:1.1rem">${qHoje}</div></div>`;
+  document.getElementById('kpiMetas').innerHTML=`<div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Horas</div><div class="kpi-value" style="font-size:1rem">${fmtH(minH)}</div></div><div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Questões</div><div class="kpi-value" style="font-size:1rem">${qHoje}</div></div>`;
   document.getElementById('goalHoras').style.width=Math.min(100,(minH/240)*100)+'%';
   document.getElementById('goalQuestoes').style.width=Math.min(100,(qHoje/30)*100)+'%';
   document.getElementById('metaHoras').textContent=fmtH(minH)+' / 4h';
-  document.getElementById('metaQuestoes').textContent=qHoje+' / 30';
+  document.getElementById('metaQuestoes').textContent=qHoje+' / 100';
+}
+
+// Revisions no loadData
+function renderRevisions(){
+  const hoje=new Date(),topicLast={};estudos.forEach(e=>{const k=e.materia+'|||'+e.bloco+'|||'+e.topico;if(!topicLast[k]||e.data>topicLast[k].data)topicLast[k]=e});
+  const revItems=Object.values(topicLast).map(e=>{const ds=Math.floor((hoje-e.data)/(1000*60*60*24));return{...e,daysSince:ds,urgency:ds>=30?'overdue':ds>=14?'warning':'ok'}}).sort((a,b)=>b.daysSince-a.daysSince);
+  document.getElementById('revisionAlerts').innerHTML=(revItems.filter(r=>r.daysSince>=30).length>0?`<div class="alert danger">🔴 ${revItems.filter(r=>r.daysSince>=30).length} tópicos sem revisão há 30+ dias!</div>`:'')+(revItems.filter(r=>r.daysSince>=14&&r.daysSince<30).length>0?`<div class="alert warning">🟡 ${revItems.filter(r=>r.daysSince>=14&&r.daysSince<30).length} tópicos sem revisão há 14-30 dias.</div>`:'')+(revItems.filter(r=>r.daysSince>=30).length===0&&revItems.filter(r=>r.daysSince>=14).length===0?'<div class="alert success">✅ Revisões em dia!</div>':'');
+  document.querySelector('#revisionTable tbody').innerHTML=revItems.slice(0,50).map(r=>{const uc=r.urgency==='overdue'?'rev-overdue':r.urgency==='warning'?'rev-warning':'rev-ok',bc=r.urgency==='overdue'?'badge-red':r.urgency==='warning'?'badge-amber':'badge-green',lb=r.urgency==='overdue'?'URGENTE':r.urgency==='warning'?'Atenção':'OK';return`<tr><td>${r.materia}</td><td>${r.bloco}</td><td>${r.topico.substring(0,40)}</td><td>${r.dataStr.split('-').reverse().join('/')}</td><td class="${uc}">${r.daysSince}d</td><td><span class="badge ${bc}">${lb}</span></td></tr>`}).join('');
 }
 
 // Init
 updateTimerDisplay();loadMaterias();loadData();
+// Atualiza revisões ao carregar
+const origLoadData=loadData;loadData=async function(){await origLoadData();renderRevisions()};
 </script>
 </body>
 </html>
