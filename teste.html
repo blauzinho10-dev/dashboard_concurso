@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+body{background:#0a0e1a;color:white;font-family:Arial;margin:20px}
+.card{background:#111827;padding:20px;margin:10px 0;border-radius:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px}
+.kpi{background:#111827;padding:20px;border-radius:10px;border-top:3px solid #3b82f6}
+.kpi-value{font-size:36px;font-weight:bold;color:#3b82f6}
+canvas{max-height:300px}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+td,th{padding:8px;border-bottom:1px solid #333;text-align:left}
+.loading{text-align:center;padding:50px;font-size:20px}
+</style>
+</head>
+<body>
+
+<div id="loading" class="loading">🔄 Carregando dados...</div>
+<div id="content" style="display:none">
+  <h1>📊 Dashboard - Auditor Fiscal</h1>
+  <div id="countdown" style="text-align:center;padding:20px;background:#1a1a2e;border-radius:10px;margin:20px 0">
+    <div style="font-size:48px;font-weight:bold;color:#f59e0b" id="days">--</div>
+    <div>dias para SEFAZ-AL (30/08/2026)</div>
+  </div>
+  
+  <div class="grid" id="kpis"></div>
+  
+  <div class="card">
+    <h3>Progresso por Matéria</h3>
+    <canvas id="chart1"></canvas>
+  </div>
+  
+  <div class="card">
+    <h3>Desempenho</h3>
+    <canvas id="chart2"></canvas>
+  </div>
+  
+  <div class="card">
+    <h3>Últimos Estudos</h3>
+    <table id="table"></table>
+  </div>
+</div>
+
+<script>
+const URL = 'https://script.google.com/macros/s/AKfycbyJSiRC20qG0J5IXkpOmcwCvC-3SabABRqWqmDCVj3yZlPKvbOBT01fvB2F_5k6Br5ueQ/exec';
+
+async function load() {
+  try {
+    const [painel, estudos, desempenho] = await Promise.all([
+      fetch(URL + '?sheet=Painel').then(r => r.text()),
+      fetch(URL + '?sheet=Estudos').then(r => r.text()),
+      fetch(URL + '?sheet=Desempenho').then(r => r.text())
+    ]);
+    
+    const painelData = parsePainel(painel);
+    const estudosData = parseEstudos(estudos);
+    const desempenhoData = parseDesempenho(desempenho);
+    
+    render(painelData, estudosData, desempenhoData);
+  } catch(e) {
+    document.getElementById('loading').innerHTML = '❌ Erro: ' + e.message;
+  }
+}
+
+function parseCSV(text) {
+  const lines = text.split('\n');
+  return lines.map(line => {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+    for (let ch of line) {
+      if (ch === '"') { inQuotes = !inQuotes; }
+      else if (ch === ',' && !inQuotes) { result.push(current); current = ''; }
+      else { current += ch; }
+    }
+    result.push(current);
+    return result;
+  }).filter(r => r.some(c => c.trim() !== ''));
+}
+
+function parsePainel(csv) {
+  const rows = parseCSV(csv);
+  const data = [];
+  let start = false;
+  for (let row of rows) {
+    if (row[0] && row[0].includes('Matéria')) { start = true; continue; }
+    if (!start || !row[0] || row[0] === 'TOTAL') continue;
+    if (row[0].includes('📊') || row[0].includes('📖') || row[0].includes('🎨') || row[0].includes('1️⃣')) continue;
+    const total = parseInt(row[1]) || 0;
+    if (total === 0) continue;
+    data.push({
+      materia: row[0].trim(),
+      total: total,
+      estudados: parseInt(row[2]) || 0,
+      pct: parseFloat(String(row[3]).replace('%','').replace(',','.')) || 0,
+      pendentes: parseInt(row[5]) || 0
+    });
+  }
+  return data;
+}
+
+function parseEstudos(csv) {
+  const rows = parseCSV(csv);
+  const data = [];
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    if (!row[0] || !row[1]) continue;
+    data.push({
+      data: row[0].trim(),
+      materia: row[1].trim(),
+      bloco: (row[2]||'').trim(),
+      topico: (row[3]||'').trim(),
+      tempo: parseInt(row[4]) || 0,
+      questoes: parseInt(row[5]) || 0,
+      acertos: parseInt(row[6]) || 0
+    });
+  }
+  return data;
+}
+
+function parseDesempenho(csv) {
+  const rows = parseCSV(csv);
+  const data = [];
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    if (!row[0]) continue;
+    data.push({
+      materia: row[0].trim(),
+      questoes: parseInt(row[1]) || 0,
+      pct: parseFloat(String(row[2]).replace('%','').replace(',','.')) || 0,
+      acertos: parseInt(row[3]) || 0,
+      erros: parseInt(row[5]) || 0
+    });
+  }
+  return data;
+}
+
+function render(painel, estudos, desempenho) {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('content').style.display = 'block';
+  
+  // Countdown
+  const prova = new Date('2026-08-30');
+  const hoje = new Date();
+  const dias = Math.ceil((prova - hoje) / (1000 * 60 * 60 * 24));
+  document.getElementById('days').textContent = dias;
+  
+  // KPIs
+  const totalTopicos = painel.reduce((s,m) => s + m.total, 0);
+  const totalEstudados = painel.reduce((s,m) => s + m.estudados, 0);
+  const totalPendentes = painel.reduce((s,m) => s + m.pendentes, 0);
+  const horas = estudos.reduce((s,e) => s + e.tempo, 0);
+  const totalQ = desempenho.reduce((s,d) => s + d.questoes, 0);
+  const totalA = desempenho.reduce((s,d) => s + d.acertos, 0);
+  const taxa = totalQ > 0 ? (totalA / totalQ * 100) : 0;
+  
+  document.getElementById('kpis').innerHTML = `
+    <div class="kpi"><div>Cobertura</div><div class="kpi-value">${(totalEstudados/totalTopicos*100).toFixed(1)}%</div><div>${totalEstudados}/${totalTopicos}</div></div>
+    <div class="kpi" style="border-top-color:#10b981"><div style="color:#10b981">Horas</div><div class="kpi-value" style="color:#10b981">${(horas/60).toFixed(1)}h</div></div>
+    <div class="kpi" style="border-top-color:#f59e0b"><div style="color:#f59e0b">Taxa Acerto</div><div class="kpi-value" style="color:#f59e0b">${taxa.toFixed(1)}%</div><div>${totalQ} questões</div></div>
+    <div class="kpi" style="border-top-color:#ef4444"><div style="color:#ef4444">Pendentes</div><div class="kpi-value" style="color:#ef4444">${totalPendentes}</div></div>
+  `;
+  
+  // Chart 1 - Progresso
+  const ctx1 = document.getElementById('chart1').getContext('2d');
+  new Chart(ctx1, {
+    type: 'bar',
+    data: {
+      labels: painel.map(m => m.materia),
+      datasets: [{
+        label: 'Concluído (%)',
+        data: painel.map(m => Math.min(100, m.pct * 100)),
+        backgroundColor: painel.map(m => m.pct >= 0.8 ? '#10b981' : m.pct >= 0.5 ? '#f59e0b' : '#ef4444')
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: true,
+      scales: { x: { max: 100 } },
+      plugins: { legend: { display: false } }
+    }
+  });
+  
+  // Chart 2 - Desempenho
+  const ctx2 = document.getElementById('chart2').getContext('2d');
+  new Chart(ctx2, {
+    type: 'bar',
+    data: {
+      labels: desempenho.map(d => d.materia.substring(0, 20)),
+      datasets: [
+        { label: 'Acertos', data: desempenho.map(d => d.acertos), backgroundColor: '#10b981' },
+        { label: 'Erros', data: desempenho.map(d => d.erros), backgroundColor: '#ef4444' }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      scales: { x: { stacked: true }, y: { stacked: true } }
+    }
+  });
+  
+  // Table
+  const tbody = document.getElementById('table');
+  tbody.innerHTML = '<tr><th>Data</th><th>Matéria</th><th>Tópico</th><th>Tempo</th></tr>';
+  estudos.slice(0, 20).forEach(e => {
+    tbody.innerHTML += `<tr><td>${e.data}</td><td>${e.materia}</td><td>${e.topico.substring(0,40)}</td><td>${e.tempo}min</td></tr>`;
+  });
+}
+
+load();
+</script>
+</body>
+</html>
