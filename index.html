@@ -205,16 +205,20 @@ async function registrarEstudo(){
   if(t==='__novo__'){t=prompt('Novo tópico:');if(!t)return}
   const tipo=document.getElementById('regTipo').value,tempo=document.getElementById('regTempo').value,q=document.getElementById('regQuestoes').value,a=document.getElementById('regAcertos').value,anki=document.getElementById('regAnki').value,st=document.getElementById('regStatus');
   if(!m||!b||!t||!tempo){st.innerHTML='<span style="color:#ef4444">Preencha todos!</span>';return}
-  try{st.innerHTML='⏳';const dados = [m,b,t,tempo,q,a,tipo,anki];
-console.log('Enviando dados:', dados);
-await fetch(API+'?action=addEstudo&data='+encodeURIComponent(dados.join('|')));
-
-function parseEstudos(csvText){const lines=csvText.trim().split('\n');const data=[];for(let i=1;i<lines.length;i++){const row=[];let c='',q=!1;for(let ch of lines[i]){if(ch==='"')q=!q;else if(ch===','&&!q){row.push(c);c=''}else c+=ch}row.push(c);if(!row[0]||row[0].includes('Data'))continue;const ds=row[0].replace(/"/g,'').trim();let d=new Date(ds);if(isNaN(d.getTime())){const parts=ds.split('/');if(parts.length===3)d=new Date(parseInt(parts[2]),parseInt(parts[1])-1,parseInt(parts[0]))}if(isNaN(d.getTime()))continue;const materia=row[1].replace(/"/g,'').trim(),bloco=row[2].replace(/"/g,'').trim(),topico=row[3].replace(/"/g,'').trim(),tempo=parseNum(row[4]),questoes=parseNum(row[5]),acertos=parseNum(row[6]),tipo=row[7]?row[7].replace(/"/g,'').trim():'Teoria',anki=row[8]?parseNum(row[8]):0;if(materia&&tempo>0)data.push({data:d,dataStr:toISO(d),materia,bloco,topico,tempo,questoes,acertos,tipo:tipo||'Teoria',anki})}return data.sort((a,b)=>b.data-a.data)}
-function parsePainel(csvText){const lines=csvText.trim().split('\n');const data=[];let start=!1;for(let i=0;i<lines.length;i++){const row=[];let c='',q=!1;for(let ch of lines[i]){if(ch==='"')q=!q;else if(ch===','&&!q){row.push(c);c=''}else c+=ch}row.push(c);if(row[0]&&row[0].includes('Matéria')){start=!0;continue}if(!start||!row[0]||row[0]==='TOTAL')continue;const t=parseInt(row[1])||0;if(!t)continue;data.push({materia:row[0].replace(/"/g,'').trim(),total:t,estudados:parseInt(row[2])||0,pct:parsePct(row[3]),pendentes:parseInt(row[5])||0})}return data}
-
-async function loadData(){
-  document.getElementById('loading').style.display='flex';
-  try{const[p,e]=await Promise.all([fetch(API+'?sheet=Painel').then(r=>r.text()),fetch(API+'?sheet=Estudos').then(r=>r.text())]);painel=parsePainel(p);estudos=parseEstudos(e);document.getElementById('loading').style.display='none';document.getElementById('lastUpdate').textContent=new Date().toLocaleTimeString('pt-BR');document.getElementById('streakBadge').textContent='🔥 '+calcStreak();renderOverview();renderEvolution();renderSubjects();renderMetas();renderRevisions();document.getElementById('previsaoConclusao').textContent=calcPrevisao()}catch(err){document.getElementById('loading').innerHTML='<p style="color:#ef4444">❌ '+err.message+'</p>'}
+  try{
+    st.innerHTML='⏳';
+    const dados = [m,b,t,tempo,q,a,tipo,anki];
+    console.log('Enviando dados:', dados);
+    await fetch(API+'?action=addEstudo&data='+encodeURIComponent(dados.join('|')));
+    st.innerHTML='<span style="color:#10b981">✅ Registrado!</span>';
+    document.getElementById('regQuestoes').value='0';
+    document.getElementById('regAcertos').value='0';
+    document.getElementById('regAnki').value='0';
+    setTimeout(()=>st.innerHTML='',2000);
+    await loadData();
+  }catch(e){
+    st.innerHTML='<span style="color:#ef4444">Erro: '+e.message+'</span>';
+  }
 }
 
 function calcStreak(){const dias=[...new Set(estudos.map(e=>e.dataStr))].sort().reverse();if(!dias.length)return 0;let s=0;const hoje=toISO(new Date());for(let i=0;i<dias.length;i++){const exp=new Date(hoje);exp.setDate(exp.getDate()-i);if(dias[i]===toISO(exp))s++;else break}return s}
