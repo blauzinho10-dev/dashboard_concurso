@@ -250,8 +250,9 @@ function renderOverview(){
   
   const totalT=painel.reduce((s,m)=>s+m.total,0),totalE=painel.reduce((s,m)=>s+m.estudados,0),totalP=painel.reduce((s,m)=>s+m.pendentes,0);
   const h=filt.reduce((s,e)=>s+e.tempo,0),q=filt.reduce((s,e)=>s+e.questoes,0),a=filt.reduce((s,e)=>s+e.acertos,0),e=q-a,taxa=q?a/q:0,sessoes=filt.length;
-  const anki=filt.reduce((s,e)=>s+e.anki,0);
+  const anki=filt.reduce((s,e)=>s+e.anki,0); // ← CORRIGIDO: depois do filtro
   const hAnt=filtAnt.reduce((s,e)=>s+e.tempo,0),qAnt=filtAnt.reduce((s,e)=>s+e.questoes,0),aAnt=filtAnt.reduce((s,e)=>s+e.acertos,0),sAnt=filtAnt.length;
+  const ankiAnt=filtAnt.reduce((s,e)=>s+e.anki,0);
   
   document.getElementById('kpiOverview').innerHTML=`
     <div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Cobertura</div><div class="kpi-value">${fmtPct(totalT?totalE/totalT:0)}</div><div class="kpi-sub">${totalE}/${totalT}</div></div>
@@ -260,9 +261,12 @@ function renderOverview(){
     <div class="kpi" style="border-top:3px solid #ef4444"><div class="kpi-label">Pendentes</div><div class="kpi-value">${totalP}</div></div>
     <div class="kpi" style="border-top:3px solid #8b5cf6"><div class="kpi-label">Acertos</div><div class="kpi-value">${a}</div><div class="kpi-comp ${calcComp(a,aAnt).cls}">${calcComp(a,aAnt).val} vs ant.</div></div>
     <div class="kpi" style="border-top:3px solid #06b6d4"><div class="kpi-label">Erros</div><div class="kpi-value">${e}</div></div>
-    <div class="kpi" style="border-top:3px solid #a78bfa"><div class="kpi-label">Anki</div><div class="kpi-value">${anki}</div><div class="kpi-sub">cards revisados</div></div>
+    <div class="kpi" style="border-top:3px solid #a78bfa"><div class="kpi-label">🃏 Anki</div><div class="kpi-value">${anki}</div><div class="kpi-comp ${calcComp(anki,ankiAnt).cls}">${calcComp(anki,ankiAnt).val} vs ant.</div></div>
     <div class="kpi" style="border-top:3px solid #84cc16"><div class="kpi-label">Sessões</div><div class="kpi-value">${sessoes}</div><div class="kpi-comp ${calcComp(sessoes,sAnt).cls}">${calcComp(sessoes,sAnt).val} vs ant.</div></div>
   `;
+
+  // ... (o resto dos charts permanece igual)
+}
 
   // Charts
   const sp=[...painel].sort((a,b)=>b.pct-a.pct);
@@ -333,9 +337,9 @@ function renderMetas(){
   const hoje=toISO(new Date()),minH=estudos.filter(e=>e.dataStr===hoje).reduce((s,e)=>s+e.tempo,0),qHoje=estudos.filter(e=>e.dataStr===hoje).reduce((s,e)=>s+e.questoes,0),ankiHoje=estudos.filter(e=>e.dataStr===hoje).reduce((s,e)=>s+e.anki,0);
   document.getElementById('kpiMetas').innerHTML=`<div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Horas</div><div class="kpi-value" style="font-size:1rem">${fmtH(minH)}</div></div><div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Questões</div><div class="kpi-value" style="font-size:1rem">${qHoje}</div></div><div class="kpi" style="border-top:3px solid #a78bfa"><div class="kpi-label">Anki</div><div class="kpi-value" style="font-size:1rem">${ankiHoje}</div></div>`;
   document.getElementById('goalHoras').style.width=Math.min(100,(minH/240)*100)+'%';
-  document.getElementById('goalQuestoes').style.width=Math.min(100,(qHoje/100)*100)+'%';
+  document.getElementById('goalQuestoes').style.width=Math.min(100,(qHoje/120)*100)+'%';
   document.getElementById('metaHoras').textContent=fmtH(minH)+' / 4h';
-  document.getElementById('metaQuestoes').textContent=qHoje+' / 100';
+  document.getElementById('metaQuestoes').textContent=qHoje+' / 120';
   document.getElementById('metaAnki').textContent=ankiHoje+' cards';
 }
 
