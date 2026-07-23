@@ -79,6 +79,10 @@ td{padding:5px 8px;border-bottom:1px solid rgba(30,41,59,.5);color:#cbd5e1}
 .modal h3{color:#fff;margin-bottom:15px}
 .modal .form-group{margin-bottom:10px}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:15px}
+.vinculo-option{display:flex;align-items:center;gap:8px;padding:8px 10px;margin:4px 0;background:#1e293b;border-radius:5px;cursor:pointer;border:2px solid transparent;font-size:.75rem}
+.vinculo-option:hover{border-color:#3b82f6}
+.vinculo-option.selected{border-color:#10b981;background:#0f172a}
+.vinculo-radio{accent-color:#3b82f6;width:16px;height:16px}
 @media(max-width:768px){.grid-2{grid-template-columns:1fr}.timer-display{font-size:2rem}}
 </style>
 </head>
@@ -105,6 +109,7 @@ td{padding:5px 8px;border-bottom:1px solid rgba(30,41,59,.5);color:#cbd5e1}
 <div class="content">
   <div id="loading" class="loading"><div class="spinner"></div><p>Carregando...</p></div>
 
+  <!-- ESTUDAR -->
   <div id="tab-study" class="tab-panel active">
     <div class="grid-2">
       <div class="card"><h3>⏱️ Pomodoro 50/10</h3><div class="timer-display" id="timerDisplay">50:00</div><div class="timer-status" id="timerStatus">Pronto</div><div class="timer-controls"><button class="btn-start" onclick="startPomodoro()">▶</button><button class="btn-pause" onclick="pausePomodoro()">⏸</button><button class="btn-reset" onclick="resetPomodoro()">↺</button></div></div>
@@ -123,6 +128,7 @@ td{padding:5px 8px;border-bottom:1px solid rgba(30,41,59,.5);color:#cbd5e1}
     <div class="card"><h3>🎯 Hoje</h3><div class="kpi-grid" id="kpiMetas"></div><div style="font-size:.7rem"><strong>Horas:</strong> <span id="metaHoras">0,0h / 4h</span><div class="goal-bar"><div class="goal-fill" id="goalHoras" style="width:0%"></div></div><strong>Questões:</strong> <span id="metaQuestoes">0 / 120</span><div class="goal-bar"><div class="goal-fill" id="goalQuestoes" style="width:0%"></div></div><strong>Anki:</strong> <span id="metaAnki">0 cards</span></div></div>
   </div>
 
+  <!-- VISÃO GERAL -->
   <div id="tab-overview" class="tab-panel">
     <div class="filters"><label>Período:</label><select id="overviewPeriodo" onchange="renderOverview()"><option value="mes">Mês</option><option value="semana">Semana</option><option value="15d">15 dias</option><option value="30d">30 dias</option><option value="tudo">Tudo</option></select><label>Matéria:</label><select id="overviewMateria" onchange="renderOverview()"><option value="all">Todas</option></select></div>
     <div class="kpi-grid" id="kpiOverview"></div>
@@ -130,12 +136,14 @@ td{padding:5px 8px;border-bottom:1px solid rgba(30,41,59,.5);color:#cbd5e1}
     <div class="grid-2"><div class="card"><h3>Horas por Matéria</h3><div class="chart-wrap"><canvas id="chartHours"></canvas></div></div><div class="card"><h3>Tipo por Matéria</h3><div class="chart-wrap"><canvas id="chartTipoMateria"></canvas></div></div></div>
   </div>
 
+  <!-- EVOLUÇÃO -->
   <div id="tab-evolution" class="tab-panel">
     <div class="filters"><label>De:</label><input type="date" id="evolDe" onchange="renderEvolution()"><label>Até:</label><input type="date" id="evolAte" onchange="renderEvolution()"><label>Matéria:</label><select id="evolMateria" onchange="renderEvolution()"><option value="all">Todas</option></select></div>
     <div class="grid-2"><div class="card"><h3>Horas por Dia</h3><div class="chart-wrap"><canvas id="chartDailyHours"></canvas></div></div><div class="card"><h3>Horas Acumuladas</h3><div class="chart-wrap"><canvas id="chartCumHours"></canvas></div></div></div>
     <div class="grid-2"><div class="card"><h3>Questões/Acertos</h3><div class="chart-wrap"><canvas id="chartDailyQ"></canvas></div></div><div class="card"><h3>Taxa Semanal</h3><div class="chart-wrap"><canvas id="chartAcertoSemanal"></canvas></div></div></div>
   </div>
 
+  <!-- MATÉRIAS/TÓPICOS -->
   <div id="tab-subjects" class="tab-panel">
     <div class="filters"><label>Matéria:</label><select id="subjMateria" onchange="renderSubjects()"><option value="all">Todas</option></select><label>Bloco:</label><select id="subjBloco" onchange="renderSubjects()"><option value="all">Todos</option></select><label>Tópico:</label><select id="subjTopico" onchange="renderSubjects()"><option value="all">Todos</option></select><label>De:</label><input type="date" id="subjDe" onchange="renderSubjects()"><label>Até:</label><input type="date" id="subjAte" onchange="renderSubjects()"></div>
     <div class="kpi-grid" id="kpiSubjects"></div>
@@ -143,6 +151,7 @@ td{padding:5px 8px;border-bottom:1px solid rgba(30,41,59,.5);color:#cbd5e1}
     <div class="card"><h3>🔍 Raio-X por Tópico</h3><div class="scroll"><table id="topicTable"><thead><tr><th>Matéria</th><th>Bloco</th><th>Tópico</th><th>Horas</th><th>Tipo</th><th>Q</th><th>Taxa</th><th>Anki</th><th>Dificuldade</th><th>Último</th></tr></thead><tbody></tbody></table></div></div>
   </div>
 
+  <!-- REVISÕES -->
   <div id="tab-revisions" class="tab-panel">
     <div class="filters"><label>Matéria:</label><select id="revMateria" onchange="renderRevisions()"><option value="all">Todas</option></select><label>Bloco:</label><select id="revBloco" onchange="renderRevisions()"><option value="all">Todos</option></select><label>Tópico:</label><select id="revTopico" onchange="renderRevisions()"><option value="all">Todos</option></select></div>
     <div id="revisionAlerts"></div>
@@ -150,16 +159,33 @@ td{padding:5px 8px;border-bottom:1px solid rgba(30,41,59,.5);color:#cbd5e1}
   </div>
 </div>
 
+<!-- Modal Adicionar -->
 <div class="modal-overlay" id="modalAdd">
   <div class="modal"><h3 id="modalTitle">Adicionar</h3><div class="form-group"><label id="modalLabel">Nome</label><input type="text" id="modalInput"></div><div class="modal-actions"><button class="btn-sm" onclick="closeModal()">Cancelar</button><button class="btn-submit" style="width:auto" onclick="saveModal()">Salvar</button></div></div>
+</div>
+
+<!-- Modal Vincular -->
+<div class="modal-overlay" id="modalVincular">
+  <div class="modal">
+    <h3>🔗 Vincular Tópico</h3>
+    <div style="font-size:.8rem;color:#94a3b8;margin-bottom:8px" id="vinculoInfo"></div>
+    <div style="font-size:.7rem;color:#f59e0b;margin-bottom:12px" id="vinculoAviso"></div>
+    <p style="font-size:.7rem;color:#94a3b8;margin-bottom:8px">Selecione o estudo mais recente com o qual vincular:</p>
+    <div id="vinculoOpcoes" style="max-height:250px;overflow-y:auto"></div>
+    <div class="modal-actions">
+      <button class="btn-sm" onclick="closeVincular()">Cancelar</button>
+      <button class="btn-submit" style="width:auto;background:#8b5cf6" onclick="confirmarVinculo()">✅ Vincular</button>
+    </div>
+  </div>
 </div>
 
 <script>
 const API='https://script.google.com/macros/s/AKfycbw8N0S4CKaaIYkzZgg_D3tArCXag_iV6ycDLr_09vw2cFSSjskpny0r8lrHbCOpJDwAfA/exec';
 let painel=[],estudos=[],charts={},pomodoroInterval,pomodoroSeconds=3000,isStudying=!0,modalType='';
+let vinculoData=null,vinculoSelecionado=null;
 Chart.register(ChartDataLabels);
 const COLORS=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f43f5e','#84cc16','#e879f9','#fb923c'];
-const TIPO_COLORS={Teoria:'#3b82f6',Questões:'#f59e0b','Teoria+Questões':'#10b981',Anki:'#8b5cf6'};
+const TIPO_COLORS={Teoria:'#3b82f6',Questões:'#f59e0b','Teoria+Questões':'#10b981',Anki:'#8b5cf6',Vinculado:'#a78bfa'};
 
 function parseNum(v){if(v===null||v===undefined||v==='')return 0;v=String(v).replace(/"/g,'').replace(',','.').trim();return parseFloat(v)||0}
 function parsePct(v){if(!v)return 0;v=String(v).replace(/"/g,'').replace('%','').replace(',','.').trim();let n=parseFloat(v);return isNaN(n)?0:n>1?n/100:n}
@@ -201,6 +227,57 @@ async function loadData(){
 
 function calcStreak(){const dias=[...new Set(estudos.map(e=>e.dataStr))].sort().reverse();if(!dias.length)return 0;let s=0;const hoje=toISO(new Date());for(let i=0;i<dias.length;i++){const exp=new Date(hoje);exp.setDate(exp.getDate()-i);if(dias[i]===toISO(exp))s++;else break}return s}
 
+// ==================== VINCULAÇÃO INTELIGENTE ====================
+function showVincularModal(materia,bloco,topico,daysSince){
+  vinculoData={materia,bloco,topico,daysSince};
+  vinculoSelecionado=null;
+  
+  document.getElementById('vinculoInfo').innerHTML=`📚 <strong>${materia}</strong> › ${bloco} › ${topico}`;
+  document.getElementById('vinculoAviso').textContent=`⚠️ ${daysSince} dias sem revisão`;
+  
+  // Busca últimos 8 estudos desta matéria (não vinculados)
+  const recentes=estudos.filter(e=>e.materia===materia&&e.tipo!=='Vinculado').slice(0,8);
+  
+  document.getElementById('vinculoOpcoes').innerHTML=recentes.map((e,i)=>{
+    const dias=Math.floor((new Date()-e.data)/(1000*60*60*24));
+    return`<label class="vinculo-option" onclick="selecionarVinculo(${i})">
+      <input type="radio" name="vinculo" class="vinculo-radio" ${i===0?'checked':''}>
+      <div style="flex:1">
+        <strong>${e.dataStr.split('-').reverse().join('/')}</strong> - ${e.topico.substring(0,40)}<br>
+        <span style="font-size:.65rem;color:#64748b">${e.bloco} · ${e.tempo}min · ${dias}d atrás</span>
+      </div>
+    </label>`;
+  }).join('')||'<div class="empty-state">Nenhum estudo recente encontrado</div>';
+  
+  if(recentes.length>0)vinculoSelecionado=recentes[0];
+  document.getElementById('modalVincular').classList.add('active');
+}
+
+function selecionarVinculo(index){
+  const recentes=estudos.filter(e=>e.materia===vinculoData.materia&&e.tipo!=='Vinculado').slice(0,8);
+  vinculoSelecionado=recentes[index];
+  document.querySelectorAll('.vinculo-option').forEach((el,i)=>el.classList.toggle('selected',i===index));
+}
+
+function closeVincular(){
+  document.getElementById('modalVincular').classList.remove('active');
+  vinculoData=null;vinculoSelecionado=null;
+}
+
+async function confirmarVinculo(){
+  if(!vinculoData||!vinculoSelecionado)return;
+  const {materia,bloco,topico}=vinculoData;
+  const dataVinculo=vinculoSelecionado.dataStr;
+  
+  try{
+    await fetch(API+'?action=addEstudo&data='+encodeURIComponent([materia,bloco,topico,'1','0','0','Vinculado','0']));
+    alert('✅ Vinculado com sucesso!');
+    closeVincular();
+    await loadData();
+  }catch(e){alert('Erro ao vincular')}
+}
+
+// ==================== RENDER FUNCTIONS ====================
 function renderOverview(){
   Object.values(charts).forEach(c=>{try{c.destroy()}catch(e){}});charts={};
   const periodo=document.getElementById('overviewPeriodo')?.value||'mes',matFilt=document.getElementById('overviewMateria')?.value||'all',p=getPeriodo(periodo);
@@ -217,8 +294,9 @@ function renderOverview(){
   
   const byTipo={};filt.forEach(e=>{byTipo[e.tipo]=(byTipo[e.tipo]||0)+e.tempo});
   const tipoEntries=Object.entries(byTipo).sort((a,b)=>b[1]-a[1]);
-   const totalHoras=tipoEntries.reduce((s,e)=>s+e[1],0);
+  const totalHoras=tipoEntries.reduce((s,e)=>s+e[1],0);
   charts.cTipo=new Chart(document.getElementById('chartTipoEstudo').getContext('2d'),{type:'doughnut',data:{labels:tipoEntries.map(e=>e[0]),datasets:[{data:tipoEntries.map(e=>+(e[1]/60).toFixed(1)),backgroundColor:tipoEntries.map(e=>TIPO_COLORS[e[0]]||'#64748b')}]},options:{responsive:!0,maintainAspectRatio:!1,cutout:'55%',plugins:{legend:{position:'bottom',labels:{color:'#fff',font:{size:9},padding:15}},datalabels:{color:'#fff',font:{size:10,weight:'bold'},formatter:(v)=>{const pct=totalHoras>0?((v*60/totalHoras)*100).toFixed(0):0;return v+'h ('+pct+'%)';}}}}});
+
   const hByM={};filt.forEach(e=>{hByM[e.materia]=(hByM[e.materia]||0)+e.tempo});const hByMAnt={};filtAnt.forEach(e=>{hByMAnt[e.materia]=(hByMAnt[e.materia]||0)+e.tempo});
   const hE=Object.entries(hByM).sort((a,b)=>b[1]-a[1]);
   if(hE.length>0){charts.c2=new Chart(document.getElementById('chartHours').getContext('2d'),{type:'bar',data:{labels:hE.map(e=>e[0]),datasets:[{label:'Atual',data:hE.map(e=>+(e[1]/60).toFixed(1)),backgroundColor:'#3b82f6',borderRadius:4},{label:'Anterior',data:hE.map(e=>+((hByMAnt[e[0]]||0)/60).toFixed(1)),backgroundColor:'rgba(148,163,184,.3)',borderRadius:4}]},options:{indexAxis:'y',responsive:!0,maintainAspectRatio:!1,layout:{padding:{right:30}},plugins:{legend:{labels:{color:'#fff',font:{size:9}}},datalabels:{anchor:'end',align:'right',color:'#fff',font:{size:9,weight:'bold'},formatter:v=>v>0?v+'h':''}},scales:{x:{grid:{color:'#1e293b'},ticks:{color:'#94a3b8'}},y:{grid:{display:!1},ticks:{color:'#cbd5e1',font:{size:9}}}}} })}
@@ -281,12 +359,7 @@ function renderRevisions(){
   const revItems=Object.values(topicLast).map(e=>{const ds=Math.floor((hoje-e.data)/(1000*60*60*24));let faixa;if(ds<=5)faixa='🟢 0-5d';else if(ds<=12)faixa='🔵 6-12d';else if(ds<=20)faixa='🟡 13-20d';else if(ds<=30)faixa='🟠 21-30d';else faixa='🔴 30+d';return{...e,daysSince:ds,faixa}}).sort((a,b)=>b.daysSince-a.daysSince);
   const faixa0_5=revItems.filter(r=>r.daysSince<=5).length,faixa30plus=revItems.filter(r=>r.daysSince>30).length;
   document.getElementById('revisionAlerts').innerHTML=`<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:10px">${['🟢 0-5d','🔵 6-12d','🟡 13-20d','🟠 21-30d','🔴 30+d'].map((f,i)=>{const c=[faixa0_5,revItems.filter(r=>r.daysSince>5&&r.daysSince<=12).length,revItems.filter(r=>r.daysSince>12&&r.daysSince<=20).length,revItems.filter(r=>r.daysSince>20&&r.daysSince<=30).length,faixa30plus][i];return`<div class="card" style="text-align:center;border-top:3px solid ${['#10b981','#3b82f6','#f59e0b','#f97316','#ef4444'][i]};padding:8px"><div style="font-size:1.2rem;font-weight:bold;color:${['#10b981','#60a5fa','#f59e0b','#f97316','#ef4444'][i]}">${c}</div><div style="font-size:.6rem;color:#94a3b8">${f}</div></div>`}).join('')}</div>${faixa30plus>0?`<div class="alert danger">🚨 ${faixa30plus} tópicos sem revisão há 30+ dias!</div>`:'<div class="alert success">✅ Revisões em dia!</div>'}`;
-  document.querySelector('#revisionTable tbody').innerHTML=revItems.slice(0,150).map(r=>{let corDias,badgeClass,acaoLabel;if(r.daysSince<=5){corDias='#10b981';badgeClass='badge-green';acaoLabel='Em dia'}else if(r.daysSince<=12){corDias='#60a5fa';badgeClass='badge-blue';acaoLabel='Agendar'}else if(r.daysSince<=20){corDias='#f59e0b';badgeClass='badge-amber';acaoLabel='Revisar'}else if(r.daysSince<=30){corDias='#f97316';badgeClass='badge-amber';acaoLabel='Urgente'}else{corDias='#ef4444';badgeClass='badge-red';acaoLabel='CRÍTICO'}return`<tr><td>${r.materia}</td><td>${r.bloco}</td><td>${r.topico.length>40?r.topico.substring(0,38)+'…':r.topico}</td><td>${r.dataStr.split('-').reverse().join('/')}</td><td style="color:${corDias};font-weight:bold">${r.daysSince}d</td><td><span style="font-size:.6rem">${r.faixa}</span></td><td><span class="badge ${badgeClass}">${acaoLabel}</span></td><td><button class="btn-sm" onclick="vincularTopico('${r.materia.replace(/'/g,"\\'")}','${r.bloco.replace(/'/g,"\\'")}','${r.topico.replace(/'/g,"\\'")}',${r.daysSince})">🔗</button></td></tr>`}).join('')+`<tr><td colspan="8" style="text-align:center;color:#64748b;padding:10px;font-size:.65rem">📊 <strong>${revItems.length}</strong> tópicos | 🟢 <strong>${faixa0_5}</strong> em dia | 🔴 <strong>${faixa30plus}</strong> urgentes</td></tr>`;
-}
-
-async function vincularTopico(materia,bloco,topico,daysSince){
-  if(!confirm(`"${topico}" está há ${daysSince}d sem revisão.\n\nVincular como estudado hoje?`))return;
-  try{await fetch(API+'?action=addEstudo&data='+encodeURIComponent([materia,bloco,topico,'1','0','0','Teoria','0']));alert('✅ Vinculado!');await loadData()}catch(e){alert('Erro')}
+  document.querySelector('#revisionTable tbody').innerHTML=revItems.slice(0,150).map(r=>{let corDias,badgeClass,acaoLabel;if(r.daysSince<=5){corDias='#10b981';badgeClass='badge-green';acaoLabel='Em dia'}else if(r.daysSince<=12){corDias='#60a5fa';badgeClass='badge-blue';acaoLabel='Agendar'}else if(r.daysSince<=20){corDias='#f59e0b';badgeClass='badge-amber';acaoLabel='Revisar'}else if(r.daysSince<=30){corDias='#f97316';badgeClass='badge-amber';acaoLabel='Urgente'}else{corDias='#ef4444';badgeClass='badge-red';acaoLabel='CRÍTICO'}return`<tr><td>${r.materia}</td><td>${r.bloco}</td><td>${r.topico.length>40?r.topico.substring(0,38)+'…':r.topico}</td><td>${r.dataStr.split('-').reverse().join('/')}</td><td style="color:${corDias};font-weight:bold">${r.daysSince}d</td><td><span style="font-size:.6rem">${r.faixa}</span></td><td><span class="badge ${badgeClass}">${acaoLabel}</span></td><td><button class="btn-sm" onclick="showVincularModal('${r.materia.replace(/'/g,"\\'")}','${r.bloco.replace(/'/g,"\\'")}','${r.topico.replace(/'/g,"\\'")}',${r.daysSince})">🔗</button></td></tr>`}).join('')+`<tr><td colspan="8" style="text-align:center;color:#64748b;padding:10px;font-size:.65rem">📊 <strong>${revItems.length}</strong> tópicos | 🟢 <strong>${faixa0_5}</strong> em dia | 🔴 <strong>${faixa30plus}</strong> urgentes</td></tr>`;
 }
 
 updateTimerDisplay();loadMaterias();loadData();
