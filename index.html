@@ -30,6 +30,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0a0e1a;color:#e0e0e0;mi
 .kpi-comp.up{color:#10b981}
 .kpi-comp.down{color:#ef4444}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
 .chart-wrap{position:relative;width:100%;height:300px}
 .chart-wrap-sm{position:relative;width:100%;height:250px}
 table{width:100%;border-collapse:collapse;font-size:.7rem}
@@ -40,6 +41,7 @@ td{padding:5px 8px;border-bottom:1px solid rgba(30,41,59,.5);color:#cbd5e1}
 .badge-amber{background:rgba(245,158,11,.2);color:#f59e0b}
 .badge-red{background:rgba(239,68,68,.2);color:#ef4444}
 .badge-blue{background:rgba(59,130,246,.2);color:#60a5fa}
+.badge-purple{background:rgba(139,92,246,.2);color:#a78bfa}
 .loading{text-align:center;padding:40px;color:#fff;display:flex;flex-direction:column;align-items:center}
 .spinner{width:40px;height:40px;border:3px solid #1e293b;border-top-color:#3b82f6;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -64,6 +66,7 @@ td{padding:5px 8px;border-bottom:1px solid rgba(30,41,59,.5);color:#cbd5e1}
 .form-group label{display:block;font-size:.65rem;color:#94a3b8;margin-bottom:2px}
 .form-group select,.form-group input{width:100%;background:#1e293b;border:1px solid #334155;color:#f1f5f9;padding:6px;border-radius:4px;font-family:inherit;font-size:.78rem}
 .btn-submit{background:#3b82f6;color:#fff;border:none;padding:8px;border-radius:5px;font-weight:bold;cursor:pointer;width:100%;font-size:.8rem}
+.btn-sm{background:#334155;color:#f1f5f9;border:1px solid #475569;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:.65rem}
 .goal-bar{height:8px;background:#1e293b;border-radius:4px;margin:3px 0;overflow:hidden}
 .goal-fill{height:100%;background:linear-gradient(90deg,#3b82f6,#10b981);border-radius:4px;transition:width .5s}
 .rev-overdue{color:#ef4444;font-weight:bold}
@@ -73,13 +76,19 @@ td{padding:5px 8px;border-bottom:1px solid rgba(30,41,59,.5);color:#cbd5e1}
 .empty-state{text-align:center;padding:30px;color:#475569;font-size:.75rem}
 .arrow-up{color:#10b981}
 .arrow-down{color:#ef4444}
-@media(max-width:768px){.grid-2{grid-template-columns:1fr}.timer-display{font-size:2rem}}
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:999;justify-content:center;align-items:center}
+.modal-overlay.active{display:flex}
+.modal{background:#111827;padding:20px;border-radius:10px;border:1px solid #1e293b;max-width:500px;width:90%;max-height:80vh;overflow-y:auto}
+.modal h3{color:#fff;margin-bottom:15px}
+.modal .form-group{margin-bottom:10px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:15px}
+@media(max-width:768px){.grid-2,.grid-3{grid-template-columns:1fr}.timer-display{font-size:2rem}}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>📊 Dashboard</h1>
+  <h1>📊 Caminho da Aprovação</h1>
   <div style="display:flex;align-items:center;gap:8px">
     <span style="background:rgba(245,158,11,.2);color:#f59e0b;padding:2px 8px;border-radius:15px;font-size:.65rem;font-weight:bold">Estudos</span>
     <span id="streakBadge" class="streak-badge">Bora Estudar!</span>
@@ -105,23 +114,26 @@ td{padding:5px 8px;border-bottom:1px solid rgba(30,41,59,.5);color:#cbd5e1}
     <div class="grid-2">
       <div class="card"><h3>⏱️ Pomodoro 50/10</h3><div class="timer-display" id="timerDisplay">50:00</div><div class="timer-status" id="timerStatus">Pronto</div><div class="timer-controls"><button class="btn-start" onclick="startPomodoro()">▶</button><button class="btn-pause" onclick="pausePomodoro()">⏸</button><button class="btn-reset" onclick="resetPomodoro()">↺</button></div></div>
       <div class="card"><h3>📝 Registrar</h3>
-        <div class="form-group"><label>Matéria</label><select id="regMateria" onchange="loadBlocos()"><option value="">Selecione...</option></select></div>
-        <div class="form-group"><label>Bloco</label><select id="regBloco" onchange="loadTopicos()"><option value="">Matéria primeiro</option></select></div>
-        <div class="form-group"><label>Tópico</label><select id="regTopico"><option value="">Bloco primeiro</option></select></div>
+        <div class="form-group"><label>Matéria</label><div style="display:flex;gap:4px"><select id="regMateria" onchange="loadBlocos()" style="flex:1"><option value="">Selecione...</option></select><button class="btn-sm" onclick="showAddModal('materia')" title="Nova matéria">+</button></div></div>
+        <div class="form-group"><label>Bloco</label><div style="display:flex;gap:4px"><select id="regBloco" onchange="loadTopicos()" style="flex:1"><option value="">Matéria primeiro</option></select><button class="btn-sm" onclick="showAddModal('bloco')" title="Novo bloco">+</button></div></div>
+        <div class="form-group"><label>Tópico</label><div style="display:flex;gap:4px"><select id="regTopico" style="flex:1"><option value="">Bloco primeiro</option></select><button class="btn-sm" onclick="showAddModal('topico')" title="Novo tópico">+</button></div></div>
+        <div class="form-group"><label>Tipo de Estudo</label><select id="regTipo"><option value="Teoria">📖 Teoria</option><option value="Questões">📝 Questões</option><option value="Teoria+Questões">📖📝 Teoria+Questões</option><option value="Anki">🃏 Anki</option></select></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px"><div class="form-group"><label>Tempo(min)</label><input type="number" id="regTempo" value="50" min="1"></div><div class="form-group"><label>Questões</label><input type="number" id="regQuestoes" value="0" min="0"></div></div>
         <div class="form-group"><label>Acertos</label><input type="number" id="regAcertos" value="0" min="0"></div>
+        <div class="form-group"><label>Anki (cards revisados)</label><input type="number" id="regAnki" value="0" min="0"></div>
         <button class="btn-submit" onclick="registrarEstudo()">✅ Registrar</button>
         <div id="regStatus" style="margin-top:5px;text-align:center;font-size:.7rem"></div>
       </div>
     </div>
-    <div class="card"><h3>🎯 Hoje</h3><div class="kpi-grid" id="kpiMetas"></div><div style="font-size:.7rem"><strong>Horas:</strong> <span id="metaHoras">0,0h / 4h</span><div class="goal-bar"><div class="goal-fill" id="goalHoras" style="width:0%"></div></div><strong>Questões:</strong> <span id="metaQuestoes">0 / 30</span><div class="goal-bar"><div class="goal-fill" id="goalQuestoes" style="width:0%"></div></div><hr style="border-color:#1e293b;margin:6px 0"><strong>📅 Previsão:</strong> <span id="previsaoConclusao" style="color:#f59e0b">—</span></div></div>
+    <div class="card"><h3>🎯 Hoje</h3><div class="kpi-grid" id="kpiMetas"></div><div style="font-size:.7rem"><strong>Horas:</strong> <span id="metaHoras">0,0h / 4h</span><div class="goal-bar"><div class="goal-fill" id="goalHoras" style="width:0%"></div></div><strong>Questões:</strong> <span id="metaQuestoes">0 / 100</span><div class="goal-bar"><div class="goal-fill" id="goalQuestoes" style="width:0%"></div></div><strong>Anki:</strong> <span id="metaAnki">0 cards</span><hr style="border-color:#1e293b;margin:6px 0"><strong>📅 Previsão:</strong> <span id="previsaoConclusao" style="color:#f59e0b">—</span></div></div>
   </div>
 
   <!-- VISÃO GERAL -->
   <div id="tab-overview" class="tab-panel">
     <div class="filters"><label>Período:</label><select id="overviewPeriodo" onchange="renderOverview()"><option value="mes">Este mês</option><option value="semana">Esta semana</option><option value="15d">Últimos 15 dias</option><option value="30d">Últimos 30 dias</option><option value="tudo">Tudo</option></select><label>Matéria:</label><select id="overviewMateria" onchange="renderOverview()"><option value="all">Todas</option></select></div>
     <div class="kpi-grid" id="kpiOverview"></div>
-    <div class="grid-2"><div class="card"><h3>Progresso por Matéria</h3><div class="chart-wrap"><canvas id="chartProgress"></canvas></div></div><div class="card"><h3>Horas por Matéria</h3><div class="chart-wrap"><canvas id="chartHours"></canvas></div></div></div>
+    <div class="grid-2"><div class="card"><h3>Progresso por Matéria</h3><div class="chart-wrap"><canvas id="chartProgress"></canvas></div></div><div class="card"><h3>Horas por Tipo de Estudo</h3><div class="chart-wrap"><canvas id="chartTipoEstudo"></canvas></div></div></div>
+    <div class="grid-2"><div class="card"><h3>Horas por Matéria</h3><div class="chart-wrap"><canvas id="chartHours"></canvas></div></div><div class="card"><h3>Tempo por Tipo e Matéria</h3><div class="chart-wrap"><canvas id="chartTipoMateria"></canvas></div></div></div>
   </div>
 
   <!-- EVOLUÇÃO -->
@@ -129,26 +141,40 @@ td{padding:5px 8px;border-bottom:1px solid rgba(30,41,59,.5);color:#cbd5e1}
     <div class="filters"><label>De:</label><input type="date" id="evolDe" onchange="renderEvolution()"><label>Até:</label><input type="date" id="evolAte" onchange="renderEvolution()"><label>Matéria:</label><select id="evolMateria" onchange="renderEvolution()"><option value="all">Todas</option></select></div>
     <div class="grid-2"><div class="card"><h3>Horas por Dia</h3><div class="chart-wrap"><canvas id="chartDailyHours"></canvas></div></div><div class="card"><h3>Horas Acumuladas</h3><div class="chart-wrap"><canvas id="chartCumHours"></canvas></div></div></div>
     <div class="grid-2"><div class="card"><h3>Questões/Acertos por Dia</h3><div class="chart-wrap"><canvas id="chartDailyQ"></canvas></div></div><div class="card"><h3>Taxa de Acerto Semanal</h3><div class="chart-wrap"><canvas id="chartAcertoSemanal"></canvas></div></div></div>
-    <div class="card"><h3>Evolução por Matéria (barras lado a lado)</h3><div class="chart-wrap-lg" style="height:400px"><canvas id="chartEvoMateria"></canvas></div></div>
   </div>
 
-  <!-- MATÉRIAS/TÓPICOS (UNIFICADO) -->
+  <!-- MATÉRIAS/TÓPICOS -->
   <div id="tab-subjects" class="tab-panel">
     <div class="filters"><label>Matéria:</label><select id="subjMateria" onchange="renderSubjects()"><option value="all">Todas</option></select><label>Bloco:</label><select id="subjBloco" onchange="renderSubjects()"><option value="all">Todos</option></select><label>Tópico:</label><select id="subjTopico" onchange="renderSubjects()"><option value="all">Todos</option></select><label>De:</label><input type="date" id="subjDe" onchange="renderSubjects()"><label>Até:</label><input type="date" id="subjAte" onchange="renderSubjects()"></div>
     <div class="kpi-grid" id="kpiSubjects"></div>
-    <div class="card"><h3>📊 Comparativo por Matéria</h3><div class="scroll"><table id="compTable"><thead><tr><th>Matéria</th><th>Horas</th><th>vs Ant.</th><th>Questões</th><th>vs Ant.</th><th>Taxa</th><th>vs Ant.</th><th>Sessões</th><th>vs Ant.</th></tr></thead><tbody></tbody></table></div></div>
-    <div class="card"><h3>🔍 Raio-X por Tópico</h3><div class="scroll"><table id="topicTable"><thead><tr><th>Matéria</th><th>Bloco</th><th>Tópico</th><th>Horas</th><th>Q</th><th>Taxa</th><th>Dificuldade</th><th>Último</th></tr></thead><tbody></tbody></table></div></div>
+    <div class="card"><h3>📊 Comparativo por Matéria</h3><div class="scroll"><table id="compTable"><thead><tr><th>Matéria</th><th>Horas</th><th>vs Ant.</th><th>Questões</th><th>vs Ant.</th><th>Taxa</th><th>Sessões</th><th>vs Ant.</th></tr></thead><tbody></tbody></table></div></div>
+    <div class="card"><h3>🔍 Raio-X por Tópico</h3><div class="scroll"><table id="topicTable"><thead><tr><th>Matéria</th><th>Bloco</th><th>Tópico</th><th>Horas</th><th>Tipo</th><th>Q</th><th>Taxa</th><th>Anki</th><th>Dificuldade</th><th>Último</th></tr></thead><tbody></tbody></table></div></div>
   </div>
 
   <!-- REVISÕES -->
-  <div id="tab-revisions" class="tab-panel"><div id="revisionAlerts"></div><div class="card"><h3>Revisões</h3><div class="scroll"><table id="revisionTable"><thead><tr><th>Matéria</th><th>Bloco</th><th>Tópico</th><th>Último</th><th>Dias</th><th>Urgência</th></tr></thead><tbody></tbody></table></div></div></div>
+  <div id="tab-revisions" class="tab-panel">
+    <div class="filters"><label>Matéria:</label><select id="revMateria" onchange="renderRevisions()"><option value="all">Todas</option></select><label>Bloco:</label><select id="revBloco" onchange="renderRevisions()"><option value="all">Todos</option></select><label>Tópico:</label><select id="revTopico" onchange="renderRevisions()"><option value="all">Todos</option></select></div>
+    <div id="revisionAlerts"></div>
+    <div class="card"><h3>Revisões</h3><div class="scroll"><table id="revisionTable"><thead><tr><th>Matéria</th><th>Bloco</th><th>Tópico</th><th>Último</th><th>Dias</th><th>Faixa</th><th>Ação</th><th>Vincular</th></tr></thead><tbody></tbody></table></div></div>
+  </div>
+</div>
+
+<!-- Modal para adicionar matéria/bloco/tópico -->
+<div class="modal-overlay" id="modalAdd">
+  <div class="modal">
+    <h3 id="modalTitle">Adicionar</h3>
+    <div class="form-group"><label id="modalLabel">Nome</label><input type="text" id="modalInput" placeholder="Digite o nome..."></div>
+    <div class="modal-actions"><button class="btn-sm" onclick="closeModal()">Cancelar</button><button class="btn-submit" style="width:auto" onclick="saveModal()">Salvar</button></div>
+  </div>
 </div>
 
 <script>
 const API='https://script.google.com/macros/s/AKfycbyWKWYrs9bOpaQe9-QN-t3QsXUodlG9eiEUmqFTPqPnlWScpi1s3dRa5wHhSFFYjWsgJA/exec';
 let painel=[],estudos=[],charts={},pomodoroInterval,pomodoroSeconds=3000,isStudying=!0;
+let modalType='',modalCallback=null;
 Chart.register(ChartDataLabels);
-const COLORS=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f43f5e','#84cc16','#e879f9','#fb923c','#a78bfa','#34d399','#fbbf24','#f472b6','#22d3ee','#64748b'];
+const COLORS=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f43f5e','#84cc16','#e879f9','#fb923c','#a78bfa','#34d399'];
+const TIPO_COLORS={Teoria:'#3b82f6',Questões:'#f59e0b','Teoria+Questões':'#10b981',Anki:'#8b5cf6'};
 
 function parseNum(v){if(v===null||v===undefined||v==='')return 0;v=String(v).replace(/"/g,'').replace(',','.').trim();return parseFloat(v)||0}
 function parsePct(v){if(!v)return 0;v=String(v).replace(/"/g,'').replace('%','').replace(',','.').trim();let n=parseFloat(v);return isNaN(n)?0:n>1?n/100:n}
@@ -169,6 +195,13 @@ function getPeriodo(periodo){
 }
 function calcComp(atual,anterior){if(anterior===0)return atual>0?{val:'+100%',cls:'up'}:{val:'—',cls:''};const pct=((atual-anterior)/anterior*100);return{val:(pct>=0?'+':'')+pct.toFixed(1)+'%',cls:pct>=0?'up':'down'}}
 
+// Modal
+function showAddModal(type){modalType=type;document.getElementById('modalTitle').textContent='Adicionar '+type;document.getElementById('modalLabel').textContent='Nome da '+type;document.getElementById('modalInput').value='';document.getElementById('modalAdd').classList.add('active')}
+function closeModal(){document.getElementById('modalAdd').classList.remove('active')}
+function saveModal(){const val=document.getElementById('modalInput').value.trim();if(!val)return;const m=document.getElementById('regMateria').value,b=document.getElementById('regBloco').value;if(modalType==='materia'){addMateria(val)}else if(modalType==='bloco'&&m){addItem('bloco',val,m)}else if(modalType==='topico'&&m&&b){addItem('topico',val,m,b)}closeModal()}
+function addMateria(nome){const s=document.getElementById('regMateria');s.innerHTML+=`<option value="${nome}" selected>${nome}</option>`;fetch(API+'?action=addMateria&nome='+encodeURIComponent(nome)+'&total=10')}
+function addItem(type,val,m,b){if(type==='bloco'){const s=document.getElementById('regBloco');s.innerHTML+=`<option value="${val}" selected>${val}</option>`;fetch(API+'?action=addBloco&materia='+encodeURIComponent(m)+'&bloco='+encodeURIComponent(val))}else{const s=document.getElementById('regTopico');s.innerHTML+=`<option value="${val}" selected>${val}</option>`}}
+
 // Pomodoro
 function updateTimerDisplay(){const m=Math.floor(pomodoroSeconds/60),s=pomodoroSeconds%60;document.getElementById('timerDisplay').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')}
 function startPomodoro(){if(pomodoroInterval)return;document.getElementById('timerStatus').textContent='📚 Estudando';pomodoroInterval=setInterval(()=>{pomodoroSeconds--;updateTimerDisplay();if(pomodoroSeconds<=0){clearInterval(pomodoroInterval);pomodoroInterval=null;isStudying?(pomodoroSeconds=600,document.getElementById('timerStatus').textContent='☕ Pausa'):(pomodoroSeconds=3000,document.getElementById('timerStatus').textContent='📚 Estudar');isStudying=!isStudying;updateTimerDisplay()}},1000)}
@@ -178,19 +211,20 @@ function resetPomodoro(){if(pomodoroInterval)clearInterval(pomodoroInterval);pom
 // Matérias/Blocos
 async function loadMaterias(){try{const r=await fetch(API+'?action=getMaterias');const t=await r.text();const m=t.split('|').filter(m=>m.trim());const s=document.getElementById('regMateria');s.innerHTML='<option value="">Selecione...</option>';m.forEach(m=>s.innerHTML+=`<option value="${m}">${m}</option>`)}catch(e){}}
 async function loadBlocos(){const m=document.getElementById('regMateria').value;const s=document.getElementById('regBloco');if(!m){s.innerHTML='<option value="">Matéria primeiro</option>';return}s.innerHTML='<option value="">Carregando...</option>';try{const r=await fetch(API+'?action=getBlocos&materia='+encodeURIComponent(m));const t=await r.text();const b=t.split('|').filter(b=>b.trim());s.innerHTML='<option value="">Selecione...</option>';b.forEach(b=>s.innerHTML+=`<option value="${b}">${b}</option>`)}catch(e){s.innerHTML='<option value="">Erro</option>'}}
-async function loadTopicos(){const m=document.getElementById('regMateria').value,b=document.getElementById('regBloco').value,s=document.getElementById('regTopico');if(!m||!b){s.innerHTML='<option value="">Bloco primeiro</option>';return}const topicos=estudos.filter(e=>e.materia===m&&e.bloco===b).map(e=>e.topico).filter((v,i,a)=>a.indexOf(v)===i).sort();s.innerHTML='<option value="">Selecione...</option>';topicos.forEach(t=>s.innerHTML+=`<option value="${t}">${t}</option>`);if(topicos.length===0)s.innerHTML+='<option value="__novo__">➕ Novo</option>'}
+async function loadTopicos(){const m=document.getElementById('regMateria').value,b=document.getElementById('regBloco').value,s=document.getElementById('regTopico');if(!m||!b){s.innerHTML='<option value="">Bloco primeiro</option>';return}const topicos=estudos.filter(e=>e.materia===m&&e.bloco===b).map(e=>e.topico).filter((v,i,a)=>a.indexOf(v)===i).sort();s.innerHTML='<option value="">Selecione...</option>';topicos.forEach(t=>s.innerHTML+=`<option value="${t}">${t}</option>`);if(topicos.length===0)s.innerHTML+='<option value="__novo__">➕ Novo (use o botão +)</option>'}
 
 async function registrarEstudo(){
   const m=document.getElementById('regMateria').value,b=document.getElementById('regBloco').value;let t=document.getElementById('regTopico').value;
   if(t==='__novo__'){t=prompt('Novo tópico:');if(!t)return}
-  const tempo=document.getElementById('regTempo').value,q=document.getElementById('regQuestoes').value,a=document.getElementById('regAcertos').value,st=document.getElementById('regStatus');
+  const tipo=document.getElementById('regTipo').value,tempo=document.getElementById('regTempo').value,q=document.getElementById('regQuestoes').value,a=document.getElementById('regAcertos').value,anki=document.getElementById('regAnki').value,st=document.getElementById('regStatus');
   if(!m||!b||!t||!tempo){st.innerHTML='<span style="color:#ef4444">Preencha todos!</span>';return}
-  try{st.innerHTML='⏳';await fetch(API+'?action=addEstudo&data='+encodeURIComponent([m,b,t,tempo,q,a].join('|')));st.innerHTML='<span style="color:#10b981">✅</span>';document.getElementById('regQuestoes').value='0';document.getElementById('regAcertos').value='0';setTimeout(()=>st.innerHTML='',2000);await loadData()}catch(e){st.innerHTML='<span style="color:#ef4444">Erro</span>'}
+  try{st.innerHTML='⏳';await fetch(API+'?action=addEstudo&data='+encodeURIComponent([m,b,t,tempo,q,a,tipo,anki].join('|')));st.innerHTML='<span style="color:#10b981">✅</span>';document.getElementById('regQuestoes').value='0';document.getElementById('regAcertos').value='0';document.getElementById('regAnki').value='0';setTimeout(()=>st.innerHTML='',2000);await loadData()}catch(e){st.innerHTML='<span style="color:#ef4444">Erro</span>'}
 }
 
+// Parse
 function parseEstudos(csvText){
   const lines=csvText.trim().split('\n');const data=[];
-  for(let i=1;i<lines.length;i++){const row=[];let c='',q=!1;for(let ch of lines[i]){if(ch==='"')q=!q;else if(ch===','&&!q){row.push(c);c=''}else c+=ch}row.push(c);if(!row[0]||row[0].includes('Data'))continue;const ds=row[0].replace(/"/g,'').trim();let d=new Date(ds);if(isNaN(d.getTime())){const parts=ds.split('/');if(parts.length===3)d=new Date(parseInt(parts[2]),parseInt(parts[1])-1,parseInt(parts[0]))}if(isNaN(d.getTime()))continue;const materia=row[1].replace(/"/g,'').trim(),bloco=row[2].replace(/"/g,'').trim(),topico=row[3].replace(/"/g,'').trim(),tempo=parseNum(row[4]),questoes=parseNum(row[5]),acertos=parseNum(row[6]);if(materia&&tempo>0)data.push({data:d,dataStr:toISO(d),materia,bloco,topico,tempo,questoes,acertos})}
+  for(let i=1;i<lines.length;i++){const row=[];let c='',q=!1;for(let ch of lines[i]){if(ch==='"')q=!q;else if(ch===','&&!q){row.push(c);c=''}else c+=ch}row.push(c);if(!row[0]||row[0].includes('Data'))continue;const ds=row[0].replace(/"/g,'').trim();let d=new Date(ds);if(isNaN(d.getTime())){const parts=ds.split('/');if(parts.length===3)d=new Date(parseInt(parts[2]),parseInt(parts[1])-1,parseInt(parts[0]))}if(isNaN(d.getTime()))continue;const materia=row[1].replace(/"/g,'').trim(),bloco=row[2].replace(/"/g,'').trim(),topico=row[3].replace(/"/g,'').trim(),tempo=parseNum(row[4]),questoes=parseNum(row[5]),acertos=parseNum(row[6]),tipo=row[7]?row[7].replace(/"/g,'').trim():'Teoria',anki=row[8]?parseNum(row[8]):0;if(materia&&tempo>0)data.push({data:d,dataStr:toISO(d),materia,bloco,topico,tempo,questoes,acertos,tipo:tipo||'Teoria',anki})}
   return data.sort((a,b)=>b.data-a.data);
 }
 function parsePainel(csvText){
@@ -201,7 +235,7 @@ function parsePainel(csvText){
 
 async function loadData(){
   document.getElementById('loading').style.display='flex';
-  try{const[p,e]=await Promise.all([fetch(API+'?sheet=Painel').then(r=>r.text()),fetch(API+'?sheet=Estudos').then(r=>r.text())]);painel=parsePainel(p);estudos=parseEstudos(e);document.getElementById('loading').style.display='none';document.getElementById('lastUpdate').textContent=new Date().toLocaleTimeString('pt-BR');const streak=calcStreak();document.getElementById('streakBadge').textContent='🔥 '+streak;renderOverview();renderEvolution();renderSubjects();renderMetas();document.getElementById('previsaoConclusao').textContent=calcPrevisao()}catch(err){document.getElementById('loading').innerHTML='<p style="color:#ef4444">❌ '+err.message+'</p>'}
+  try{const[p,e]=await Promise.all([fetch(API+'?sheet=Painel').then(r=>r.text()),fetch(API+'?sheet=Estudos').then(r=>r.text())]);painel=parsePainel(p);estudos=parseEstudos(e);document.getElementById('loading').style.display='none';document.getElementById('lastUpdate').textContent=new Date().toLocaleTimeString('pt-BR');const streak=calcStreak();document.getElementById('streakBadge').textContent='🔥 '+streak;renderOverview();renderEvolution();renderSubjects();renderMetas();renderRevisions();document.getElementById('previsaoConclusao').textContent=calcPrevisao()}catch(err){document.getElementById('loading').innerHTML='<p style="color:#ef4444">❌ '+err.message+'</p>'}
 }
 
 function calcStreak(){const dias=[...new Set(estudos.map(e=>e.dataStr))].sort().reverse();if(!dias.length)return 0;let s=0;const hoje=toISO(new Date());for(let i=0;i<dias.length;i++){const exp=new Date(hoje);exp.setDate(exp.getDate()-i);if(dias[i]===toISO(exp))s++;else break}return s}
@@ -210,66 +244,64 @@ function calcPrevisao(){const tT=painel.reduce((s,m)=>s+m.total,0),tE=painel.red
 // ==================== VISÃO GERAL ====================
 function renderOverview(){
   Object.values(charts).forEach(c=>{try{c.destroy()}catch(e){}});charts={};
-  const periodo=document.getElementById('overviewPeriodo')?.value||'mes';
-  const matFilt=document.getElementById('overviewMateria')?.value||'all';
-  const p=getPeriodo(periodo);
+  const periodo=document.getElementById('overviewPeriodo')?.value||'mes',matFilt=document.getElementById('overviewMateria')?.value||'all',p=getPeriodo(periodo);
   let filt=estudos.filter(e=>e.dataStr>=p.ini&&e.dataStr<=p.fim);if(matFilt!=='all')filt=filt.filter(e=>e.materia===matFilt);
   let filtAnt=estudos.filter(e=>e.dataStr>=p.iniAnt&&e.dataStr<=p.fimAnt);if(matFilt!=='all')filtAnt=filtAnt.filter(e=>e.materia===matFilt);
   
   const totalT=painel.reduce((s,m)=>s+m.total,0),totalE=painel.reduce((s,m)=>s+m.estudados,0),totalP=painel.reduce((s,m)=>s+m.pendentes,0);
   const h=filt.reduce((s,e)=>s+e.tempo,0),q=filt.reduce((s,e)=>s+e.questoes,0),a=filt.reduce((s,e)=>s+e.acertos,0),e=q-a,taxa=q?a/q:0,sessoes=filt.length;
-  const hAnt=filtAnt.reduce((s,e)=>s+e.tempo,0),qAnt=filtAnt.reduce((s,e)=>s+e.questoes,0),aAnt=filtAnt.reduce((s,e)=>s+e.acertos,0),eAnt=qAnt-aAnt,sAnt=filtAnt.length;
-  
-  const compH=calcComp(h,hAnt),compQ=calcComp(q,qAnt),compA=calcComp(a,aAnt),compE=calcComp(e,eAnt),compS=calcComp(sessoes,sAnt);
+  const anki=filt.reduce((s,e)=>s+e.anki,0);
+  const hAnt=filtAnt.reduce((s,e)=>s+e.tempo,0),qAnt=filtAnt.reduce((s,e)=>s+e.questoes,0),aAnt=filtAnt.reduce((s,e)=>s+e.acertos,0),sAnt=filtAnt.length;
   
   document.getElementById('kpiOverview').innerHTML=`
     <div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Cobertura</div><div class="kpi-value">${fmtPct(totalT?totalE/totalT:0)}</div><div class="kpi-sub">${totalE}/${totalT}</div></div>
-    <div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Horas</div><div class="kpi-value">${fmtH(h)}</div><div class="kpi-comp ${compH.cls}">${compH.val} vs ant.</div></div>
+    <div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Horas</div><div class="kpi-value">${fmtH(h)}</div><div class="kpi-comp ${calcComp(h,hAnt).cls}">${calcComp(h,hAnt).val} vs ant.</div></div>
     <div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Taxa</div><div class="kpi-value">${fmtPct(taxa)}</div><div class="kpi-sub">${q} questões</div></div>
     <div class="kpi" style="border-top:3px solid #ef4444"><div class="kpi-label">Pendentes</div><div class="kpi-value">${totalP}</div></div>
-    <div class="kpi" style="border-top:3px solid #8b5cf6"><div class="kpi-label">Acertos</div><div class="kpi-value">${a}</div><div class="kpi-comp ${compA.cls}">${compA.val} vs ant.</div></div>
-    <div class="kpi" style="border-top:3px solid #06b6d4"><div class="kpi-label">Erros</div><div class="kpi-value">${e}</div><div class="kpi-comp ${compE.cls}">${compE.val} vs ant.</div></div>
-    <div class="kpi" style="border-top:3px solid #84cc16"><div class="kpi-label">Sessões</div><div class="kpi-value">${sessoes}</div><div class="kpi-comp ${compS.cls}">${compS.val} vs ant.</div></div>
+    <div class="kpi" style="border-top:3px solid #8b5cf6"><div class="kpi-label">Acertos</div><div class="kpi-value">${a}</div><div class="kpi-comp ${calcComp(a,aAnt).cls}">${calcComp(a,aAnt).val} vs ant.</div></div>
+    <div class="kpi" style="border-top:3px solid #06b6d4"><div class="kpi-label">Erros</div><div class="kpi-value">${e}</div></div>
+    <div class="kpi" style="border-top:3px solid #a78bfa"><div class="kpi-label">Anki</div><div class="kpi-value">${anki}</div><div class="kpi-sub">cards revisados</div></div>
+    <div class="kpi" style="border-top:3px solid #84cc16"><div class="kpi-label">Sessões</div><div class="kpi-value">${sessoes}</div><div class="kpi-comp ${calcComp(sessoes,sAnt).cls}">${calcComp(sessoes,sAnt).val} vs ant.</div></div>
   `;
 
   // Charts
   const sp=[...painel].sort((a,b)=>b.pct-a.pct);
   charts.c1=new Chart(document.getElementById('chartProgress').getContext('2d'),{type:'bar',data:{labels:sp.map(m=>m.materia),datasets:[{data:sp.map(m=>+(m.pct*100).toFixed(1)),backgroundColor:sp.map(m=>m.pct>=.8?'#10b981':m.pct>=.5?'#f59e0b':'#ef4444'),borderRadius:4}]},options:{indexAxis:'y',responsive:!0,maintainAspectRatio:!1,layout:{padding:{right:30}},plugins:{legend:{display:!1},datalabels:{anchor:'end',align:'right',color:'#fff',font:{size:9,weight:'bold'},formatter:v=>v+'%'}},scales:{x:{max:100,grid:{color:'#1e293b'},ticks:{color:'#94a3b8'}},y:{grid:{display:!1},ticks:{color:'#cbd5e1',font:{size:9}}}}} });
   
+  // Horas por tipo de estudo
+  const byTipo={};filt.forEach(e=>{byTipo[e.tipo]=(byTipo[e.tipo]||0)+e.tempo});
+  const tipoEntries=Object.entries(byTipo).sort((a,b)=>b[1]-a[1]);
+  charts.cTipo=new Chart(document.getElementById('chartTipoEstudo').getContext('2d'),{type:'doughnut',data:{labels:tipoEntries.map(e=>e[0]),datasets:[{data:tipoEntries.map(e=>+(e[1]/60).toFixed(1)),backgroundColor:tipoEntries.map(e=>TIPO_COLORS[e[0]]||'#64748b')}]},options:{responsive:!0,maintainAspectRatio:!1,cutout:'60%',plugins:{legend:{labels:{color:'#fff',font:{size:9}}},datalabels:{color:'#fff',font:{size:9,weight:'bold'},formatter:v=>v+'h'}}}});
+
+  // Horas por matéria
   const hByM={};filt.forEach(e=>{hByM[e.materia]=(hByM[e.materia]||0)+e.tempo});const hByMAnt={};filtAnt.forEach(e=>{hByMAnt[e.materia]=(hByMAnt[e.materia]||0)+e.tempo});
   const hE=Object.entries(hByM).sort((a,b)=>b[1]-a[1]);
-  if(hE.length>0){charts.c2=new Chart(document.getElementById('chartHours').getContext('2d'),{type:'bar',data:{labels:hE.map(e=>e[0]),datasets:[{label:'Período atual',data:hE.map(e=>+(e[1]/60).toFixed(1)),backgroundColor:'#3b82f6',borderRadius:4},{label:'Período anterior',data:hE.map(e=>+((hByMAnt[e[0]]||0)/60).toFixed(1)),backgroundColor:'rgba(148,163,184,.3)',borderRadius:4}]},options:{indexAxis:'y',responsive:!0,maintainAspectRatio:!1,layout:{padding:{right:30}},plugins:{legend:{labels:{color:'#fff',font:{size:9}}},datalabels:{anchor:'end',align:'right',color:'#fff',font:{size:9,weight:'bold'},formatter:v=>v>0?v+'h':''}},scales:{x:{grid:{color:'#1e293b'},ticks:{color:'#94a3b8'}},y:{grid:{display:!1},ticks:{color:'#cbd5e1',font:{size:9}}}}} })}
+  if(hE.length>0){charts.c2=new Chart(document.getElementById('chartHours').getContext('2d'),{type:'bar',data:{labels:hE.map(e=>e[0]),datasets:[{label:'Atual',data:hE.map(e=>+(e[1]/60).toFixed(1)),backgroundColor:'#3b82f6',borderRadius:4},{label:'Anterior',data:hE.map(e=>+((hByMAnt[e[0]]||0)/60).toFixed(1)),backgroundColor:'rgba(148,163,184,.3)',borderRadius:4}]},options:{indexAxis:'y',responsive:!0,maintainAspectRatio:!1,layout:{padding:{right:30}},plugins:{legend:{labels:{color:'#fff',font:{size:9}}},datalabels:{anchor:'end',align:'right',color:'#fff',font:{size:9,weight:'bold'},formatter:v=>v>0?v+'h':''}},scales:{x:{grid:{color:'#1e293b'},ticks:{color:'#94a3b8'}},y:{grid:{display:!1},ticks:{color:'#cbd5e1',font:{size:9}}}}} })}
 
-  // Preenche filtros
+  // Tipo por matéria
+  const mats=[...new Set(filt.map(e=>e.materia))].slice(0,8);
+  const tipos=[...new Set(filt.map(e=>e.tipo))];
+  if(mats.length>0&&tipos.length>0){charts.cTM=new Chart(document.getElementById('chartTipoMateria').getContext('2d'),{type:'bar',data:{labels:mats,datasets:tipos.map(tipo=>({label:tipo,data:mats.map(mat=>+((filt.filter(e=>e.materia===mat&&e.tipo===tipo).reduce((s,e)=>s+e.tempo,0))/60).toFixed(1)),backgroundColor:TIPO_COLORS[tipo]||'#64748b',borderRadius:3}))},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{labels:{color:'#fff',font:{size:8}}},datalabels:{display:!1}},scales:{x:{grid:{display:!1},ticks:{color:'#94a3b8',font:{size:8}}},y:{grid:{color:'#1e293b'},ticks:{color:'#94a3b8',callback:v=>v+'h'}}}}})}
+
   const materias=[...new Set(estudos.map(e=>e.materia))].sort();
-  ['overviewMateria','evolMateria','subjMateria'].forEach(id=>{const el=document.getElementById(id);if(el){const v=el.value;el.innerHTML='<option value="all">Todas</option>'+materias.map(m=>`<option value="${m}">${m}</option>`).join('');if(v)el.value=v}});
+  ['overviewMateria','evolMateria','subjMateria','revMateria'].forEach(id=>{const el=document.getElementById(id);if(el){const v=el.value;el.innerHTML='<option value="all">Todas</option>'+materias.map(m=>`<option value="${m}">${m}</option>`).join('');if(v)el.value=v}});
 }
 
 // ==================== EVOLUÇÃO ====================
 function renderEvolution(){
-  ['cE1','cE2','cE3','cE4','cE5'].forEach(k=>{if(charts[k]){try{charts[k].destroy()}catch(e){}delete charts[k]}});
+  ['cE1','cE2','cE3','cE4'].forEach(k=>{if(charts[k]){try{charts[k].destroy()}catch(e){}delete charts[k]}});
   let filt=[...estudos];const de=document.getElementById('evolDe')?.value,ate=document.getElementById('evolAte')?.value,mat=document.getElementById('evolMateria')?.value;
   if(de)filt=filt.filter(e=>e.dataStr>=de);if(ate)filt=filt.filter(e=>e.dataStr<=ate);if(mat!=='all')filt=filt.filter(e=>e.materia===mat);
-  if(!filt.length){['chartDailyHours','chartCumHours','chartDailyQ','chartAcertoSemanal','chartEvoMateria'].forEach(id=>{const el=document.getElementById(id);if(el)el.parentElement.innerHTML='<div class="empty-state">Sem dados</div>'});return}
+  if(!filt.length){['chartDailyHours','chartCumHours','chartDailyQ','chartAcertoSemanal'].forEach(id=>{const el=document.getElementById(id);if(el)el.parentElement.innerHTML='<div class="empty-state">Sem dados</div>'});return}
   
   const byDate={};filt.forEach(e=>{if(!byDate[e.dataStr])byDate[e.dataStr]={h:0,q:0,a:0};byDate[e.dataStr].h+=e.tempo;byDate[e.dataStr].q+=e.questoes;byDate[e.dataStr].a+=e.acertos});
   const dates=Object.keys(byDate).sort(),fd=d=>{const p=d.split('-');return p[2]+'/'+p[1]};
-
   charts.cE1=new Chart(document.getElementById('chartDailyHours').getContext('2d'),{type:'bar',data:{labels:dates.map(fd),datasets:[{data:dates.map(d=>+(byDate[d].h/60).toFixed(1)),backgroundColor:'rgba(59,130,246,.6)',borderRadius:4}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1},datalabels:{color:'#fff',font:{size:8,weight:'bold'},formatter:v=>v>0?v+'h':'',anchor:'end',align:'top'}},scales:{x:{grid:{display:!1},ticks:{color:'#94a3b8',maxRotation:45,font:{size:8}}},y:{grid:{color:'#1e293b'},ticks:{color:'#94a3b8',callback:v=>v+'h'}}}}});
-  
   let cum=0;charts.cE2=new Chart(document.getElementById('chartCumHours').getContext('2d'),{type:'line',data:{labels:dates.map(fd),datasets:[{data:dates.map(d=>{cum+=byDate[d].h;return+(cum/60).toFixed(1)}),borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.1)',fill:!0,tension:.3,pointRadius:3}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1},datalabels:{display:!1}},scales:{x:{grid:{display:!1},ticks:{color:'#94a3b8',maxRotation:45,font:{size:8}}},y:{grid:{color:'#1e293b'},ticks:{color:'#94a3b8',callback:v=>v+'h'}}}}});
-  
   charts.cE3=new Chart(document.getElementById('chartDailyQ').getContext('2d'),{type:'bar',data:{labels:dates.map(fd),datasets:[{label:'Acertos',data:dates.map(d=>byDate[d].a),backgroundColor:'#10b981',borderRadius:4},{label:'Erros',data:dates.map(d=>byDate[d].q-byDate[d].a),backgroundColor:'#ef4444',borderRadius:4}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{labels:{color:'#fff',font:{size:9}}},datalabels:{display:!1}},scales:{x:{stacked:!0,grid:{display:!1},ticks:{color:'#94a3b8',maxRotation:45,font:{size:8}}},y:{stacked:!0,grid:{color:'#1e293b'},ticks:{color:'#94a3b8'}}}}});
-
-  // Taxa semanal
   const byWeek={};filt.forEach(e=>{if(e.questoes<1)return;const d=new Date(e.data);d.setHours(0,0,0,0);d.setDate(d.getDate()+3-(d.getDay()+6)%7);const w=toISO(d).substring(0,7)+'-S'+Math.ceil((d.getTime()-new Date(d.getFullYear(),0,4).getTime())/(7*86400000));if(!byWeek[w])byWeek[w]={q:0,a:0};byWeek[w].q+=e.questoes;byWeek[w].a+=e.acertos});
   const weeks=Object.keys(byWeek).sort().filter(w=>byWeek[w].q>=5);
   if(weeks.length>0){charts.cE4=new Chart(document.getElementById('chartAcertoSemanal').getContext('2d'),{type:'line',data:{labels:weeks,datasets:[{label:'Taxa %',data:weeks.map(w=>+((byWeek[w].a/byWeek[w].q)*100).toFixed(1)),borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.1)',fill:!0,tension:.3,pointRadius:4,yAxisID:'y'}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1},datalabels:{display:!1}},scales:{y:{max:100,grid:{color:'#1e293b'},ticks:{color:'#94a3b8',callback:v=>v+'%'}},x:{grid:{display:!1},ticks:{color:'#94a3b8',font:{size:8}}}}}})}
-
-  // Evolução por matéria (barras agrupadas por mês)
-  const meses=[...new Set(filt.map(e=>e.dataStr.substring(0,7)))].sort();
-  const mats=[...new Set(filt.map(e=>e.materia))].slice(0,8);
-  if(meses.length>0&&mats.length>0){const fmtMes=m=>{const[n,a]=m.split('-');return['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(a)-1]+'/'+n.substring(2)};charts.cE5=new Chart(document.getElementById('chartEvoMateria').getContext('2d'),{type:'bar',data:{labels:meses.map(fmtMes),datasets:mats.map((mat,i)=>({label:mat,data:meses.map(mes=>+((filt.filter(e=>e.materia===mat&&e.dataStr.substring(0,7)===mes).reduce((s,e)=>s+e.tempo,0))/60).toFixed(1)),backgroundColor:COLORS[i%COLORS.length],borderRadius:2}))},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{labels:{color:'#fff',font:{size:8}}},datalabels:{display:!1}},scales:{x:{grid:{display:!1},ticks:{color:'#94a3b8',font:{size:8}}},y:{grid:{color:'#1e293b'},ticks:{color:'#94a3b8',callback:v=>v+'h'}}}}})}
 }
 
 // ==================== MATÉRIAS/TÓPICOS ====================
@@ -277,147 +309,74 @@ function renderSubjects(){
   let filt=[...estudos];
   const mat=document.getElementById('subjMateria')?.value,bloco=document.getElementById('subjBloco')?.value,topico=document.getElementById('subjTopico')?.value,de=document.getElementById('subjDe')?.value,ate=document.getElementById('subjAte')?.value;
   if(mat!=='all')filt=filt.filter(e=>e.materia===mat);if(bloco!=='all')filt=filt.filter(e=>e.bloco===bloco);if(topico!=='all')filt=filt.filter(e=>e.topico===topico);if(de)filt=filt.filter(e=>e.dataStr>=de);if(ate)filt=filt.filter(e=>e.dataStr<=ate);
-  
   const p=getPeriodo('mes');let filtAnt=estudos.filter(e=>e.dataStr>=p.iniAnt&&e.dataStr<=p.fimAnt);if(mat!=='all')filtAnt=filtAnt.filter(e=>e.materia===mat);if(bloco!=='all')filtAnt=filtAnt.filter(e=>e.bloco===bloco);if(topico!=='all')filtAnt=filtAnt.filter(e=>e.topico===topico);
-  
   const blocos=[...new Set(filt.map(e=>e.bloco))].sort(),topicos=[...new Set(filt.map(e=>e.topico))].sort();
-  ['subjBloco','subjTopico'].forEach((id,i)=>{const el=document.getElementById(id);if(el){const v=el.value;el.innerHTML='<option value="all">Todos</option>'+(i===0?blocos:topicos).map(x=>`<option value="${x}">${x.substring(0,30)}</option>`).join('');if(v)el.value=v}});
+  ['subjBloco','subjTopico','revBloco','revTopico'].forEach((id,i)=>{const el=document.getElementById(id);if(el){const v=el.value;el.innerHTML='<option value="all">Todos</option>'+(i<2?blocos:topicos).map(x=>`<option value="${x}">${x.substring(0,30)}</option>`).join('');if(v)el.value=v}});
   
   const h=filt.reduce((s,e)=>s+e.tempo,0),q=filt.reduce((s,e)=>s+e.questoes,0),a=filt.reduce((s,e)=>s+e.acertos,0),s=filt.length,taxa=q?a/q:0;
   const hAnt=filtAnt.reduce((s,e)=>s+e.tempo,0),qAnt=filtAnt.reduce((s,e)=>s+e.questoes,0),sAnt=filtAnt.length;
-  const compH=calcComp(h,hAnt),compQ=calcComp(q,qAnt),compS=calcComp(s,sAnt);
   
-  document.getElementById('kpiSubjects').innerHTML=`<div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Horas</div><div class="kpi-value">${fmtH(h)}</div><div class="kpi-comp ${compH.cls}">${compH.val} vs ant.</div></div><div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Questões</div><div class="kpi-value">${q}</div><div class="kpi-comp ${compQ.cls}">${compQ.val} vs ant.</div></div><div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Taxa</div><div class="kpi-value">${q?fmtPct(taxa):'—'}</div></div><div class="kpi" style="border-top:3px solid #8b5cf6"><div class="kpi-label">Sessões</div><div class="kpi-value">${s}</div><div class="kpi-comp ${compS.cls}">${compS.val} vs ant.</div></div>`;
+  document.getElementById('kpiSubjects').innerHTML=`<div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Horas</div><div class="kpi-value">${fmtH(h)}</div><div class="kpi-comp ${calcComp(h,hAnt).cls}">${calcComp(h,hAnt).val} vs ant.</div></div><div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Questões</div><div class="kpi-value">${q}</div><div class="kpi-comp ${calcComp(q,qAnt).cls}">${calcComp(q,qAnt).val} vs ant.</div></div><div class="kpi" style="border-top:3px solid #f59e0b"><div class="kpi-label">Taxa</div><div class="kpi-value">${q?fmtPct(taxa):'—'}</div></div><div class="kpi" style="border-top:3px solid #8b5cf6"><div class="kpi-label">Sessões</div><div class="kpi-value">${s}</div><div class="kpi-comp ${calcComp(s,sAnt).cls}">${calcComp(s,sAnt).val} vs ant.</div></div>`;
 
-  // Tabela comparativa por matéria
   const byM={};filt.forEach(e=>{if(!byM[e.materia])byM[e.materia]={h:0,q:0,a:0,s:0};byM[e.materia].h+=e.tempo;byM[e.materia].q+=e.questoes;byM[e.materia].a+=e.acertos;byM[e.materia].s++});
   const byMAnt={};filtAnt.forEach(e=>{if(!byMAnt[e.materia])byMAnt[e.materia]={h:0,q:0,s:0};byMAnt[e.materia].h+=e.tempo;byMAnt[e.materia].q+=e.questoes;byMAnt[e.materia].s++});
-  document.querySelector('#compTable tbody').innerHTML=Object.entries(byM).sort((a,b)=>b[1].h-a[1].h).map(([mat,val])=>{const ant=byMAnt[mat]||{h:0,q:0,s:0};const t=val.q?val.a/val.q:0;return`<tr><td>${mat}</td><td>${fmtH(val.h)}</td><td>${fmtComp(val.h,ant.h)}</td><td>${val.q}</td><td>${fmtComp(val.q,ant.q)}</td><td>${fmtPct(t)}</td><td>—</td><td>${val.s}</td><td>${fmtComp(val.s,ant.s)}</td></tr>`}).join('')||'<tr><td colspan="9" class="empty-state">Sem dados</td></tr>';
+  document.querySelector('#compTable tbody').innerHTML=Object.entries(byM).sort((a,b)=>b[1].h-a[1].h).map(([mat,val])=>{const ant=byMAnt[mat]||{h:0,q:0,s:0};const t=val.q?val.a/val.q:0;return`<tr><td>${mat}</td><td>${fmtH(val.h)}</td><td>${fmtComp(val.h,ant.h)}</td><td>${val.q}</td><td>${fmtComp(val.q,ant.q)}</td><td>${fmtPct(t)}</td><td>${val.s}</td><td>${fmtComp(val.s,ant.s)}</td></tr>`}).join('')||'<tr><td colspan="8" class="empty-state">Sem dados</td></tr>';
   
-  // Raio-X por tópico
-  const byT={};filt.forEach(e=>{const k=e.materia+'|||'+e.bloco+'|||'+e.topico;if(!byT[k])byT[k]={materia:e.materia,bloco:e.bloco,topico:e.topico,h:0,q:0,a:0,ultimo:e.data};byT[k].h+=e.tempo;byT[k].q+=e.questoes;byT[k].a+=e.acertos;if(e.data>byT[k].ultimo)byT[k].ultimo=e.data});
-  document.querySelector('#topicTable tbody').innerHTML=Object.values(byT).sort((a,b)=>b.h-a.h).slice(0,50).map(t=>{const taxa=t.q?t.a/t.q:0,df=taxa>=.7?'Fácil':taxa>=.5?'Médio':'Difícil',bc=taxa>=.7?'badge-green':taxa>=.5?'badge-amber':'badge-red';return`<tr><td>${t.materia}</td><td>${t.bloco}</td><td>${t.topico.substring(0,35)}</td><td>${fmtH(t.h)}</td><td>${t.q||'—'}</td><td><span class="badge ${bc}">${t.q?fmtPct(taxa):'—'}</span></td><td><span class="badge ${bc}">${df}</span></td><td>${toISO(t.ultimo).split('-').reverse().join('/')}</td></tr>`}).join('');
+  const byT={};filt.forEach(e=>{const k=e.materia+'|||'+e.bloco+'|||'+e.topico;if(!byT[k])byT[k]={materia:e.materia,bloco:e.bloco,topico:e.topico,h:0,q:0,a:0,anki:0,tipo:e.tipo,ultimo:e.data};byT[k].h+=e.tempo;byT[k].q+=e.questoes;byT[k].a+=e.acertos;byT[k].anki+=e.anki;if(e.data>byT[k].ultimo)byT[k].ultimo=e.data});
+  document.querySelector('#topicTable tbody').innerHTML=Object.values(byT).sort((a,b)=>b.h-a.h).slice(0,50).map(t=>{const taxa=t.q?t.a/t.q:0,df=taxa>=.7?'Fácil':taxa>=.5?'Médio':'Difícil',bc=taxa>=.7?'badge-green':taxa>=.5?'badge-amber':'badge-red';return`<tr><td>${t.materia}</td><td>${t.bloco}</td><td>${t.topico.substring(0,35)}</td><td>${fmtH(t.h)}</td><td>${t.tipo}</td><td>${t.q||'—'}</td><td><span class="badge ${bc}">${t.q?fmtPct(taxa):'—'}</span></td><td>${t.anki||'—'}</td><td><span class="badge ${bc}">${df}</span></td><td>${toISO(t.ultimo).split('-').reverse().join('/')}</td></tr>`}).join('');
 }
 
 function fmtComp(at,ant){if(ant===0&&at===0)return'—';if(ant===0)return'<span class="arrow-up">+100%</span>';const p=((at-ant)/ant*100);return p>=0?`<span class="arrow-up">▲${p.toFixed(0)}%</span>`:`<span class="arrow-down">▼${Math.abs(p).toFixed(0)}%</span>`}
 
 // ==================== METAS ====================
 function renderMetas(){
-  const hoje=toISO(new Date()),minH=estudos.filter(e=>e.dataStr===hoje).reduce((s,e)=>s+e.tempo,0),qHoje=estudos.filter(e=>e.dataStr===hoje).reduce((s,e)=>s+e.questoes,0);
-  document.getElementById('kpiMetas').innerHTML=`<div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Horas</div><div class="kpi-value" style="font-size:1rem">${fmtH(minH)}</div></div><div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Questões</div><div class="kpi-value" style="font-size:1rem">${qHoje}</div></div>`;
+  const hoje=toISO(new Date()),minH=estudos.filter(e=>e.dataStr===hoje).reduce((s,e)=>s+e.tempo,0),qHoje=estudos.filter(e=>e.dataStr===hoje).reduce((s,e)=>s+e.questoes,0),ankiHoje=estudos.filter(e=>e.dataStr===hoje).reduce((s,e)=>s+e.anki,0);
+  document.getElementById('kpiMetas').innerHTML=`<div class="kpi" style="border-top:3px solid #3b82f6"><div class="kpi-label">Horas</div><div class="kpi-value" style="font-size:1rem">${fmtH(minH)}</div></div><div class="kpi" style="border-top:3px solid #10b981"><div class="kpi-label">Questões</div><div class="kpi-value" style="font-size:1rem">${qHoje}</div></div><div class="kpi" style="border-top:3px solid #a78bfa"><div class="kpi-label">Anki</div><div class="kpi-value" style="font-size:1rem">${ankiHoje}</div></div>`;
   document.getElementById('goalHoras').style.width=Math.min(100,(minH/240)*100)+'%';
-  document.getElementById('goalQuestoes').style.width=Math.min(100,(qHoje/30)*100)+'%';
+  document.getElementById('goalQuestoes').style.width=Math.min(100,(qHoje/100)*100)+'%';
   document.getElementById('metaHoras').textContent=fmtH(minH)+' / 4h';
   document.getElementById('metaQuestoes').textContent=qHoje+' / 100';
+  document.getElementById('metaAnki').textContent=ankiHoje+' cards';
 }
 
-// Revisions no loadData
+// ==================== REVISÕES ====================
 function renderRevisions(){
-  const hoje = new Date();
-  const topicLast = {};
-  estudos.forEach(e => {
-    const k = e.materia + '|||' + e.bloco + '|||' + e.topico;
-    if (!topicLast[k] || e.data > topicLast[k].data) topicLast[k] = e;
-  });
+  const matFilt=document.getElementById('revMateria')?.value||'all',blocoFilt=document.getElementById('revBloco')?.value||'all',topicoFilt=document.getElementById('revTopico')?.value||'all';
+  let filtEstudos=[...estudos];if(matFilt!=='all')filtEstudos=filtEstudos.filter(e=>e.materia===matFilt);if(blocoFilt!=='all')filtEstudos=filtEstudos.filter(e=>e.bloco===blocoFilt);if(topicoFilt!=='all')filtEstudos=filtEstudos.filter(e=>e.topico===topicoFilt);
   
-  const revItems = Object.values(topicLast).map(e => {
-    const ds = Math.floor((hoje - e.data) / (1000 * 60 * 60 * 24));
-    let urgency, faixa;
-    if (ds <= 5) { urgency = 'ok'; faixa = '🟢 0-5 dias'; }
-    else if (ds <= 12) { urgency = 'soon'; faixa = '🔵 6-12 dias'; }
-    else if (ds <= 20) { urgency = 'warning'; faixa = '🟡 13-20 dias'; }
-    else if (ds <= 30) { urgency = 'attention'; faixa = '🟠 21-30 dias'; }
-    else { urgency = 'overdue'; faixa = '🔴 30+ dias'; }
-    return { ...e, daysSince: ds, urgency, faixa };
-  }).sort((a, b) => b.daysSince - a.daysSince);
+  const hoje=new Date(),topicLast={};
+  filtEstudos.forEach(e=>{const k=e.materia+'|||'+e.bloco+'|||'+e.topico;if(!topicLast[k]||e.data>topicLast[k].data)topicLast[k]=e});
+  
+  const revItems=Object.values(topicLast).map(e=>{const ds=Math.floor((hoje-e.data)/(1000*60*60*24));let urgency,faixa;if(ds<=5){urgency='ok';faixa='🟢 0-5d'}else if(ds<=12){urgency='soon';faixa='🔵 6-12d'}else if(ds<=20){urgency='warning';faixa='🟡 13-20d'}else if(ds<=30){urgency='attention';faixa='🟠 21-30d'}else{urgency='overdue';faixa='🔴 30+d'}return{...e,daysSince:ds,urgency,faixa}}).sort((a,b)=>b.daysSince-a.daysSince);
 
-  // Contagem por faixa
-  const faixa0_5 = revItems.filter(r => r.daysSince <= 5).length;
-  const faixa6_12 = revItems.filter(r => r.daysSince > 5 && r.daysSince <= 12).length;
-  const faixa13_20 = revItems.filter(r => r.daysSince > 12 && r.daysSince <= 20).length;
-  const faixa21_30 = revItems.filter(r => r.daysSince > 20 && r.daysSince <= 30).length;
-  const faixa30plus = revItems.filter(r => r.daysSince > 30).length;
-  const totalTopicos = revItems.length;
+  const faixa0_5=revItems.filter(r=>r.daysSince<=5).length,faixa6_12=revItems.filter(r=>r.daysSince>5&&r.daysSince<=12).length,faixa13_20=revItems.filter(r=>r.daysSince>12&&r.daysSince<=20).length,faixa21_30=revItems.filter(r=>r.daysSince>20&&r.daysSince<=30).length,faixa30plus=revItems.filter(r=>r.daysSince>30).length,totalTopicos=revItems.length;
   
-  // Cards de resumo
-  document.getElementById('revisionAlerts').innerHTML = `
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:12px">
-      <div class="card" style="text-align:center;border-top:3px solid #10b981;padding:12px">
-        <div style="font-size:1.8rem;font-weight:bold;color:#10b981">${faixa0_5}</div>
-        <div style="font-size:.7rem;color:#94a3b8">🟢 0-5 dias</div>
-        <div style="font-size:.6rem;color:#64748b">Revisão em dia</div>
-      </div>
-      <div class="card" style="text-align:center;border-top:3px solid #3b82f6;padding:12px">
-        <div style="font-size:1.8rem;font-weight:bold;color:#60a5fa">${faixa6_12}</div>
-        <div style="font-size:.7rem;color:#94a3b8">🔵 6-12 dias</div>
-        <div style="font-size:.6rem;color:#64748b">Revisão próxima</div>
-      </div>
-      <div class="card" style="text-align:center;border-top:3px solid #f59e0b;padding:12px">
-        <div style="font-size:1.8rem;font-weight:bold;color:#f59e0b">${faixa13_20}</div>
-        <div style="font-size:.7rem;color:#94a3b8">🟡 13-20 dias</div>
-        <div style="font-size:.6rem;color:#64748b">Atenção</div>
-      </div>
-      <div class="card" style="text-align:center;border-top:3px solid #f97316;padding:12px">
-        <div style="font-size:1.8rem;font-weight:bold;color:#f97316">${faixa21_30}</div>
-        <div style="font-size:.7rem;color:#94a3b8">🟠 21-30 dias</div>
-        <div style="font-size:.6rem;color:#64748b">Alerta</div>
-      </div>
-      <div class="card" style="text-align:center;border-top:3px solid #ef4444;padding:12px">
-        <div style="font-size:1.8rem;font-weight:bold;color:#ef4444">${faixa30plus}</div>
-        <div style="font-size:.7rem;color:#94a3b8">🔴 30+ dias</div>
-        <div style="font-size:.6rem;color:#64748b">Urgente</div>
-      </div>
+  document.getElementById('revisionAlerts').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:6px;margin-bottom:10px">
+      <div class="card" style="text-align:center;border-top:3px solid #10b981;padding:8px"><div style="font-size:1.2rem;font-weight:bold;color:#10b981">${faixa0_5}</div><div style="font-size:.6rem;color:#94a3b8">🟢 0-5d</div></div>
+      <div class="card" style="text-align:center;border-top:3px solid #3b82f6;padding:8px"><div style="font-size:1.2rem;font-weight:bold;color:#60a5fa">${faixa6_12}</div><div style="font-size:.6rem;color:#94a3b8">🔵 6-12d</div></div>
+      <div class="card" style="text-align:center;border-top:3px solid #f59e0b;padding:8px"><div style="font-size:1.2rem;font-weight:bold;color:#f59e0b">${faixa13_20}</div><div style="font-size:.6rem;color:#94a3b8">🟡 13-20d</div></div>
+      <div class="card" style="text-align:center;border-top:3px solid #f97316;padding:8px"><div style="font-size:1.2rem;font-weight:bold;color:#f97316">${faixa21_30}</div><div style="font-size:.6rem;color:#94a3b8">🟠 21-30d</div></div>
+      <div class="card" style="text-align:center;border-top:3px solid #ef4444;padding:8px"><div style="font-size:1.2rem;font-weight:bold;color:#ef4444">${faixa30plus}</div><div style="font-size:.6rem;color:#94a3b8">🔴 30+d</div></div>
     </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-      <span style="background:rgba(16,185,129,.1);color:#10b981;padding:3px 8px;border-radius:10px;font-size:.65rem">🟢 ${faixa0_5} em dia (${totalTopicos?Math.round(faixa0_5/totalTopicos*100):0}%)</span>
-      <span style="background:rgba(239,68,68,.1);color:#ef4444;padding:3px 8px;border-radius:10px;font-size:.65rem">🔴 ${faixa30plus} urgentes (${totalTopicos?Math.round(faixa30plus/totalTopicos*100):0}%)</span>
-      <span style="background:rgba(148,163,184,.1);color:#94a3b8;padding:3px 8px;border-radius:10px;font-size:.65rem">📊 ${totalTopicos} tópicos no total</span>
-    </div>
-    ${faixa30plus > 0 ? `<div class="alert danger">🚨 ${faixa30plus} tópico(s) sem revisão há mais de 30 dias! Priorize imediatamente.</div>` : ''}
-    ${faixa21_30 > 0 ? `<div class="alert warning">⚠️ ${faixa21_30} tópico(s) entre 21-30 dias sem revisão. Agende esta semana.</div>` : ''}
-    ${faixa30plus === 0 && faixa21_30 === 0 ? `<div class="alert success">✅ Nenhum tópico crítico! Maioria das revisões em dia.</div>` : ''}
+    ${faixa30plus>0?`<div class="alert danger">🚨 ${faixa30plus} tópico(s) sem revisão há 30+ dias!</div>`:''}
+    ${faixa21_30>0?`<div class="alert warning">⚠️ ${faixa21_30} tópico(s) entre 21-30 dias.</div>`:''}
+    ${faixa30plus===0&&faixa21_30===0?`<div class="alert success">✅ Nenhum tópico crítico!</div>`:''}
   `;
-   // Tabela com faixas coloridas + últimos estudados
-  document.querySelector('#revisionTable thead').innerHTML = `
-    <tr>
-      <th>Matéria</th><th>Bloco</th><th>Tópico</th><th>Último Estudo</th><th>Dias</th><th>Faixa</th><th>Ação</th>
-    </tr>`;
-  
-  // Ordenação: mais atrasado primeiro (30+ dias) → mais recente (0-5 dias)
-  document.querySelector('#revisionTable tbody').innerHTML = revItems.slice(0, 150).map(r => {
-    let corDias, badgeClass, faixaLabel, acaoLabel;
-    if (r.daysSince <= 5) {
-      corDias = '#10b981'; badgeClass = 'badge-green'; faixaLabel = '🟢 0-5d'; acaoLabel = 'Em dia';
-    } else if (r.daysSince <= 12) {
-      corDias = '#60a5fa'; badgeClass = 'badge-blue'; faixaLabel = '🔵 6-12d'; acaoLabel = 'Agendar';
-    } else if (r.daysSince <= 20) {
-      corDias = '#f59e0b'; badgeClass = 'badge-amber'; faixaLabel = '🟡 13-20d'; acaoLabel = 'Revisar';
-    } else if (r.daysSince <= 30) {
-      corDias = '#f97316'; badgeClass = 'badge-amber'; faixaLabel = '🟠 21-30d'; acaoLabel = 'Urgente';
-    } else {
-      corDias = '#ef4444'; badgeClass = 'badge-red'; faixaLabel = '🔴 30+d'; acaoLabel = 'CRÍTICO';
-    }
-    return `<tr>
-      <td>${r.materia}</td>
-      <td>${r.bloco}</td>
-      <td>${r.topico.length > 40 ? r.topico.substring(0,38)+'…' : r.topico}</td>
-      <td>${r.dataStr.split('-').reverse().join('/')}</td>
-      <td style="color:${corDias};font-weight:bold">${r.daysSince}d</td>
-      <td><span style="font-size:.65rem">${faixaLabel}</span></td>
-      <td><span class="badge ${badgeClass}">${acaoLabel}</span></td>
-    </tr>`;
-  }).join('') + `
-    <tr><td colspan="7" style="text-align:center;color:#64748b;padding:15px;font-size:.7rem">
-      📊 <strong>${revItems.length}</strong> tópicos monitorados | 
-      🟢 <strong>${faixa0_5}</strong> em dia | 
-      🔴 <strong>${faixa30plus}</strong> urgentes
-    </td></tr>`;
+
+  document.querySelector('#revisionTable tbody').innerHTML=revItems.slice(0,150).map(r=>{let corDias,badgeClass,faixaLabel,acaoLabel;if(r.daysSince<=5){corDias='#10b981';badgeClass='badge-green';faixaLabel='🟢 0-5d';acaoLabel='Em dia'}else if(r.daysSince<=12){corDias='#60a5fa';badgeClass='badge-blue';faixaLabel='🔵 6-12d';acaoLabel='Agendar'}else if(r.daysSince<=20){corDias='#f59e0b';badgeClass='badge-amber';faixaLabel='🟡 13-20d';acaoLabel='Revisar'}else if(r.daysSince<=30){corDias='#f97316';badgeClass='badge-amber';faixaLabel='🟠 21-30d';acaoLabel='Urgente'}else{corDias='#ef4444';badgeClass='badge-red';faixaLabel='🔴 30+d';acaoLabel='CRÍTICO'}
+  return`<tr><td>${r.materia}</td><td>${r.bloco}</td><td>${r.topico.length>40?r.topico.substring(0,38)+'…':r.topico}</td><td>${r.dataStr.split('-').reverse().join('/')}</td><td style="color:${corDias};font-weight:bold">${r.daysSince}d</td><td><span style="font-size:.6rem">${faixaLabel}</span></td><td><span class="badge ${badgeClass}">${acaoLabel}</span></td><td><button class="btn-sm" onclick="vincularTopico('${r.materia.replace(/'/g,"\\'")}','${r.bloco.replace(/'/g,"\\'")}','${r.topico.replace(/'/g,"\\'")}',${r.daysSince})" title="Estudei junto com outro tópico">🔗 Vincular</button></td></tr>`}).join('')+`<tr><td colspan="8" style="text-align:center;color:#64748b;padding:10px;font-size:.65rem">📊 <strong>${totalTopicos}</strong> tópicos | 🟢 <strong>${faixa0_5}</strong> em dia | 🔴 <strong>${faixa30plus}</strong> urgentes</td></tr>`;
+}
+
+async function vincularTopico(materia,bloco,topico,daysSince){
+  const hoje=new Date();const dataStr=toISO(hoje);
+  const novoTopico=prompt(`"${topico}" (${daysSince}d sem revisão)\n\nCom qual tópico você estudou junto?\n\nDigite o nome do tópico que já foi estudado HOJE para vincular a data:`,topico);
+  if(!novoTopico)return;
+  try{await fetch(API+'?action=addEstudo&data='+encodeURIComponent([materia,bloco,topico,'1','0','0','Teoria','0']));alert('✅ Tópico vinculado! Último estudo atualizado para hoje.');await loadData()}catch(e){alert('Erro ao vincular')}
 }
 
 // Init
 updateTimerDisplay();loadMaterias();loadData();
-// Atualiza revisões ao carregar
-const origLoadData=loadData;loadData=async function(){await origLoadData();renderRevisions()};
 </script>
 </body>
 </html>
